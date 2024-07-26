@@ -14,8 +14,11 @@ import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp;
+import org.jline.widget.AutosuggestionWidgets;
+import org.jline.widget.TailTipWidgets;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 @Getter
 @Accessors(fluent = true)
@@ -39,7 +42,14 @@ public final class SimpleTerminal {
         this.lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .completer(new TerminalCompleter())
+                .highlighter(new TerminalHighlighter())
                 .build();
+        var autosuggestion = new AutosuggestionWidgets(this.lineReader);
+        autosuggestion.enable();
+
+        var tailtipWidgets = new TailTipWidgets(this.lineReader, new HashMap<>(), 5, TailTipWidgets.TipType.COMPLETER);
+        tailtipWidgets.enable();
+
         System.setOut(new SimplePrintStream(this.terminal.output()));
 
         this.start();

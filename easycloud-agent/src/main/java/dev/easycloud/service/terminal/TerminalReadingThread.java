@@ -1,6 +1,7 @@
 package dev.easycloud.service.terminal;
 
 
+import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.terminal.logger.LoggerColor;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import org.apache.log4j.Logger;
@@ -30,7 +31,12 @@ public class TerminalReadingThread extends Thread {
         while (!this.isInterrupted()) {
             var line = this.lineReader.readLine(this.prompt);
             if (line != null && !line.isEmpty()) {
-                SimpleLogger.info(line);
+                if(!line.contains(" ")) {
+                    EasyCloudAgent.instance().commandHandler().execute(line, new String[0]);
+                } else {
+                    var args = line.split(" ");
+                    EasyCloudAgent.instance().commandHandler().execute(args[0], line.replaceFirst(args[0], "").split(" "));
+                }
             }
         }
     }
