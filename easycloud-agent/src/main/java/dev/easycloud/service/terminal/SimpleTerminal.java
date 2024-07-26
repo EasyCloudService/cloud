@@ -2,6 +2,7 @@ package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.highlighter.TerminalHighlighter;
+import dev.easycloud.service.terminal.logger.LoggerColor;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import dev.easycloud.service.terminal.stream.SimplePrintStream;
 import lombok.Getter;
@@ -19,6 +20,8 @@ import org.jline.widget.TailTipWidgets;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 @Getter
 @Accessors(fluent = true)
@@ -42,7 +45,7 @@ public final class SimpleTerminal {
         this.lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .completer(new TerminalCompleter())
-                .highlighter(new TerminalHighlighter())
+                //.highlighter(new TerminalHighlighter())
                 .build();
         var autosuggestion = new AutosuggestionWidgets(this.lineReader);
         autosuggestion.enable();
@@ -80,5 +83,15 @@ public final class SimpleTerminal {
             this.lineReader.callWidget(LineReader.REDRAW_LINE);
             this.lineReader.callWidget(LineReader.REDISPLAY);
         }
+
+        SimpleLogger.info("""
+                
+                  ____ ____ ____ _   _ ____ _    ____ _  _ ___
+                  |___ |__| [__   \\_/  |    |    |  | |  | |  \\
+                  |___ |  | ___]   |   |___ |___ |__| |__| |__/
+                  [%RELEASE%] Contributors: FlxwDNS and 1Chickxn
+                """.replace("%RELEASE%", "PRE"));
+
+        SimpleLogger.info(ansi().a("Type").fgRgb(LoggerColor.PRIMARY.rgb()).a(" help ").reset().a("for a list of commands.").toString());
     }
 }

@@ -31,4 +31,8 @@ public final class SimpleLogger {
     public static void info(String line) {
         logger.info(line);
     }
+
+    public static void error(String line) {
+        logger.error(line);
+    }
 }
