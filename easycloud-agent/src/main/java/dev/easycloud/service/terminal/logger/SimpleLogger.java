@@ -15,19 +15,12 @@ public final class SimpleLogger {
 
     static {
         var console = new ConsoleAppender();
-        /*var PATTERN = ansi()
-                .fg(LoggerColor.GRAY.rgb()).a("[")
-                .fg(LoggerColor.WHITE.rgb()).a("%d{HH:mm:ss}")
-                .fg(LoggerColor.GRAY.rgb()).a("]")
-                .fg(LoggerColor.PRIMARY.rgb()).a(" %p: ")
-                .fg(LoggerColor.WHITE.rgb()).a("%m");*/
-
         var PATTERN = ansi()
                 .fgRgb(LoggerColor.GRAY.rgb()).a("[")
                 .fgRgb(LoggerColor.WHITE.rgb()).a("%d{HH:mm:ss}")
                 .fgRgb(LoggerColor.GRAY.rgb()).a("]")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a(" %p: ")
-                .fgRgb(LoggerColor.WHITE.rgb()).a("%m");
+                .reset().a("%m\n");
 
         console.setLayout(new PatternLayout(PATTERN.toString()));
         console.setThreshold(Level.ALL);

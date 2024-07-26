@@ -1,8 +1,12 @@
 package dev.easycloud.service.terminal;
 
 
+import dev.easycloud.service.terminal.logger.LoggerColor;
+import dev.easycloud.service.terminal.logger.SimpleLogger;
 import org.apache.log4j.Logger;
 import org.jline.reader.LineReader;
+
+import static org.fusesource.jansi.Ansi.*;
 
 public class TerminalReadingThread extends Thread {
     private final String prompt;
@@ -14,7 +18,11 @@ public class TerminalReadingThread extends Thread {
 
         this.terminal = terminal;
         this.lineReader = this.terminal.lineReader();
-        this.prompt = "&7▶▷ &fEasy&9Cloud &7» &r";
+        this.prompt = ansi()
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("easyCloud")
+                .fgRgb(LoggerColor.GRAY.rgb()).a("@")
+                .fgRgb(LoggerColor.WHITE.rgb()).a("agent")
+                .fgRgb(LoggerColor.GRAY.rgb()).a(": ").toString();
     }
 
     @Override
@@ -22,7 +30,7 @@ public class TerminalReadingThread extends Thread {
         while (!this.isInterrupted()) {
             var line = this.lineReader.readLine(this.prompt);
             if (line != null && !line.isEmpty()) {
-                System.out.println(line);
+                SimpleLogger.info(line);
             }
         }
     }

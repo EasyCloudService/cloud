@@ -43,8 +43,6 @@ public final class SimpleTerminal {
         System.setOut(new SimplePrintStream(this.terminal.output()));
 
         this.start();
-
-        SimpleLogger.info("test");
     }
 
     public void start() {
