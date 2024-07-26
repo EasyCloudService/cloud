@@ -11,6 +11,9 @@ dependencies {
 
     // define all dependencies that should be downloaded at runtime
     runtimeDownloadOnly("com.google.code.gson:gson:2.11.0")
+    runtimeDownloadOnly("org.jline:jline:3.26.3")
+    runtimeDownloadOnly("log4j:log4j:1.2.17")
+    runtimeDownloadOnly("org.fusesource.jansi:jansi:2.2.0")
 }
 
 tasks.withType<Jar> {
@@ -20,6 +23,7 @@ tasks.withType<Jar> {
     }
 
     from(project(":easycloud-agent").tasks.jar)
+    from(project(":easycloud-api").tasks.jar)
 
     manifest {
         attributes["Main-Class"] = "dev.easycloud.service.EasyCloudLoader"

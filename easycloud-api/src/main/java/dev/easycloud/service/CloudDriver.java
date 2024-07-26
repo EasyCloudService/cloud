@@ -6,7 +6,10 @@ import lombok.experimental.Accessors;
 @Getter
 @Accessors(fluent = true)
 public abstract class CloudDriver {
-    @Getter
-    private CloudDriver instance;
+
+
+    public CloudDriver instance() {
+        return this;
+    }
 
 }

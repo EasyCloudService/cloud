@@ -1,8 +1,17 @@
 package dev.easycloud.service;
 
-public final class EasyCloudAgent {
+import dev.easycloud.service.terminal.SimpleTerminal;
+import lombok.experimental.Accessors;
+
+@Accessors(fluent = true)
+public final class EasyCloudAgent extends CloudDriver {
 
     public EasyCloudAgent() {
-        System.out.println("Hello from EasyCloudAgent!");
+        new SimpleTerminal();
+    }
+
+    @Override
+    public EasyCloudAgent instance() {
+        return this;
     }
 }
