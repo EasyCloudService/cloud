@@ -1,6 +1,7 @@
 package dev.easycloud.service.terminal.completer;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.command.Command;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -20,10 +21,13 @@ public final class TerminalCompleter implements Completer {
             return;
         }
         EasyCloudAgent.instance().commandHandler().commands().stream()
-                .filter(it -> it.name().startsWith(parsedLine.line()))
-                .forEach(it -> {
-                    list.add(new Candidate(it.name()));
-                    it.alias().forEach(it2 -> list.add(new Candidate(it2)));
-                });
+                .filter(it -> it.name().toLowerCase().startsWith(parsedLine.line().toLowerCase()))
+                .forEach(it -> list.add(new Candidate(it.name())));
+
+        for (Command command : EasyCloudAgent.instance().commandHandler().commands()) {
+            command.alias().stream()
+                    .filter(it -> it.toLowerCase().startsWith(parsedLine.line().toLowerCase()))
+                    .forEach(it -> list.add(new Candidate(it)));
+        }
     }
 }

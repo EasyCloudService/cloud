@@ -19,11 +19,15 @@ public final class EasyCloudLoader {
         var classLoader = new ClassPathLoader();
         var storage = Path.of("storage");
 
+        System.out.println("[-] INFO: Starting EasyCloudLoader...");
+
         storage.toFile().mkdirs();
         storage.resolve("jars").toFile().mkdirs();
 
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
+
+        System.out.println("[-] INFO: Loading dependencies...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
                 new StandardRepository("https://repo1.maven.org/maven2/"),
@@ -31,6 +35,7 @@ public final class EasyCloudLoader {
         )).join();
         manager.loadAll(executor, classLoader).join();
 
+        System.out.println("[-] INFO: Extracting jars...");
         List.of("easycloud-agent.jar", "easycloud-api.jar").forEach(it -> {
             try {
                 Files.copy(ClassLoader.getSystemClassLoader().getResourceAsStream(it), storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
@@ -41,6 +46,7 @@ public final class EasyCloudLoader {
         });
         Thread.currentThread().setContextClassLoader(classLoader);
 
+        System.out.println("[-] INFO: Booting EasyCloudAgent...");
         Class.forName("dev.easycloud.service.EasyCloudAgent", true, classLoader).getConstructor().newInstance();
     }
 }

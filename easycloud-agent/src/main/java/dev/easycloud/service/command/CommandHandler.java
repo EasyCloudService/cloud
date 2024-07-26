@@ -2,6 +2,7 @@ package dev.easycloud.service.command;
 
 import dev.easycloud.service.command.impl.ClearCommand;
 import dev.easycloud.service.command.impl.HelpCommand;
+import dev.easycloud.service.command.impl.ShutdownCommand;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -16,7 +17,7 @@ public final class CommandHandler {
 
     public CommandHandler() {
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand()));
+        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand()));
     }
 
     public void execute(String command, String[] args) {

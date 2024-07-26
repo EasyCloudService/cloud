@@ -32,6 +32,10 @@ public final class SimpleLogger {
         logger.info(line);
     }
 
+    public static void warning(String line) {
+        logger.warn(line);
+    }
+
     public static void error(String line) {
         logger.error(line);
     }
