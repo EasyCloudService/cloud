@@ -1,5 +1,6 @@
 plugins {
     id("dev.vankka.dependencydownload.plugin") version ("1.3.1")
+    id("application")
 }
 
 repositories {
@@ -14,6 +15,9 @@ dependencies {
     runtimeDownloadOnly("org.jline:jline:3.26.3")
     runtimeDownloadOnly("log4j:log4j:1.2.17")
     runtimeDownloadOnly("org.fusesource.jansi:jansi:2.2.0")
+
+    runtimeDownloadOnly("dev.httpmarco.evelon:evelon-common:1.0.44-SNAPSHOT")
+    runtimeDownloadOnly("dev.httpmarco.evelon:evelon-sql-h2:1.0.44-SNAPSHOT")
 }
 
 tasks.withType<Jar> {

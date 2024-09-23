@@ -1,11 +1,16 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.category.SimpleCategoryFactory;
 import dev.easycloud.service.command.CommandHandler;
+import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
+import dev.httpmarco.evelon.layer.connection.ConnectionAuthenticationPath;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
+import java.nio.file.Path;
 
 @Getter
 @Accessors(fluent = true)
@@ -18,8 +23,15 @@ public final class EasyCloudAgent extends CloudDriver {
     public EasyCloudAgent() {
         instance = this;
 
+        var storagePath = Path.of("storage").toAbsolutePath();
+
+        FileFactory.writeAsList(storagePath, new HikariConfiguration());
+        ConnectionAuthenticationPath.set(storagePath.resolve("evelon.json").toString());
+
         this.terminal = new SimpleTerminal();
         this.commandHandler = new CommandHandler();
+
+        this.categoryFactory = new SimpleCategoryFactory();
     }
 
     @SneakyThrows

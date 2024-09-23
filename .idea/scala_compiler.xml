@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="Gradle 1" modules="EasyCloudRecode.easycloud-agent.main,EasyCloudRecode.easycloud-agent.test,EasyCloudRecode.easycloud-api.main,EasyCloudRecode.easycloud-api.test,EasyCloudRecode.easycloud-loader.main,EasyCloudRecode.easycloud-loader.test,EasyCloudRecode.main,EasyCloudRecode.test">
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+    </profile>
+  </component>
+</project>

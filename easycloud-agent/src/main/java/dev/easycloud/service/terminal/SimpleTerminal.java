@@ -84,13 +84,20 @@ public final class SimpleTerminal {
             this.lineReader.callWidget(LineReader.REDISPLAY);
         }
 
-        SimpleLogger.info("""
+        SimpleLogger.info(ansi().a("""
                 
                   ____ ____ ____ _   _ ____ _    ____ _  _ ___
                   |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                   |___ |  | ___]   |   |___ |___ |__| |__| |__/
-                  [%RELEASE%] Contributors: FlxwDNS and 1Chickxn
-                """.replace("%RELEASE%", "PRE"));
+                  """)
+                .fgRgb(LoggerColor.GRAY.rgb()).a("[")
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("PRE")
+                .fgRgb(LoggerColor.GRAY.rgb()).a("] ")
+                .reset().a("Contributors: ")
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("FlxwDNS")
+                .reset().a(" and ")
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("1Chickxn")
+                .reset().a("\n").toString());
 
         SimpleLogger.info(ansi().a("Type").fgRgb(LoggerColor.PRIMARY.rgb()).a(" help ").reset().a("for a list of commands.").toString());
     }
