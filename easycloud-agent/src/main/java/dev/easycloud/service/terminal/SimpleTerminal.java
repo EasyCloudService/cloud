@@ -30,7 +30,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Accessors(fluent = true)
 public final class SimpleTerminal {
     private final Terminal terminal;
-    private final LineReader lineReader;
+    private final LineReaderImpl lineReader;
 
     private Thread readingThread;
 
@@ -63,10 +63,9 @@ public final class SimpleTerminal {
 
                 this.flush();
                 this.history.moveToEnd();
-
-                this.completer = new TerminalCompleter();
             }
         };
+        this.lineReader.setCompleter(new TerminalCompleter());
 
         var autoSuggestion = new AutosuggestionWidgets(this.lineReader);
         autoSuggestion.enable();
