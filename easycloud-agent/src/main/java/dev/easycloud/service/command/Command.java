@@ -1,14 +1,13 @@
 package dev.easycloud.service.command;
 
+import dev.easycloud.service.command.sub.SubCommand;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 @Getter
 @Accessors(fluent = true)
@@ -17,7 +16,7 @@ public abstract class Command {
     private final String description;
     private final List<String> aliases;
 
-    private final Map<String, Consumer<String[]>> subCommands = new HashMap<>();
+    private final List<SubCommand> subCommands = new ArrayList<>();
 
     public Command(String name, String description, String... aliases) {
         this.name = name;
@@ -29,7 +28,7 @@ public abstract class Command {
         SimpleLogger.info("Command not implemented!");
     }
 
-    public void addSubCommand(String name, Consumer<String[]> onExecute) {
-        this.subCommands.put(name, onExecute);
+    public void addSubCommand(SubCommand subCommand) {
+        this.subCommands.add(subCommand);
     }
 }

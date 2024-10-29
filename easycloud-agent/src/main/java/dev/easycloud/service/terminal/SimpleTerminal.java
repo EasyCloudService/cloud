@@ -11,10 +11,11 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.LineReaderImpl;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.AttributedString;
 import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 import org.jline.widget.TailTipWidgets;
@@ -44,13 +45,31 @@ public final class SimpleTerminal {
                 .jansi(true)
                 .build();
 
-        this.lineReader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .completer(new TerminalCompleter())
-                //.highlighter(new TerminalHighlighter())
-                .build();
-        var autosuggestion = new AutosuggestionWidgets(this.lineReader);
-        autosuggestion.enable();
+        this.lineReader = new LineReaderImpl(this.terminal) {
+            @Override
+            protected void cleanup() {
+                this.buf.clear();
+                this.post = null;
+                this.prompt = new AttributedString("");
+
+                redisplay(false);
+
+                this.terminal.puts(InfoCmp.Capability.keypad_local);
+                this.terminal.trackMouse(Terminal.MouseTracking.Off);
+
+                if (isSet(Option.BRACKETED_PASTE)) {
+                    this.terminal.writer().write(BRACKETED_PASTE_OFF);
+                }
+
+                this.flush();
+                this.history.moveToEnd();
+
+                this.completer = new TerminalCompleter();
+            }
+        };
+
+        var autoSuggestion = new AutosuggestionWidgets(this.lineReader);
+        autoSuggestion.enable();
 
         var tailtipWidgets = new TailTipWidgets(this.lineReader, new HashMap<>(), 5, TailTipWidgets.TipType.COMPLETER);
         tailtipWidgets.enable();
@@ -81,11 +100,15 @@ public final class SimpleTerminal {
         this.redraw();
     }
 
-    public void redraw() {
+    public void update() {
         if (this.lineReader.isReading()) {
             this.lineReader.callWidget(LineReader.REDRAW_LINE);
             this.lineReader.callWidget(LineReader.REDISPLAY);
         }
+    }
+
+    public void redraw() {
+        this.update();
 
         SimpleLogger.info(ansi().a("""
                 
@@ -93,10 +116,7 @@ public final class SimpleTerminal {
                     |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                     |___ |  | ___]   |   |___ |___ |__| |__| |__/
                   """)
-                .reset().a("  ➥  Hosted on ")
-                .fgRgb(LoggerColor.PRIMARY.rgb()).a("Venocix")
-                .reset().a("\n")
-                .reset().a("  ➥  Current version ")
+                .reset().a("  ➥  Current version: ")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("DEVELOPMENT")
                 .reset().a("\n")
                 .reset().a("  ➥  Contributors: ")

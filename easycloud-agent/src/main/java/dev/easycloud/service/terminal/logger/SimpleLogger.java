@@ -5,6 +5,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.apache.log4j.*;
+import org.jline.utils.InfoCmp;
 
 import static org.fusesource.jansi.Ansi.*;
 
@@ -37,6 +38,6 @@ public final class SimpleLogger {
     }
 
     public static void error(String line) {
-        logger.error(ansi().fgRgb(LoggerColor.ERROR.rgb()).a(line));
+        logger.error(ansi().fgRgb(LoggerColor.ERROR.rgb()).a(line).reset());
     }
 }

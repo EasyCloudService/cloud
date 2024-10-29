@@ -6,19 +6,21 @@ import dev.easycloud.service.terminal.logger.LoggerColor;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import org.apache.log4j.Logger;
 import org.jline.reader.LineReader;
+import org.jline.reader.impl.LineReaderImpl;
 
 import static org.fusesource.jansi.Ansi.*;
 
 public class TerminalReadingThread extends Thread {
     private final String prompt;
     private final SimpleTerminal terminal;
-    private final LineReader lineReader;
+    private final LineReaderImpl lineReader;
 
     public TerminalReadingThread(Logger logger, SimpleTerminal terminal) {
         super("Console-Thread");
 
         this.terminal = terminal;
-        this.lineReader = this.terminal.lineReader();
+        this.lineReader = (LineReaderImpl) this.terminal.lineReader();
+
         this.prompt = ansi()
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("easyCloud")
                 .fgRgb(LoggerColor.GRAY.rgb()).a("@")
