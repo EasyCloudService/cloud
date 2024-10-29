@@ -74,13 +74,9 @@ public final class SimpleTerminal {
         tailtipWidgets.enable();
 
         System.setOut(new SimplePrintStream(this.terminal.output()));
-
-        this.start();
     }
 
     public void start() {
-        this.clear();
-
         this.readingThread = new TerminalReadingThread(SimpleLogger.logger(), this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
             if(exception instanceof UserInterruptException) {
@@ -107,8 +103,6 @@ public final class SimpleTerminal {
     }
 
     public void redraw() {
-        this.update();
-
         SimpleLogger.info(ansi().a("""
                 
                     ____ ____ ____ _   _ ____ _    ____ _  _ ___
@@ -123,5 +117,7 @@ public final class SimpleTerminal {
                 .reset().a(" and ")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("1Chickxn")
                 .reset().a("\n").toString());
+
+        this.update();
     }
 }

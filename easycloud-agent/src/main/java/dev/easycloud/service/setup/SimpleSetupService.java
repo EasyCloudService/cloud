@@ -3,6 +3,7 @@ package dev.easycloud.service.setup;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.setup.resources.SetupServiceResult;
+import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.logger.LoggerColor;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import lombok.Getter;
@@ -41,7 +42,13 @@ public final class SimpleSetupService implements SetupService {
         new Thread(() -> {
             if(tmpSetupList.isEmpty()) {
                 future.complete(new SetupServiceResult(this.answers));
-                EasyCloudAgent.instance().terminal().redraw();
+
+                try {
+                    Thread.sleep(250);
+                    EasyCloudAgent.instance().terminal().clear();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 return;
             }
             var current = this.tmpSetupList.getFirst();
@@ -50,21 +57,23 @@ public final class SimpleSetupService implements SetupService {
 
                 if (current.possible() != null) {
                     SimpleLogger.info(ansi().a("* Possible answers: " + Arrays.toString(current.possible().toArray())));
+                    current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
                 }
             }
 
             EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
-                if(current.possible() != null && current.possible().stream().noneMatch(it -> String.valueOf(it).equalsIgnoreCase(line))) {
+                if(current.possible() != null && current.possible().stream().noneMatch(it -> String.valueOf(it).equalsIgnoreCase(line.replace(" ", "")))) {
                     this.error = true;
                     trigger(future);
                     return;
                 }
                 this.error = false;
+                TerminalCompleter.TEMP_VALUES().clear();
 
                 SimpleLogger.info(ansi().fgRgb(LoggerColor.GRAY.rgb()).a("> ").a(line).reset());
 
                 this.tmpSetupList.remove(current);
-                this.answers.put(current, line);
+                this.answers.put(current, line.replace(" ", ""));
 
                 trigger(future);
             });

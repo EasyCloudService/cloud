@@ -27,7 +27,7 @@ public final class CommandHandler {
                 .filter(it -> it.name().equals(command) || it.aliases().stream().anyMatch(it2 -> it2.equalsIgnoreCase(command)))
                 .findFirst()
                 .ifPresentOrElse(it -> {
-                    if (args.length == 0 || it.subCommands().stream().noneMatch(it2 -> it2.name().equalsIgnoreCase(args[0]))) {
+                    if (args.length == 0 || it.subCommands().stream().noneMatch(it2 -> it2.name().equalsIgnoreCase(args[1]))) {
                         it.executeBase();
                     } else {
                         it.subCommands().stream().filter(it2 -> it2.name().equalsIgnoreCase(args[1]))
@@ -37,19 +37,5 @@ public final class CommandHandler {
                                 .accept(Arrays.copyOfRange(args, 1, args.length));
                     }
                 }, () -> SimpleLogger.info("This command does not exist!"));
-    }
-
-    public List<Command> similar(String context) {
-        if(context.isEmpty()) {
-            return this.commands;
-        }
-
-        List<Command> temp = new ArrayList<>();
-        this.commands.forEach(it -> {
-            if (it.name().toLowerCase().startsWith(context.toLowerCase()) || it.aliases().stream().anyMatch(it2 -> it2.toLowerCase().startsWith(context.toLowerCase()))) {
-                temp.add(it);
-            }
-        });
-        return temp;
     }
 }

@@ -1,18 +1,29 @@
 package dev.easycloud.service.terminal.completer;
 
 import dev.easycloud.service.EasyCloudAgent;
+import lombok.Getter;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TerminalCompleter implements Completer {
+    @Getter
+    private static List<String> TEMP_VALUES = new ArrayList<>();
 
     @Override
     public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> list) {
-        if (parsedLine.line().startsWith(" ") || EasyCloudAgent.instance().terminal().readingThread().prioSub() != null) return;
+        if (parsedLine.line().startsWith(" ")) return;
+
+        if(!TEMP_VALUES.isEmpty()) {
+            TEMP_VALUES.forEach(it -> list.add(new Candidate(it)));
+            return;
+        }
+
+        if(EasyCloudAgent.instance().terminal().readingThread().prioSub() != null) return;
 
         var args = parsedLine.line().split(" ", -1);
         if (args.length >= 2) {
