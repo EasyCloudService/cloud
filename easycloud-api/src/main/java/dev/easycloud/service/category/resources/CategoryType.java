@@ -1,4 +1,4 @@
-package dev.easycloud.service.category.ressources;
+package dev.easycloud.service.category.resources;
 
 public enum CategoryType {
     SERVER,

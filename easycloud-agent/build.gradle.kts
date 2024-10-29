@@ -9,8 +9,8 @@ dependencies {
     compileOnly("log4j:log4j:1.2.17")
     compileOnly("org.fusesource.jansi:jansi:2.2.0")
 
-    compileOnly("dev.httpmarco.evelon:evelon-common:1.0.44-SNAPSHOT")
-    compileOnly("dev.httpmarco.evelon:evelon-sql-h2:1.0.44-SNAPSHOT")
+    compileOnly("dev.httpmarco.evelon:evelon-common:1.0.46-SNAPSHOT")
+    compileOnly("dev.httpmarco.evelon:evelon-sql-h2:1.0.46-SNAPSHOT")
 }
 
 tasks.jar {

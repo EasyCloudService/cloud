@@ -37,6 +37,6 @@ public final class SimpleLogger {
     }
 
     public static void error(String line) {
-        logger.error(line);
+        logger.error(ansi().fgRgb(LoggerColor.ERROR.rgb()).a(line));
     }
 }

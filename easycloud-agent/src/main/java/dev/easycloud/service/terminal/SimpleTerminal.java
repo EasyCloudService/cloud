@@ -1,13 +1,14 @@
 package dev.easycloud.service.terminal;
 
+import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.highlighter.TerminalHighlighter;
 import dev.easycloud.service.terminal.logger.LoggerColor;
 import dev.easycloud.service.terminal.logger.SimpleLogger;
 import dev.easycloud.service.terminal.stream.SimplePrintStream;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
+@Slf4j
 @Getter
 @Accessors(fluent = true)
 public final class SimpleTerminal {
@@ -64,10 +66,11 @@ public final class SimpleTerminal {
         this.readingThread = new TerminalReadingThread(SimpleLogger.logger(), this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
             if(exception instanceof UserInterruptException) {
-                System.exit(0);
+                EasyCloudAgent.instance().shutdown();
+                return;
             }
-            t.interrupt();
-            throw new RuntimeException(exception);
+            exception.printStackTrace();
+            EasyCloudAgent.instance().shutdown();
         });
         this.readingThread.start();
     }
@@ -86,14 +89,17 @@ public final class SimpleTerminal {
 
         SimpleLogger.info(ansi().a("""
                 
-                  ____ ____ ____ _   _ ____ _    ____ _  _ ___
-                  |___ |__| [__   \\_/  |    |    |  | |  | |  \\
-                  |___ |  | ___]   |   |___ |___ |__| |__| |__/
+                    ____ ____ ____ _   _ ____ _    ____ _  _ ___
+                    |___ |__| [__   \\_/  |    |    |  | |  | |  \\
+                    |___ |  | ___]   |   |___ |___ |__| |__| |__/
                   """)
-                .fgRgb(LoggerColor.GRAY.rgb()).a("[")
-                .fgRgb(LoggerColor.PRIMARY.rgb()).a("PRE")
-                .fgRgb(LoggerColor.GRAY.rgb()).a("] ")
-                .reset().a("Contributors: ")
+                .reset().a("  ➥  Hosted on ")
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("Venocix")
+                .reset().a("\n")
+                .reset().a("  ➥  Current version ")
+                .fgRgb(LoggerColor.PRIMARY.rgb()).a("DEVELOPMENT")
+                .reset().a("\n")
+                .reset().a("  ➥  Contributors: ")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(" and ")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("1Chickxn")

@@ -1,6 +1,6 @@
 package dev.easycloud.service.category;
 
-import dev.easycloud.service.category.ressources.Category;
+import dev.easycloud.service.category.resources.Category;
 import dev.httpmarco.evelon.Repository;
 import dev.httpmarco.evelon.sql.h2.H2Layer;
 

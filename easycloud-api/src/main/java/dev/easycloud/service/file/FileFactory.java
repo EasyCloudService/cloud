@@ -2,7 +2,7 @@ package dev.easycloud.service.file;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.easycloud.service.file.ressources.FileEntity;
+import dev.easycloud.service.file.resources.FileEntity;
 
 import java.io.*;
 import java.nio.file.Files;

@@ -1,4 +1,4 @@
-package dev.easycloud.service.file.ressources;
+package dev.easycloud.service.file.resources;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

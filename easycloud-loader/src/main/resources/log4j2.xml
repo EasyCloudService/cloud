@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <!--<PatternLayout pattern="\n[%d{HH:mm:ss}] %level: %msg\n"/>-->
+            <PatternLayout pattern=""/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="console" level="info"/>
+        </Root>
+    </Loggers>
+</Configuration>

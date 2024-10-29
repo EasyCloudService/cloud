@@ -1,18 +1,17 @@
-package dev.easycloud.service.command.impl;
+package dev.easycloud.service.command.resources;
 
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.command.Command;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
 
 import java.util.List;
 
 public final class ClearCommand extends Command {
     public ClearCommand() {
-        super("clear", "Clear the terminal.", List.of("clr"));
+        super("clear", "Clear the terminal.","clr");
     }
 
     @Override
-    public void execute(String[] args) {
+    public void executeBase() {
         EasyCloudAgent.instance().terminal().clear();
     }
 }
