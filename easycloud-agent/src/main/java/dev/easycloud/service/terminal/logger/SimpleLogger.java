@@ -5,7 +5,6 @@ import dev.easycloud.service.EasyCloudAgent;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.apache.log4j.*;
-import org.jline.utils.InfoCmp;
 
 import static org.fusesource.jansi.Ansi.*;
 
@@ -29,15 +28,15 @@ public final class SimpleLogger {
         Logger.getRootLogger().addAppender(console);
     }
 
-    public static void info(String line) {
+    public static void info(Object line) {
         logger.info(line);
     }
 
-    public static void warning(String line) {
+    public static void warning(Object line) {
         logger.warn(line);
     }
 
-    public static void error(String line) {
+    public static void error(Object line) {
         logger.error(ansi().fgRgb(LoggerColor.ERROR.rgb()).a(line).reset());
     }
 }

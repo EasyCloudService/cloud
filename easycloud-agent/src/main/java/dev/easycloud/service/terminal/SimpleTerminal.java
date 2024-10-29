@@ -32,7 +32,7 @@ public final class SimpleTerminal {
     private final Terminal terminal;
     private final LineReaderImpl lineReader;
 
-    private Thread readingThread;
+    private TerminalReadingThread readingThread;
 
     @SneakyThrows
     public SimpleTerminal() {
@@ -123,7 +123,5 @@ public final class SimpleTerminal {
                 .reset().a(" and ")
                 .fgRgb(LoggerColor.PRIMARY.rgb()).a("1Chickxn")
                 .reset().a("\n").toString());
-
-        SimpleLogger.info(ansi().a("Type").fgRgb(LoggerColor.PRIMARY.rgb()).a(" help ").reset().a("for a list of commands.").toString());
     }
 }
