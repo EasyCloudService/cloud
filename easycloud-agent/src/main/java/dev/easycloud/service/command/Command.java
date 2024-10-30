@@ -1,14 +1,15 @@
 package dev.easycloud.service.command;
 
 import dev.easycloud.service.command.sub.SubCommand;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Log4j2
 @Getter
 @Accessors(fluent = true)
 public abstract class Command {
@@ -25,7 +26,7 @@ public abstract class Command {
     }
 
     public void executeBase() {
-        SimpleLogger.info("Command not implemented!");
+        log.info("Command not implemented!");
     }
 
     public void addSubCommand(SubCommand subCommand) {

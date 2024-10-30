@@ -6,11 +6,12 @@ dependencies {
     implementation(project(":easycloud-api"))
 
     compileOnly("org.jline:jline:3.26.3")
-    compileOnly("log4j:log4j:1.2.17")
     compileOnly("org.fusesource.jansi:jansi:2.2.0")
 
-    compileOnly("dev.httpmarco.evelon:evelon-common:1.0.46-SNAPSHOT")
-    compileOnly("dev.httpmarco.evelon:evelon-sql-h2:1.0.46-SNAPSHOT")
+    compileOnly("org.apache.logging.log4j:log4j-core:2.24.1")
+    compileOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
+
+    compileOnly("org.jetbrains:annotations:15.0")
 }
 
 tasks.jar {

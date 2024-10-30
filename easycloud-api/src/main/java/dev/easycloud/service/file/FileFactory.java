@@ -40,26 +40,32 @@ public final class FileFactory {
         }
     }
 
-    public static void write(Path path, Object object) {
-        var file = path.resolve(name(object.getClass()));
-        if (file.toFile().exists()) {
-            file.toFile().delete();
+    public static void writeRaw(Path path, Object object) {
+        if (path.toFile().exists()) {
+            path.toFile().delete();
         }
 
-        try (FileWriter writer = new FileWriter(file.toFile().getPath())) {
+        try (FileWriter writer = new FileWriter(path.toFile().getPath())) {
             GSON.toJson(object, writer);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public static <T> T read(Path path, Class<T> clazz) {
-        var file = path.resolve(name(clazz));
-        try (Reader reader = new FileReader(file.toFile().getPath())) {
+    public static void write(Path path, Object object) {
+        writeRaw(path.resolve(name(object.getClass())), object);
+    }
+
+    public static <T> T readRaw(Path path, Class<T> clazz) {
+        try (Reader reader = new FileReader(path.toFile().getPath())) {
             return GSON.fromJson(reader, clazz);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    public static <T> T read(Path path, Class<T> clazz) {
+        return readRaw(path.resolve(name(clazz)), clazz);
     }
 
     public static void removeDirectory(Path path) {

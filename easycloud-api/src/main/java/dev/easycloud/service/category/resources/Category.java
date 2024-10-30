@@ -1,8 +1,13 @@
 package dev.easycloud.service.category.resources;
 
-public interface Category {
-    String name();
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    int memory();
-    CategoryType type();
+@Getter
+@AllArgsConstructor
+public class Category {
+    private final String name;
+    private final CategoryType type;
+
+    private int memory;
 }

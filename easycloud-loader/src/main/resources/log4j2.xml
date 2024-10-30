@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="dev.easycloud.service.terminal.logger">
+    <Appenders>
+        <Log4jAppender name="Log4jAppender">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Log4jAppender>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Log4jAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+<!--<?xml version="1.0" encoding="UTF-8"?>
 
 <Configuration>
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{HH:mm:ss}] EVELON: %msg\n"/>
+            <PatternLayout pattern="[%d{HH:mm:ss}] %-5level %logger{36} : %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>
@@ -11,4 +25,4 @@
             <AppenderRef ref="console" level="info"/>
         </Root>
     </Loggers>
-</Configuration>
+</Configuration>-->

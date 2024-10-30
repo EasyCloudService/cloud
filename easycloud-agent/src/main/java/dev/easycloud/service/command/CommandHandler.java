@@ -4,14 +4,15 @@ import dev.easycloud.service.command.resources.CategoryCommand;
 import dev.easycloud.service.command.resources.ClearCommand;
 import dev.easycloud.service.command.resources.HelpCommand;
 import dev.easycloud.service.command.resources.ShutdownCommand;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Log4j2
 @Getter
 @Accessors(fluent = true)
 public final class CommandHandler {
@@ -36,6 +37,8 @@ public final class CommandHandler {
                                 .onExecute()
                                 .accept(Arrays.copyOfRange(args, 1, args.length));
                     }
-                }, () -> SimpleLogger.info("This command does not exist!"));
+                }, () -> {
+                    log.error("This command does not exist!");
+                });
     }
 }

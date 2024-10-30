@@ -2,9 +2,7 @@ package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.logger.LoggerColor;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
-import dev.easycloud.service.terminal.stream.SimplePrintStream;
+import dev.easycloud.service.terminal.stream.SimpleLoggingStream;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -29,6 +27,8 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Getter
 @Accessors(fluent = true)
 public final class SimpleTerminal {
+    private final String prompt;
+
     private final Terminal terminal;
     private final LineReaderImpl lineReader;
 
@@ -36,6 +36,12 @@ public final class SimpleTerminal {
 
     @SneakyThrows
     public SimpleTerminal() {
+        this.prompt = ansi()
+                .fgRgb(LogType.PRIMARY.rgb()).a("easyCloud")
+                .fgRgb(LogType.GRAY.rgb()).a("@")
+                .fgRgb(LogType.WHITE.rgb()).a("agent")
+                .fgRgb(LogType.GRAY.rgb()).a(": ").toString();
+
         AnsiConsole.systemInstall();
         this.terminal = TerminalBuilder.builder()
                 .system(true)
@@ -52,7 +58,7 @@ public final class SimpleTerminal {
                 this.post = null;
                 this.prompt = new AttributedString("");
 
-                redisplay(false);
+                redisplay(true);
 
                 this.terminal.puts(InfoCmp.Capability.keypad_local);
                 this.terminal.trackMouse(Terminal.MouseTracking.Off);
@@ -65,6 +71,7 @@ public final class SimpleTerminal {
                 this.history.moveToEnd();
             }
         };
+        this.lineReader.setPrompt("");
         this.lineReader.setCompleter(new TerminalCompleter());
 
         var autoSuggestion = new AutosuggestionWidgets(this.lineReader);
@@ -73,11 +80,19 @@ public final class SimpleTerminal {
         var tailtipWidgets = new TailTipWidgets(this.lineReader, new HashMap<>(), 5, TailTipWidgets.TipType.COMPLETER);
         tailtipWidgets.enable();
 
-        System.setOut(new SimplePrintStream(this.terminal.output()));
+        System.setOut(new SimpleLoggingStream(this::print).printStream());
+        System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
+    }
+
+    private void print(String message) {
+        this.terminal.puts(InfoCmp.Capability.carriage_return);
+        this.terminal.writer().println(message);
+        this.terminal.flush();
+        this.update();
     }
 
     public void start() {
-        this.readingThread = new TerminalReadingThread(SimpleLogger.logger(), this);
+        this.readingThread = new TerminalReadingThread(this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
             if(exception instanceof UserInterruptException) {
                 EasyCloudAgent.instance().shutdown();
@@ -103,21 +118,25 @@ public final class SimpleTerminal {
     }
 
     public void redraw() {
-        SimpleLogger.info(ansi().a("""
-                
+        var layout = ansi().a("""
                     ____ ____ ____ _   _ ____ _    ____ _  _ ___
                     |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                     |___ |  | ___]   |   |___ |___ |__| |__| |__/
                   """)
-                .reset().a("  ➥  Current version: ")
-                .fgRgb(LoggerColor.PRIMARY.rgb()).a("DEVELOPMENT")
+                .reset().a("  - Current version: ")
+                .fgRgb(LogType.PRIMARY.rgb()).a("DEVELOPMENT")
                 .reset().a("\n")
-                .reset().a("  ➥  Contributors: ")
-                .fgRgb(LoggerColor.PRIMARY.rgb()).a("FlxwDNS")
+                .reset().a("  - Contributors: ")
+                .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(" and ")
-                .fgRgb(LoggerColor.PRIMARY.rgb()).a("1Chickxn")
-                .reset().a("\n").toString());
+                .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
+                .reset().a("\n").toString();
 
+        for (String s : layout.split("\n")) {
+            this.terminal.writer().println(s);
+        }
+        this.terminal.writer().println("");
+        
         this.update();
     }
 }

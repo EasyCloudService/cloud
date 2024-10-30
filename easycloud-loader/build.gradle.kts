@@ -11,13 +11,15 @@ dependencies {
     implementation("dev.vankka:dependencydownload-runtime:1.3.1")
 
     // define all dependencies that should be downloaded at runtime
-    runtimeDownloadOnly("com.google.code.gson:gson:2.11.0")
-    runtimeDownloadOnly("org.jline:jline:3.26.3")
-    runtimeDownloadOnly("log4j:log4j:1.2.17")
-    runtimeDownloadOnly("org.fusesource.jansi:jansi:2.2.0")
+    runtimeDownload("com.google.code.gson:gson:2.11.0")
+    runtimeDownload("org.jline:jline:3.26.3")
+    runtimeDownload("org.fusesource.jansi:jansi:2.2.0")
 
-    runtimeDownloadOnly("dev.httpmarco.evelon:evelon-common:1.0.46-SNAPSHOT")
-    runtimeDownloadOnly("dev.httpmarco.evelon:evelon-sql-h2:1.0.46-SNAPSHOT")
+    runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")
+    runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
+
+    runtimeDownload("org.jetbrains:annotations:15.0")
+
 }
 
 tasks.withType<Jar> {

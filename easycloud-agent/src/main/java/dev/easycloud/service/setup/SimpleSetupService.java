@@ -4,9 +4,9 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.setup.resources.SetupServiceResult;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.logger.LoggerColor;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
+import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -14,22 +14,22 @@ import java.util.concurrent.CompletableFuture;
 import static org.fusesource.jansi.Ansi.ansi;
 
 @Getter
+@Slf4j
 public final class SimpleSetupService implements SetupService {
-    private final List<SetupData<?>> tmpSetupList = new ArrayList<>();
+    private final List<SetupData<?>> tempSetupList = new ArrayList<>();
+    private final Map<SetupData<?>, String> answers = new HashMap<>();
 
     @Override
     public SetupService add(SetupData<?> data) {
-        this.tmpSetupList.add(data);
+        this.tempSetupList.add(data);
         return this;
     }
-
-    private final Map<SetupData<?>, Object> answers = new HashMap<>();
 
     @Override
     public CompletableFuture<SetupServiceResult> publish() {
         EasyCloudAgent.instance().terminal().clear();
 
-        SimpleLogger.info("");
+        log.info(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to cancel the setup.").toString());
 
         var future = new CompletableFuture<SetupServiceResult>();
         this.trigger(future);
@@ -38,31 +38,32 @@ public final class SimpleSetupService implements SetupService {
     }
 
     private Boolean error = false;
+
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
-            if(tmpSetupList.isEmpty()) {
+            if (tempSetupList.isEmpty()) {
+                log.info("Setup completed.");
                 future.complete(new SetupServiceResult(this.answers));
-
-                try {
-                    Thread.sleep(250);
-                    EasyCloudAgent.instance().terminal().clear();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 return;
             }
-            var current = this.tmpSetupList.getFirst();
-            if(!this.error) {
-                SimpleLogger.info(ansi().bgRgb(LoggerColor.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset());
+            var current = this.tempSetupList.getFirst();
+            if (!this.error) {
+                log.info(ansi().bgRgb(LogType.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
-                    SimpleLogger.info(ansi().a("* Possible answers: " + Arrays.toString(current.possible().toArray())));
+                    log.info(ansi().a("* Possible answers: " + Arrays.toString(current.possible().toArray())).toString());
                     current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
                 }
             }
 
             EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
-                if(current.possible() != null && current.possible().stream().noneMatch(it -> String.valueOf(it).equalsIgnoreCase(line.replace(" ", "")))) {
+                if(line.equalsIgnoreCase("cancel")) {
+                    log.info(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup canceled.").toString());
+                    future.complete(new SetupServiceResult(new HashMap<>()));
+                    return;
+                }
+
+                if (current.possible() != null && current.possible().stream().noneMatch(it -> String.valueOf(it).equalsIgnoreCase(line.replace(" ", "")))) {
                     this.error = true;
                     trigger(future);
                     return;
@@ -70,9 +71,9 @@ public final class SimpleSetupService implements SetupService {
                 this.error = false;
                 TerminalCompleter.TEMP_VALUES().clear();
 
-                SimpleLogger.info(ansi().fgRgb(LoggerColor.GRAY.rgb()).a("> ").a(line).reset());
+                log.info(ansi().fgRgb(LogType.GRAY.rgb()).a("> ").a(line).reset().toString());
 
-                this.tmpSetupList.remove(current);
+                this.tempSetupList.remove(current);
                 this.answers.put(current, line.replace(" ", ""));
 
                 trigger(future);

@@ -6,7 +6,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 public final class SetupServiceResult {
-    private final Map<SetupData<?>, Object> answers;
+    private final Map<SetupData<?>, String> answers;
 
     public <T> T result(String id, Class<T> clazz) {
         var answer = this.answers.entrySet().stream()
@@ -15,9 +15,9 @@ public final class SetupServiceResult {
                 .findFirst()
                 .orElse(null);
 
-        if(clazz.isEnum()) return (T) Enum.valueOf((Class<? extends Enum>) clazz, String.valueOf(answer));
-        if(clazz == String.class) return (T) String.valueOf(answer);
-        if(clazz == Integer.class) return (T) Integer.valueOf(String.valueOf(answer));
+        if(clazz.isEnum()) return (T) Enum.valueOf((Class<? extends Enum>) clazz, answer);
+        if(clazz == String.class) return (T) answer;
+        if(clazz == Integer.class) return (T) Integer.valueOf(Integer.parseInt(answer));
 
         throw new RuntimeException("Unknown class type: " + clazz);
     }

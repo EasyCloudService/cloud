@@ -5,12 +5,11 @@ import dev.easycloud.service.category.SimpleCategoryFactory;
 import dev.easycloud.service.command.CommandHandler;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.terminal.SimpleTerminal;
-import dev.easycloud.service.terminal.logger.LoggerColor;
-import dev.easycloud.service.terminal.logger.SimpleLogger;
-import dev.httpmarco.evelon.layer.connection.ConnectionAuthenticationPath;
+import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 
@@ -18,6 +17,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 @Getter
 @Accessors(fluent = true)
+@Slf4j
 public final class EasyCloudAgent {
     @Getter
     private static EasyCloudAgent instance;
@@ -33,31 +33,27 @@ public final class EasyCloudAgent {
         long time = System.currentTimeMillis();
         var storagePath = Path.of("storage").toAbsolutePath();
 
-        FileFactory.writeAsList(storagePath, new HikariConfiguration());
-        ConnectionAuthenticationPath.set(storagePath.resolve("evelon.json").toString());
-
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        SimpleLogger.info("Cloud is starting... Some features may not work.");
+        log.info("Cloud is starting... Some features may not work.");
 
-        SimpleLogger.info("CommandHandler - Starting...");
+        log.info("CommandHandler - Starting...");
         this.commandHandler = new CommandHandler();
 
-        SimpleLogger.info("CategoryFactory - Starting...");
+        log.info("CategoryFactory - Starting...");
         this.categoryFactory = new SimpleCategoryFactory();
 
-        SimpleLogger.info("");
-        SimpleLogger.info("The cloud is ready. Type " + ansi().fgRgb(LoggerColor.PRIMARY.rgb()).a("help").reset() + " to get started.");
-        SimpleLogger.info("Took " + ansi().fgRgb(LoggerColor.PRIMARY.rgb()).a((System.currentTimeMillis() - time)).a("ms").reset() + " to start.");
-        SimpleLogger.info("");
+        this.terminal.clear();
+        log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
+        log.info("Took {} to start.", ansi().fgRgb(LogType.PRIMARY.rgb()).a((System.currentTimeMillis() - time)).a("ms").reset());
 
         this.terminal.start();
     }
 
     @SneakyThrows
     public void shutdown() {
-        SimpleLogger.warning("Shutting down...");
+        log.debug("Shutting down...");
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();
