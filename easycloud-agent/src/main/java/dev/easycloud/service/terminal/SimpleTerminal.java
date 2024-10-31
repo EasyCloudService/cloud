@@ -123,10 +123,10 @@ public final class SimpleTerminal {
                     |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                     |___ |  | ___]   |   |___ |___ |__| |__| |__/
                   """)
-                .reset().a("  - Current version: ")
+                .reset().a("  * Current version: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("DEVELOPMENT")
                 .reset().a("\n")
-                .reset().a("  - Contributors: ")
+                .reset().a("  * Contributors: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(" and ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")

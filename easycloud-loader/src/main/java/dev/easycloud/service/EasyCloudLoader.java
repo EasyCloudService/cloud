@@ -9,17 +9,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Executors;
 
 public final class EasyCloudLoader {
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
     @SneakyThrows
     public static void main(String[] args) {
         var classLoader = new ClassPathLoader();
         var storage = Path.of("storage");
 
-        System.out.println("[-] INFO: Starting EasyCloudLoader...");
+        print("Starting EasyCloudLoader...");
 
         storage.toFile().mkdirs();
         storage.resolve("jars").toFile().mkdirs();
@@ -27,7 +30,7 @@ public final class EasyCloudLoader {
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
 
-        System.out.println("[-] INFO: Loading dependencies...");
+        print("Loading dependencies...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
                 new StandardRepository("https://repo1.maven.org/maven2/"),
@@ -35,7 +38,7 @@ public final class EasyCloudLoader {
         )).join();
         manager.loadAll(executor, classLoader).join();
 
-        System.out.println("[-] INFO: Extracting jars...");
+        print("Extracting jars...");
         List.of("easycloud-agent.jar", "easycloud-api.jar").forEach(it -> {
             try {
                 Files.copy(ClassLoader.getSystemClassLoader().getResourceAsStream(it), storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
@@ -46,7 +49,11 @@ public final class EasyCloudLoader {
         });
         Thread.currentThread().setContextClassLoader(classLoader);
 
-        System.out.println("[-] INFO: Booting EasyCloudAgent...");
+        print("Booting EasyCloudAgent...");
         Class.forName("dev.easycloud.service.EasyCloudAgent", true, classLoader).getConstructor().newInstance();
+    }
+
+    private static void print(String message) {
+        System.out.println("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] INFO: " + message);
     }
 }

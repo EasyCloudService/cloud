@@ -51,6 +51,9 @@ public final class TerminalCompleter implements Completer {
 
         EasyCloudAgent.instance().commandHandler()
                 .commands()
-                .forEach(it -> list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true)));
+                .forEach(it -> {
+                    list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true));
+                    it.aliases().forEach(it2 -> list.add(new Candidate(it2, it2, null, it.description(), null, null, true)));
+                });
     }
 }

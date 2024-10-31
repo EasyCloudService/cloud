@@ -30,7 +30,7 @@ public final class EasyCloudAgent {
     public EasyCloudAgent() {
         instance = this;
 
-        long time = System.currentTimeMillis();
+        long timeSinceStart = System.currentTimeMillis();
         var storagePath = Path.of("storage").toAbsolutePath();
 
         this.terminal = new SimpleTerminal();
@@ -46,14 +46,14 @@ public final class EasyCloudAgent {
 
         this.terminal.clear();
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
-        log.info("Took {} to start.", ansi().fgRgb(LogType.PRIMARY.rgb()).a((System.currentTimeMillis() - time)).a("ms").reset());
+        log.info("Took {} to start.", ansi().fgRgb(LogType.PRIMARY.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
 
         this.terminal.start();
     }
 
     @SneakyThrows
     public void shutdown() {
-        log.debug("Shutting down...");
+        log.info("Shutting down... Goodbye!");
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();
