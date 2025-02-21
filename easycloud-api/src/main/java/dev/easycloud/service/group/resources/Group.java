@@ -1,5 +1,6 @@
 package dev.easycloud.service.group.resources;
 
+import dev.easycloud.service.platform.Platform;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Group {
     private final String name;
-    private final GroupType type;
+    private final Platform platform;
 
     private final GroupData data;
 }

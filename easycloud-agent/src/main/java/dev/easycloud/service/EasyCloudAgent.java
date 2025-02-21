@@ -3,6 +3,7 @@ package dev.easycloud.service;
 import dev.easycloud.service.group.GroupFactory;
 import dev.easycloud.service.group.SimpleGroupFactory;
 import dev.easycloud.service.command.CommandHandler;
+import dev.easycloud.service.platform.PlatformFactory;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public final class EasyCloudAgent {
     private final CommandHandler commandHandler;
 
     private final GroupFactory groupFactory;
+    private final PlatformFactory platformFactory;
 
     public EasyCloudAgent() {
         instance = this;
@@ -42,6 +44,11 @@ public final class EasyCloudAgent {
 
         log.info("CategoryFactory - Starting...");
         this.groupFactory = new SimpleGroupFactory();
+
+        log.info("Seaching for platforms...");
+        this.platformFactory = new PlatformFactory();
+        this.platformFactory.refresh();
+        log.info("Found {} platforms.", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.platformFactory.platforms().size()).reset());
 
         //this.terminal.clear();
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());

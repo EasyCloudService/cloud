@@ -3,7 +3,8 @@ package dev.easycloud.service.command.resources;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupData;
-import dev.easycloud.service.group.resources.GroupType;
+import dev.easycloud.service.platform.Platform;
+import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.SubCommand;
 import dev.easycloud.service.setup.SetupService;
@@ -43,7 +44,7 @@ public final class GroupCommand extends Command {
             log.info("");
             log.info(ansi().fgRgb(LogType.PRIMARY.rgb()).a(it.name()).reset());
             log.info("* Memory: {}", it.data().memory() + "mb");
-            log.info("* Type: {}", it.type());
+            log.info("* Platform: {}", it.platform().id());
         });
         log.info("");
     }
@@ -51,7 +52,7 @@ public final class GroupCommand extends Command {
     private void setup(String[] args) {
         SetupService.simple()
                 .add(new SetupData<String>("name", "What should the name be?", null))
-                .add(new SetupData<>("platform", "What should the platform be?", Arrays.stream(GroupType.values()).toList()))
+                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformFactory().platforms().stream().map(Platform::id).toList()))
                 .add(new SetupData<>("memory", "How much memory should the group have?", null))
                 .add(new SetupData<>("always", "How much services should always be online?", null))
                 .add(new SetupData<>("maximum", "How much services should be online maximal? (-1 = no limit)", null))
@@ -59,7 +60,7 @@ public final class GroupCommand extends Command {
                 .thenAccept(it -> {
                     var group = new Group(
                             it.result("name", String.class),
-                            GroupType.SERVER,
+                            null,
                             new GroupData(
                                     it.result("memory", Integer.class),
                                     it.result("always", Integer.class),
