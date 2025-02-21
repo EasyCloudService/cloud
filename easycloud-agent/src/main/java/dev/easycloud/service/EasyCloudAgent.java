@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -73,7 +74,13 @@ public final class EasyCloudAgent {
 
         this.processList.forEach(Process::destroyForcibly);
 
-        Files.deleteIfExists(Path.of("services"));
+        var services = Path.of("services").toFile();
+        String[] entries = services.list();
+        for (String s : entries) {
+            var currentFile = new File(services.getPath(), s);
+            currentFile.delete();
+        }
+        services.delete();
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();

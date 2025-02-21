@@ -3,6 +3,7 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
 import lombok.Getter;
@@ -29,6 +30,9 @@ public final class SimpleServiceFactory implements ServiceFactory {
     @SneakyThrows
     public void launch(Group group, int count) {
         var port = this.freePort();
+        if(group.platform().type().equals(PlatformType.PROXY)) {
+            port = 25565;
+        }
         if (port == -1) {
             log.error("No free port available.");
             return;

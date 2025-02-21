@@ -17,7 +17,7 @@ import java.util.List;
 public class VelocityPlatformInitializer implements PlatformInitializer {
     private final String id = "velocity";
     private final String url = "https://api.papermc.io/v2/projects/velocity";
-    private final PlatformType type = PlatformType.SERVER;
+    private final PlatformType type = PlatformType.PROXY;
 
     private List<String> versions() {
         var response = RequestFactory.getRequest(this.url);
