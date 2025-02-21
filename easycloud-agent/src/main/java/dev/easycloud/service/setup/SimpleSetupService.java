@@ -38,7 +38,6 @@ public final class SimpleSetupService implements SetupService {
     }
 
     private Boolean error = false;
-
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
             if (tempSetupList.isEmpty()) {
@@ -58,6 +57,7 @@ public final class SimpleSetupService implements SetupService {
 
             EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
+                    TerminalCompleter.TEMP_VALUES().clear();
                     log.info(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup canceled.").toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
                     return;
