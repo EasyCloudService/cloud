@@ -8,5 +8,7 @@ import lombok.Getter;
 public final class Platform {
     private final String id;
     private final String initilizerId;
+
+    private final String version;
     private final PlatformType type;
 }

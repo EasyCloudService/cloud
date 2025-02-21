@@ -4,6 +4,8 @@ import dev.easycloud.service.group.GroupFactory;
 import dev.easycloud.service.group.SimpleGroupFactory;
 import dev.easycloud.service.command.CommandHandler;
 import dev.easycloud.service.platform.PlatformFactory;
+import dev.easycloud.service.service.ServiceFactory;
+import dev.easycloud.service.service.SimpleServiceFactory;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
@@ -11,7 +13,10 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -22,9 +27,12 @@ public final class EasyCloudAgent {
     @Getter
     private static EasyCloudAgent instance;
 
+    private final List<Process> processList = new ArrayList<>();
+
     private final SimpleTerminal terminal;
     private final CommandHandler commandHandler;
 
+    private final ServiceFactory serviceFactory;
     private final GroupFactory groupFactory;
     private final PlatformFactory platformFactory;
 
@@ -42,7 +50,9 @@ public final class EasyCloudAgent {
         log.info("CommandHandler - Starting...");
         this.commandHandler = new CommandHandler();
 
-        log.info("CategoryFactory - Starting...");
+        this.serviceFactory = new SimpleServiceFactory();
+
+        log.info("GroupFactory - Starting...");
         this.groupFactory = new SimpleGroupFactory();
 
         log.info("Seaching for platforms...");
@@ -60,6 +70,10 @@ public final class EasyCloudAgent {
     @SneakyThrows
     public void shutdown() {
         log.info("Shutting down... Goodbye!");
+
+        this.processList.forEach(Process::destroyForcibly);
+
+        Files.deleteIfExists(Path.of("services"));
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();

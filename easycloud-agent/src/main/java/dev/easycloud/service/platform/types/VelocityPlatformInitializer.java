@@ -35,7 +35,8 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
         return versionList;
     }
 
-    private String buildDownload(String version) {
+    @Override
+    public String buildDownload(String version) {
         var apiUrl = this.url + "/versions/" + version + "/builds";
         var response = RequestFactory.getRequest(apiUrl);
         var json = FileFactory.GSON.fromJson(response, JsonObject.class);
@@ -67,7 +68,7 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
         }
 
         versions.forEach(version -> {
-            tmp.add(new Platform("velocity-" + version, this.id, this.type));
+            tmp.add(new Platform("velocity-" + version, this.id, version, this.type));
         });
         return tmp;
     }

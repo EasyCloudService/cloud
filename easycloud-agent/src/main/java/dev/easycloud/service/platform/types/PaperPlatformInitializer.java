@@ -35,7 +35,8 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         return versionList;
     }
 
-    private String buildDownload(String version) {
+    @Override
+    public String buildDownload(String version) {
         var apiUrl = this.url + "/versions/" + version + "/builds";
         var response = RequestFactory.getRequest(apiUrl);
         var json = FileFactory.GSON.fromJson(response, JsonObject.class);
@@ -67,7 +68,7 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         }
 
         versions.forEach(version -> {
-            tmp.add(new Platform("paper-" + version, this.id, this.type));
+            tmp.add(new Platform("paper-" + version, this.id, version, this.type));
         });
         return tmp;
     }

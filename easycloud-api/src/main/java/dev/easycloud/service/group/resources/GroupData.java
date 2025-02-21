@@ -8,6 +8,8 @@ import lombok.Data;
 public class GroupData {
     private int memory;
 
+    private int maxPlayers;
+
     private int always;
     private int maximum;
 }

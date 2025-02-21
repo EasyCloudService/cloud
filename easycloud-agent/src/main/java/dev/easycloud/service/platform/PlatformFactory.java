@@ -6,8 +6,8 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public final class PlatformFactory {
-    @Getter
     private final List<Platform> platforms = new ArrayList<>();
     private final List<PlatformInitializer> initializers = new ArrayList<>();
 

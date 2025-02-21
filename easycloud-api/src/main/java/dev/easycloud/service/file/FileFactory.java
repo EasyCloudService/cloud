@@ -3,8 +3,11 @@ package dev.easycloud.service.file;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.easycloud.service.file.resources.FileEntity;
+import lombok.SneakyThrows;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -74,6 +77,25 @@ public final class FileFactory {
                     .map(Path::toFile)
                     .forEach(File::delete);
         } catch (IOException e) {
+        }
+    }
+
+    @SneakyThrows
+    public static void download(String url, Path output) {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+
+        if (connection.getResponseCode() != 200) {
+            throw new IOException("Download failed: HTTP " + connection.getResponseCode());
+        }
+
+        try (InputStream in = connection.getInputStream();
+             FileOutputStream out = new FileOutputStream(output.toFile())) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
         }
     }
 }

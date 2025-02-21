@@ -10,5 +10,6 @@ public interface PlatformInitializer {
     String url();
     PlatformType type();
 
+    String buildDownload(String version);
     List<Platform> platforms();
 }
