@@ -50,7 +50,7 @@ public final class SimpleSetupService implements SetupService {
                 log.info(ansi().bgRgb(LogType.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
-                    log.info(ansi().a("* Possible answers: " + Arrays.toString(current.possible().toArray())).toString());
+                    log.info(ansi().a("* For possible answers use tab complete").toString());
                     current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
                 }
             }
