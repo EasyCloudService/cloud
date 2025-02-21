@@ -65,7 +65,7 @@ public final class SimpleSetupService implements SetupService {
 
                 if (current.possible() != null && current.possible().stream().noneMatch(it -> String.valueOf(it).equalsIgnoreCase(line.replace(" ", "")))) {
                     this.error = true;
-                    trigger(future);
+                    this.trigger(future);
                     return;
                 }
                 this.error = false;
@@ -76,7 +76,7 @@ public final class SimpleSetupService implements SetupService {
                 this.tempSetupList.remove(current);
                 this.answers.put(current, line.replace(" ", ""));
 
-                trigger(future);
+                this.trigger(future);
             });
         }).start();
     }

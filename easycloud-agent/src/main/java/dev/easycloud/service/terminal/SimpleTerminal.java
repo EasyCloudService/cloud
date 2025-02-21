@@ -136,7 +136,11 @@ public final class SimpleTerminal {
             this.terminal.writer().println(s);
         }
         this.terminal.writer().println("");
-        
+
         this.update();
     }
+
+	public void setReadingThread(TerminalReadingThread readingThread) {
+		this.readingThread = readingThread;
+	}
 }

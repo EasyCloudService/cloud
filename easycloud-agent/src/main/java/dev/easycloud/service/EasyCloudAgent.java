@@ -1,9 +1,8 @@
 package dev.easycloud.service;
 
-import dev.easycloud.service.category.CategoryFactory;
-import dev.easycloud.service.category.SimpleCategoryFactory;
+import dev.easycloud.service.group.GroupFactory;
+import dev.easycloud.service.group.SimpleGroupFactory;
 import dev.easycloud.service.command.CommandHandler;
-import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
@@ -25,7 +24,7 @@ public final class EasyCloudAgent {
     private final SimpleTerminal terminal;
     private final CommandHandler commandHandler;
 
-    private final CategoryFactory categoryFactory;
+    private final GroupFactory groupFactory;
 
     public EasyCloudAgent() {
         instance = this;
@@ -42,9 +41,9 @@ public final class EasyCloudAgent {
         this.commandHandler = new CommandHandler();
 
         log.info("CategoryFactory - Starting...");
-        this.categoryFactory = new SimpleCategoryFactory();
+        this.groupFactory = new SimpleGroupFactory();
 
-        this.terminal.clear();
+        //this.terminal.clear();
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
         log.info("Took {} to start.", ansi().fgRgb(LogType.PRIMARY.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
 

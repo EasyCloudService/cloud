@@ -1,6 +1,6 @@
 package dev.easycloud.service.command;
 
-import dev.easycloud.service.command.resources.CategoryCommand;
+import dev.easycloud.service.command.resources.GroupCommand;
 import dev.easycloud.service.command.resources.ClearCommand;
 import dev.easycloud.service.command.resources.HelpCommand;
 import dev.easycloud.service.command.resources.ShutdownCommand;
@@ -20,7 +20,7 @@ public final class CommandHandler {
 
     public CommandHandler() {
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new CategoryCommand()));
+        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand()));
     }
 
     public void execute(String command, String[] args) {

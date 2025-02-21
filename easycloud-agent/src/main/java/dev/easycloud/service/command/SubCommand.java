@@ -1,4 +1,4 @@
-package dev.easycloud.service.command.sub;
+package dev.easycloud.service.command;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
