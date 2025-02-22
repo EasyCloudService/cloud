@@ -35,8 +35,6 @@ public final class SimpleService implements Service {
             }
         } catch (Exception exception) {
             log.error("Stream is not available", exception);
-            log.error("Service will be shutdown...");
-            this.shutdown();
             return;
         }
         log.error("Command could not be executed: {}", command);

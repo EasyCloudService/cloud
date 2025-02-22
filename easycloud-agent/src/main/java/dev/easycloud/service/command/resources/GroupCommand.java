@@ -47,7 +47,7 @@ public final class GroupCommand extends Command {
             log.info("");
             log.info(ansi().fgRgb(LogType.PRIMARY.rgb()).a(it.name()).reset());
             log.info("* Memory: {}", it.data().memory() + "mb");
-            log.info("* Platform: {}", it.platform().id());
+            log.info("* Platform: {}", it.platform().initilizerId() + "_" + it.platform().version());
         });
         log.info("");
     }
@@ -55,7 +55,7 @@ public final class GroupCommand extends Command {
     private void setup(String[] args) {
         SetupService.simple()
                 .add(new SetupData<String>("name", "What should the name be?", null))
-                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformFactory().platforms().stream().map(Platform::id).toList()))
+                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformFactory().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
                 .add(new SetupData<>("memory", "How much memory should the group have?", null))
                 .add(new SetupData<>("maxPlayers", "How many players should be online (max)", null))
                 .add(new SetupData<>("always", "How much services should always be online?", null))
@@ -65,7 +65,7 @@ public final class GroupCommand extends Command {
                 .thenAccept(it -> {
                     var group = new Group(
                             it.result("name", String.class),
-                            EasyCloudAgent.instance().platformFactory().platforms().stream().filter(platform -> platform.id().equals(it.result("platform", String.class))).findFirst().orElseThrow(),
+                            EasyCloudAgent.instance().platformFactory().platforms().stream().filter(platform -> (platform.initilizerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow(),
                             new GroupData(
                                     it.result("memory", Integer.class),
                                     it.result("maxPlayers", Integer.class),

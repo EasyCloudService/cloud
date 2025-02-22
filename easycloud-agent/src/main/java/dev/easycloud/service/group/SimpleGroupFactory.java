@@ -3,6 +3,7 @@ package dev.easycloud.service.group;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.terminal.LogType;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,10 +34,49 @@ public final class SimpleGroupFactory implements GroupFactory {
     }
 
     @Override
+    public void refresh() {
+        List<Platform> platforms = new ArrayList<>();
+        for (Group group : this.groups) {
+            if(platforms.contains(group.platform())) {
+                continue;
+            }
+            platforms.add(group.platform());
+        }
+
+        var platformPath = Path.of("storage").resolve("platforms");
+        if(!platformPath.toFile().exists()) {
+            platformPath.toFile().mkdirs();
+        }
+
+        platforms.forEach(platform -> {
+            var initializer = EasyCloudAgent.instance().platformFactory().initializers()
+                    .stream()
+                    .filter(it -> it.id().equals(platform.initilizerId()))
+                    .findFirst()
+                    .orElseThrow();
+            var jarPath = platformPath.resolve(platform.initilizerId() + "-" + platform.version() + ".jar");
+
+            if(!jarPath.toFile().exists()) {
+                log.info("Downloading {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset());
+
+                var downloadUrl = initializer.buildDownload(platform.version());
+                if(downloadUrl == null) {
+                    log.error("Failed to download platform. Invalid download url/version.");
+                    return;
+                }
+
+                FileFactory.download(downloadUrl, jarPath);
+                log.info("Platform {} is now ready.", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset());
+            }
+        });
+    }
+
+    @Override
     public void create(Group group) {
         this.groups.add(group);
 
-        log.info("Updating {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(group.platform().id()).reset());
+       /* var platform = group.platform();
+        log.info("Updating {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + platform.version()).reset());
         var platformPath = Path.of("storage").resolve("platforms");
         if(!platformPath.toFile().exists()) {
             platformPath.toFile().mkdirs();
@@ -47,11 +87,13 @@ public final class SimpleGroupFactory implements GroupFactory {
                 .findFirst()
                 .orElseThrow();
         var download = initializer.buildDownload(group.platform().version());
-        var jarPath = platformPath.resolve(group.platform().id() + ".jar");
+        var jarPath = platformPath.resolve(platform.initilizerId() + platform.version() + ".jar");
 
         jarPath.toFile().delete();
         FileFactory.download(download, jarPath);
-        log.info("Platform is now up to date.");
+        log.info("Platform is now up to date.");*/
+
+        this.refresh();
 
         FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
     }

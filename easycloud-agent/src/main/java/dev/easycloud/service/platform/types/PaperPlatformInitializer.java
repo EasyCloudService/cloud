@@ -40,6 +40,10 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         var apiUrl = this.url + "/versions/" + version + "/builds";
         var response = RequestFactory.getRequest(apiUrl);
         var json = FileFactory.GSON.fromJson(response, JsonObject.class);
+        if(json == null) {
+            return null;
+        }
+
         var builds = json.getAsJsonArray("builds");
 
         Integer latestBuild = null;
@@ -68,7 +72,7 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         }
 
         versions.forEach(version -> {
-            tmp.add(new Platform("paper-" + version, this.id, version, this.type));
+            tmp.add(new Platform(this.id, version, this.type));
         });
         return tmp;
     }

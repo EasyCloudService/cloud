@@ -41,7 +41,8 @@ public final class SimpleSetupService implements SetupService {
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
             if (tempSetupList.isEmpty()) {
-                log.info("Setup completed.");
+                EasyCloudAgent.instance().terminal().clear();
+                log.info("Setup is completed.");
                 future.complete(new SetupServiceResult(this.answers));
                 return;
             }

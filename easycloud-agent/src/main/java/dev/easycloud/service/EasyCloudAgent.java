@@ -58,6 +58,8 @@ public final class EasyCloudAgent {
 
         log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformFactory.platforms().size() + " platforms").reset());
 
+        this.groupFactory.refresh();
+
         //this.terminal.clear();
         log.info("It took {} to start the cloud.", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());

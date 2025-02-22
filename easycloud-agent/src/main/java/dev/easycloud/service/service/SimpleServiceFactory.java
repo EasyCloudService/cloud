@@ -40,7 +40,7 @@ public final class SimpleServiceFactory implements ServiceFactory {
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
         var service = new SimpleService(group.name() + "-" + id, group, port, Path.of("services").resolve(group.name() + "-" + id), null);
         service.directory().toFile().mkdirs();
-        Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().id() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
 
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
