@@ -45,8 +45,6 @@ public final class SimpleServiceFactory implements ServiceFactory {
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
 
-        EasyCloudAgent.instance().processList().add(process);
-
         this.services.add(service);
     }
 

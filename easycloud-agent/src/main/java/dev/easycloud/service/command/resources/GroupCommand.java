@@ -13,6 +13,7 @@ import dev.easycloud.service.terminal.LogType;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -59,6 +60,7 @@ public final class GroupCommand extends Command {
                 .add(new SetupData<>("maxPlayers", "How many players should be online (max)", null))
                 .add(new SetupData<>("always", "How much services should always be online?", null))
                 .add(new SetupData<>("maximum", "How much services should be online maximal? (-1 = no limit)", null))
+                .add(new SetupData<>("static", "Should the group be static?", List.of(true, false)))
                 .publish()
                 .thenAccept(it -> {
                     var group = new Group(
@@ -68,7 +70,8 @@ public final class GroupCommand extends Command {
                                     it.result("memory", Integer.class),
                                     it.result("maxPlayers", Integer.class),
                                     it.result("always", Integer.class),
-                                    it.result("maximum", Integer.class)
+                                    it.result("maximum", Integer.class),
+                                    it.result("static", Boolean.class)
                             ));
                     EasyCloudAgent.instance().groupFactory().create(group);
 

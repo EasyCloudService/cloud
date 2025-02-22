@@ -11,5 +11,6 @@ public interface Service {
     int port();
     Path directory();
 
+    void execute(String command);
     void shutdown();
 }

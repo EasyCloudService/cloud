@@ -6,6 +6,7 @@ import dev.easycloud.service.command.CommandHandler;
 import dev.easycloud.service.platform.PlatformFactory;
 import dev.easycloud.service.service.ServiceFactory;
 import dev.easycloud.service.service.SimpleServiceFactory;
+import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
@@ -28,8 +29,6 @@ public final class EasyCloudAgent {
     @Getter
     private static EasyCloudAgent instance;
 
-    private final List<Process> processList = new ArrayList<>();
-
     private final SimpleTerminal terminal;
     private final CommandHandler commandHandler;
 
@@ -39,6 +38,17 @@ public final class EasyCloudAgent {
 
     public EasyCloudAgent() {
         instance = this;
+
+        // clear services folder
+        var services = Path.of("services").toFile();
+        if(services.exists()) {
+            String[] entries = services.list();
+            for (String s : entries) {
+                var currentFile = new File(services.getPath(), s);
+                currentFile.delete();
+            }
+            services.delete();
+        }
 
         long timeSinceStart = System.currentTimeMillis();
         var storagePath = Path.of("storage").toAbsolutePath();
@@ -72,15 +82,12 @@ public final class EasyCloudAgent {
     public void shutdown() {
         log.info("Shutting down... Goodbye!");
 
-        this.processList.forEach(Process::destroyForcibly);
-
-        var services = Path.of("services").toFile();
-        String[] entries = services.list();
-        for (String s : entries) {
-            var currentFile = new File(services.getPath(), s);
-            currentFile.delete();
+        for (Service service : new ArrayList<>(this.serviceFactory.services())) {
+            service.shutdown();
         }
-        services.delete();
+        while (this.serviceFactory.services().isEmpty()) {
+
+        }
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();

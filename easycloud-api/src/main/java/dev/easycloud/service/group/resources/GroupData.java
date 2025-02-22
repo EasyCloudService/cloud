@@ -12,4 +12,6 @@ public class GroupData {
 
     private int always;
     private int maximum;
+
+    private boolean isStatic;
 }
