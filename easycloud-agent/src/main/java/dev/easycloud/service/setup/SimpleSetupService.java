@@ -59,6 +59,7 @@ public final class SimpleSetupService implements SetupService {
             EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
                     TerminalCompleter.TEMP_VALUES().clear();
+                    EasyCloudAgent.instance().terminal().clear();
                     log.info(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup canceled.").toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
                     return;
