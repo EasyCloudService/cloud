@@ -31,8 +31,8 @@ public class RequestFactory {
                 }
             }
             return response.toString();
-        } catch (IOException e) {
-            System.err.println("Failed to make API request: " + e.getMessage());
+        } catch (IOException exception) {
+            System.err.println("Failed to make API request: " + exception.getMessage());
         }
         return null;
     }

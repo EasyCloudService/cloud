@@ -33,8 +33,8 @@ public final class SimpleService implements Service {
                 outputStream.flush();
                 return;
             }
-        } catch (Exception e) {
-            log.error("Stream is not available", e);
+        } catch (Exception exception) {
+            log.error("Stream is not available", exception);
             log.error("Service will be shutdown...");
             this.shutdown();
             return;
@@ -45,7 +45,7 @@ public final class SimpleService implements Service {
     @Override
     public void shutdown() {
         this.execute("stop");
-        if(this.group.data().isStatic()) {
+        if (this.group.data().isStatic()) {
             new AdvancedScheduler((Void) -> {
                 if (!this.process.isAlive()) {
                     log.info("Service {} has been shutdown", this.id);

@@ -1,5 +1,6 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.GroupFactory;
 import dev.easycloud.service.group.SimpleGroupFactory;
 import dev.easycloud.service.command.CommandHandler;
@@ -39,55 +40,40 @@ public final class EasyCloudAgent {
     public EasyCloudAgent() {
         instance = this;
 
-        // clear services folder
-        var services = Path.of("services").toFile();
-        if(services.exists()) {
-            String[] entries = services.list();
-            for (String s : entries) {
-                var currentFile = new File(services.getPath(), s);
-                currentFile.delete();
-            }
-            services.delete();
-        }
-
         long timeSinceStart = System.currentTimeMillis();
-        var storagePath = Path.of("storage").toAbsolutePath();
+        FileFactory.removeDirectory(Path.of("services"));
 
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        log.info("Cloud is starting... Some features may not work.");
-
-        log.info("CommandHandler - Starting...");
         this.commandHandler = new CommandHandler();
 
         this.serviceFactory = new SimpleServiceFactory();
-
-        log.info("GroupFactory - Starting...");
         this.groupFactory = new SimpleGroupFactory();
 
-        log.info("Seaching for platforms...");
+        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupFactory.groups().size() + " groups").reset());
+
         this.platformFactory = new PlatformFactory();
         this.platformFactory.refresh();
-        log.info("Found {} platforms.", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.platformFactory.platforms().size()).reset());
+
+        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformFactory.platforms().size() + " platforms").reset());
 
         //this.terminal.clear();
+        log.info("It took {} to start the cloud.", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
-        log.info("Took {} to start.", ansi().fgRgb(LogType.PRIMARY.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
 
         this.terminal.start();
     }
 
     @SneakyThrows
     public void shutdown() {
-        log.info("Shutting down... Goodbye!");
+        log.info("Shutting down services...");
 
         for (Service service : new ArrayList<>(this.serviceFactory.services())) {
             service.shutdown();
         }
-        while (this.serviceFactory.services().isEmpty()) {
 
-        }
+        log.info("Shutting down... Goodbye!");
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();

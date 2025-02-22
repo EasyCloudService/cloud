@@ -72,6 +72,10 @@ public final class FileFactory {
     }
 
     public static void removeDirectory(Path path) {
+        if(!path.toFile().exists()) {
+            return;
+        }
+
         try (Stream<Path> pathStream = Files.walk(path)) {
             pathStream.sorted(Comparator.reverseOrder())
                     .map(Path::toFile)

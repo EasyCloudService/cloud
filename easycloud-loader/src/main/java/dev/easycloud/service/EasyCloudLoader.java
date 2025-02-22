@@ -42,8 +42,8 @@ public final class EasyCloudLoader {
         List.of("easycloud-agent.jar", "easycloud-api.jar").forEach(it -> {
             try {
                 Files.copy(ClassLoader.getSystemClassLoader().getResourceAsStream(it), storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (IOException exception) {
+                throw new RuntimeException(exception);
             }
             classLoader.appendFileToClasspath(storage.resolve("jars").resolve(it));
         });
