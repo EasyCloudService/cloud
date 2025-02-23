@@ -1,11 +1,12 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudAgent;
-import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.platform.PlatformType;
+import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
+import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,36 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
 public final class SimpleServiceFactory implements ServiceFactory {
     @Getter
     private final List<Service> services = new ArrayList<>();
+
+    public SimpleServiceFactory() {
+        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
+    }
+
+    public void refresh() {
+        for (Group group : EasyCloudAgent.instance().groupFactory().groups()) {
+            var always = group.data().always();
+            var max = group.data().maximum();
+            var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
+
+            if(always > online) {
+                this.launch(group, (int) (always - online));
+            }
+            if(max < online && max != -1) {
+                this.services.stream()
+                        .filter(it -> it.group().name().equals(group.name()))
+                        .limit(online - max)
+                        .forEach(Service::shutdown);
+            }
+        }
+    }
 
     @Override
     public void launch(Group group) {
@@ -38,12 +64,17 @@ public final class SimpleServiceFactory implements ServiceFactory {
             return;
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
-        var service = new SimpleService(group.name() + "-" + id, group, port, Path.of("services").resolve(group.name() + "-" + id), null);
+
+        var directory = Path.of(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
+        var service = new SimpleService(group.name() + "-" + id, group, port, directory, null);
+
         service.directory().toFile().mkdirs();
         Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
 
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
+
+        log.info("Service {} launched on port {}.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset());
 
         this.services.add(service);
     }

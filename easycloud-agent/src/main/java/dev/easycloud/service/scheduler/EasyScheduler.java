@@ -17,6 +17,19 @@ public final class EasyScheduler {
         }).start();
     }
 
+    public void repeat(long value) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(value);
+                    runnable.run();
+                } catch (InterruptedException exception) {
+                    throw new RuntimeException(exception);
+                }
+            }
+        }).start();
+    }
+
     public void repeat(long value, int times) {
         new Thread(() -> {
             for (int i = 0; i < times; i++) {
@@ -29,4 +42,5 @@ public final class EasyScheduler {
             }
         }).start();
     }
+
 }

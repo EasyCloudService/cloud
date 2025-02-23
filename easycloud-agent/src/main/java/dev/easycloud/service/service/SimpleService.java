@@ -29,7 +29,7 @@ public final class SimpleService implements Service {
         var outputStream = process.getOutputStream();
         try {
             if (process != null && outputStream != null) {
-                outputStream.write(command.getBytes());
+                outputStream.write((command + "\n").getBytes());
                 outputStream.flush();
                 return;
             }

@@ -75,26 +75,7 @@ public final class SimpleGroupFactory implements GroupFactory {
     public void create(Group group) {
         this.groups.add(group);
 
-       /* var platform = group.platform();
-        log.info("Updating {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + platform.version()).reset());
-        var platformPath = Path.of("storage").resolve("platforms");
-        if(!platformPath.toFile().exists()) {
-            platformPath.toFile().mkdirs();
-        }
-        var initializer = EasyCloudAgent.instance().platformFactory().initializers()
-                .stream()
-                .filter(it -> it.id().equals(group.platform().initilizerId()))
-                .findFirst()
-                .orElseThrow();
-        var download = initializer.buildDownload(group.platform().version());
-        var jarPath = platformPath.resolve(platform.initilizerId() + platform.version() + ".jar");
-
-        jarPath.toFile().delete();
-        FileFactory.download(download, jarPath);
-        log.info("Platform is now up to date.");*/
-
         this.refresh();
-
         FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
     }
 

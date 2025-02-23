@@ -31,8 +31,6 @@ public final class ServiceLaunchBuilder {
         }
         arguments.add("--port=" + service.port());
 
-        log.info(arguments.toString().replace(",", ""));
-
         var builder = new ProcessBuilder(arguments);
         builder.directory(service.directory().toFile());
         return builder.start();
