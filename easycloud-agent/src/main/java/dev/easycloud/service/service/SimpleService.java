@@ -4,12 +4,15 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.scheduler.AdvancedScheduler;
 import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.terminal.LogType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
+
+import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
 @Getter
@@ -43,10 +46,10 @@ public final class SimpleService implements Service {
     @Override
     public void shutdown() {
         this.execute("stop");
+        log.info("Service {} will be shutdown.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
         if (this.group.data().isStatic()) {
             new AdvancedScheduler((Void) -> {
                 if (!this.process.isAlive()) {
-                    log.info("Service {} has been shutdown", this.id);
                     EasyCloudAgent.instance().serviceFactory().services().remove(this);
                     return false;
                 }
@@ -54,7 +57,6 @@ public final class SimpleService implements Service {
             }).run(1000);
         } else {
             this.process.destroyForcibly();
-            log.info("Service {} has been shutdown", this.id);
             EasyCloudAgent.instance().serviceFactory().services().remove(this);
         }
     }
