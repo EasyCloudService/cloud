@@ -53,7 +53,7 @@ public final class SimpleServiceFactory implements ServiceFactory {
     }
 
     @Override
-    @SneakyThrows
+
     public void launch(Group group, int count) {
         var port = this.freePort();
         if(group.platform().type().equals(PlatformType.PROXY)) {
@@ -69,7 +69,14 @@ public final class SimpleServiceFactory implements ServiceFactory {
         var service = new SimpleService(group.name() + "-" + id, group, port, directory, null);
 
         service.directory().toFile().mkdirs();
-        Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
+        if(!service.directory().resolve("platform.jar").toFile().exists()) {
+            try {
+                Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
+            } catch (Exception exception) {
+                log.error("Failed to copy platform jar.", exception);
+                return;
+            }
+        }
 
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);

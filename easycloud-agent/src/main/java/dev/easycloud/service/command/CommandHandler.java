@@ -1,9 +1,6 @@
 package dev.easycloud.service.command;
 
-import dev.easycloud.service.command.resources.GroupCommand;
-import dev.easycloud.service.command.resources.ClearCommand;
-import dev.easycloud.service.command.resources.HelpCommand;
-import dev.easycloud.service.command.resources.ShutdownCommand;
+import dev.easycloud.service.command.resources.*;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +17,7 @@ public final class CommandHandler {
 
     public CommandHandler() {
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand()));
+        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand()));
     }
 
     public void execute(String command, String[] args) {

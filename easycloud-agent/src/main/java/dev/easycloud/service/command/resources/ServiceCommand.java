@@ -31,11 +31,11 @@ public final class ServiceCommand extends Command {
     }
 
     private void shutdown(String[] args) {
-        if(args.length < 1) {
+        if(args.length < 2) {
             this.executeBase();
             return;
         }
-        var service = EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it.id().equals(args[0])).findFirst().orElse(null);
+        var service = EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
             log.error("Service not found.");
             return;
