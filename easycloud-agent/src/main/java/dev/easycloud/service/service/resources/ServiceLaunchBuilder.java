@@ -25,9 +25,9 @@ public final class ServiceLaunchBuilder {
         arguments.add("-Dcom.mojang.eula.agree=true");
         arguments.add("-jar");
         arguments.add("platform.jar");
-        if(service.group().platform().type().equals(PlatformType.SERVER)) {
+        if (service.group().platform().type().equals(PlatformType.SERVER)) {
             arguments.add("--max-players=" + service.group().data().maxPlayers());
-            //arguments.add("--nogui");
+            arguments.add("nogui");
         }
         arguments.add("--port=" + service.port());
 

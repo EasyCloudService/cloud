@@ -1,6 +1,9 @@
 package dev.easycloud.service.command;
 
+import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.command.resources.*;
+import dev.easycloud.service.service.SimpleService;
+import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +24,33 @@ public final class CommandHandler {
     }
 
     public void execute(String command, String[] args) {
+        if(EasyCloudAgent.instance().terminal().screenPrinting()) {
+            var service = EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it instanceof SimpleService)
+                    .map(it -> (SimpleService) it)
+                    .filter(SimpleService::logStream)
+                    .findFirst()
+                    .orElse(null);
+
+            if(service == null) {
+                log.error("No service is running.");
+            }
+
+            if(command.equalsIgnoreCase("exit") || service == null) {
+                EasyCloudAgent.instance().terminal().screenPrinting(false);
+                EasyCloudAgent.instance().terminal().clear();
+                if(service != null) {
+                    service.logStream(false);
+                }
+
+                TerminalCompleter.enabled(true);
+                log.info("Screen printing is disabled. You can now use the terminal.");
+                return;
+            }
+
+            service.execute(command + " " + String.join(" ", args));
+            return;
+        }
+
         this.commands.stream()
                 .filter(it -> it.name().equals(command) || it.aliases().stream().anyMatch(it2 -> it2.equalsIgnoreCase(command)))
                 .findFirst()

@@ -1,9 +1,11 @@
 package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.stream.SimpleLoggingStream;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,10 @@ import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 import org.jline.widget.TailTipWidgets;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -33,6 +39,9 @@ public final class SimpleTerminal {
     private final LineReaderImpl lineReader;
 
     private TerminalReadingThread readingThread;
+
+    @Setter
+    private boolean screenPrinting = false;
 
     @SneakyThrows
     public SimpleTerminal() {
@@ -94,7 +103,7 @@ public final class SimpleTerminal {
     public void start() {
         this.readingThread = new TerminalReadingThread(this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
-            if(exception instanceof UserInterruptException) {
+            if (exception instanceof UserInterruptException) {
                 EasyCloudAgent.instance().shutdown();
                 return;
             }
@@ -119,10 +128,10 @@ public final class SimpleTerminal {
 
     public void redraw() {
         var layout = ansi().a("""
-                    ____ ____ ____ _   _ ____ _    ____ _  _ ___
-                    |___ |__| [__   \\_/  |    |    |  | |  | |  \\
-                    |___ |  | ___]   |   |___ |___ |__| |__| |__/
-                  """)
+                          ____ ____ ____ _   _ ____ _    ____ _  _ ___
+                          |___ |__| [__   \\_/  |    |    |  | |  | |  \\
+                          |___ |  | ___]   |   |___ |___ |__| |__| |__/
+                        """)
                 .reset().a("  * Current version: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("DEVELOPMENT")
                 .reset().a("\n")
@@ -140,7 +149,7 @@ public final class SimpleTerminal {
         this.update();
     }
 
-	public void setReadingThread(TerminalReadingThread readingThread) {
-		this.readingThread = readingThread;
-	}
+    public void setReadingThread(TerminalReadingThread readingThread) {
+        this.readingThread = readingThread;
+    }
 }

@@ -8,12 +8,10 @@ import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +51,6 @@ public final class SimpleServiceFactory implements ServiceFactory {
     }
 
     @Override
-
     public void launch(Group group, int count) {
         var port = this.freePort();
         if(group.platform().type().equals(PlatformType.PROXY)) {
@@ -66,7 +63,7 @@ public final class SimpleServiceFactory implements ServiceFactory {
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
         var directory = Path.of(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
-        var service = new SimpleService(group.name() + "-" + id, group, port, directory, null);
+        var service = new SimpleService(group.name() + "-" + id, group, port, directory);
 
         service.directory().toFile().mkdirs();
         if(!service.directory().resolve("platform.jar").toFile().exists()) {

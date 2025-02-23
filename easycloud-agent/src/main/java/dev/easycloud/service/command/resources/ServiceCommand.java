@@ -6,9 +6,11 @@ import dev.easycloud.service.command.SubCommand;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupData;
 import dev.easycloud.service.platform.Platform;
+import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.extern.log4j.Log4j2;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -45,16 +47,25 @@ public final class ServiceCommand extends Command {
     }
 
     private void screen(String[] args) {
-        if(args.length < 1) {
+        if(args.length < 2) {
             this.executeBase();
             return;
         }
-        var service = EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it.id().equals(args[0])).findFirst().orElse(null);
+        var service = (SimpleService) EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
             log.error("Service not found.");
             return;
         }
 
-        // TODO
+        TerminalCompleter.enabled(false);
+        TerminalCompleter.TEMP_VALUES().clear();
+
+        EasyCloudAgent.instance().terminal().screenPrinting(true);
+        EasyCloudAgent.instance().terminal().clear();
+
+        service.logCache().forEach(service::print);
+
+        service.logStream(true);
+        log.info("SERVICE_LOG: Service screen opened. Use {} to close.", ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset());
     }
 }

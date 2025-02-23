@@ -2,6 +2,7 @@ package dev.easycloud.service.terminal.completer;
 
 import dev.easycloud.service.EasyCloudAgent;
 import lombok.Getter;
+import lombok.Setter;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -14,9 +15,13 @@ public final class TerminalCompleter implements Completer {
     @Getter
     private static List<String> TEMP_VALUES = new ArrayList<>();
 
+    @Getter
+    @Setter
+    private static boolean enabled = true;
+
     @Override
     public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> list) {
-        if (parsedLine.line().startsWith(" ")) return;
+        if (parsedLine.line().startsWith(" ") || !enabled) return;
 
         if(!TEMP_VALUES.isEmpty()) {
             TEMP_VALUES.forEach(it -> list.add(new Candidate(it)));

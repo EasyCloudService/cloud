@@ -1,5 +1,6 @@
 package dev.easycloud.service.terminal.logger;
 
+import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.terminal.LogType;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -57,7 +58,14 @@ public final class Log4jAppender extends AbstractAppender {
                 .fgRgb(LogType.GRAY.rgb()).a("]")
                 .fgRgb(LogType.PRIMARY.rgb()).a(" " + event.getLevel().name() + ": ")
                 .reset().a(format(message));
-        System.out.println(PATTERN.toString());
+
+        if(event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
+            System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
+        }
+
+        if(!EasyCloudAgent.instance().terminal().screenPrinting()) {
+            System.out.println(PATTERN.toString());
+        }
     }
 
     private String format(String message) {
