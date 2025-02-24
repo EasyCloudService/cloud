@@ -10,6 +10,10 @@ import dev.easycloud.service.service.SimpleServiceFactory;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
+import dev.httpmarco.netline.Net;
+import dev.httpmarco.netline.NetChannel;
+import dev.httpmarco.netline.NetComp;
+import dev.httpmarco.netline.security.SecurityHandler;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -37,6 +41,7 @@ public final class EasyCloudAgent {
     private final GroupFactory groupFactory;
     private final PlatformFactory platformFactory;
 
+
     public EasyCloudAgent() {
         instance = this;
 
@@ -45,6 +50,27 @@ public final class EasyCloudAgent {
 
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
+
+        Net.line()
+                .server()
+                .config(config -> {
+                    config.hostname("0.0.0.0");
+                    config.port(5200);
+                });
+        Net.line().server().withSecurityPolicy(new SecurityHandler() {
+            @Override
+            public void detectUnauthorizedAccess(NetChannel netChannel) {
+                log.warn("Unauthorized access from {}.", netChannel.hostname());
+            }
+
+            @Override
+            public boolean authenticate(NetChannel netChannel) {
+                // TODO Implement authentication
+                return true;
+            }
+        });
+
+        log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
         this.commandHandler = new CommandHandler();
 

@@ -62,13 +62,23 @@ public final class SimpleServiceFactory implements ServiceFactory {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
+        var storagePath = Path.of("storage");
         var directory = Path.of(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new SimpleService(group.name() + "-" + id, group, port, directory);
 
         service.directory().toFile().mkdirs();
+        service.directory().resolve("plugins").toFile().mkdirs();
+
+        try {
+            Files.copy(storagePath.resolve("jars").resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"));
+        } catch (Exception exception) {
+            log.error("Failed to copy server plugin.", exception);
+            return;
+        }
+
         if(!service.directory().resolve("platform.jar").toFile().exists()) {
             try {
-                Files.copy(Path.of("storage").resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
+                Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {
                 log.error("Failed to copy platform jar.", exception);
                 return;

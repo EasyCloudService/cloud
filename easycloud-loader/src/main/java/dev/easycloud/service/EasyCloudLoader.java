@@ -39,7 +39,7 @@ public final class EasyCloudLoader {
         manager.loadAll(executor, classLoader).join();
 
         print("Extracting jars...");
-        List.of("easycloud-agent.jar", "easycloud-api.jar").forEach(it -> {
+        List.of("easycloud-agent.jar", "easycloud-api.jar", "easycloud-plugin.jar").forEach(it -> {
             try {
                 Files.copy(ClassLoader.getSystemClassLoader().getResourceAsStream(it), storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException exception) {
