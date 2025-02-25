@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 @Slf4j
 public final class EasyCloudLoader {
@@ -22,7 +23,18 @@ public final class EasyCloudLoader {
 
         copyFile("EasyCloudUpdater.class", libaries.resolve("EasyCloudUpdater.class"));
 
-        new UpdateServiceHandler();
+        if(Arrays.stream(args).toList().stream().anyMatch(arg -> arg.equals("-Dauto.updates=true"))) {
+            new UpdateServiceHandler();
+        } else {
+            System.out.println("""
+                  ┌──────────────────────────────────┐
+                  │                                  │
+                  │  (Auto)Updates are not enabled!  │
+                  │                                  │
+                  └──────────────────────────────────┘
+                  To enable them, open the 'start-script' and add the following argument 'eaup' to the end.
+                """);
+        }
 
         new DependencyLoader();
 
