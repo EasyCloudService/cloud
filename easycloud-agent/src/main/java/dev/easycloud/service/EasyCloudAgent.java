@@ -82,13 +82,6 @@ public final class EasyCloudAgent {
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
 
         this.terminal.start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            this.shutdown();
-
-            while (true) {
-            }
-        }));
     }
 
     @SneakyThrows
