@@ -1,6 +1,7 @@
 package dev.easycloud.service.terminal.logger;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.terminal.LogType;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import org.apache.logging.log4j.core.Core;
@@ -62,11 +63,17 @@ public final class Log4jAppender extends AbstractAppender {
 
         TerminalCompleter.TEMP_VALUES().clear();
 
-        if(event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
-            System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
+        if(event.getMessage().getFormattedMessage().startsWith("SETUP: ")) {
+            System.out.println(PATTERN.toString().replace("SETUP: ", ""));
+            return;
         }
 
-        if(!EasyCloudAgent.instance().terminal().screenPrinting()) {
+        if(event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
+            System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
+            return;
+        }
+
+        if(!EasyCloudAgent.instance().terminal().screenPrinting() && SetupService.running.isEmpty()) {
             System.out.println(PATTERN.toString());
             EasyCloudAgent.instance().terminal().history().add(PATTERN.toString());
         }
@@ -75,6 +82,7 @@ public final class Log4jAppender extends AbstractAppender {
     private String format(String message) {
         return message
                 .replace("ready", ansi().fgRgb(LogType.SUCCESS.rgb()).a("ready").reset().toString())
+                .replace("successfully", ansi().fgRgb(LogType.SUCCESS.rgb()).a("successfully").reset().toString())
                 .replace("success", ansi().fgRgb(LogType.SUCCESS.rgb()).a("success").reset().toString())
                 .replace("canceled", ansi().fgRgb(LogType.ERROR.rgb()).a("canceled").reset().toString())
                 .replace("completed", ansi().fgRgb(LogType.SUCCESS.rgb()).a("completed").reset().toString())

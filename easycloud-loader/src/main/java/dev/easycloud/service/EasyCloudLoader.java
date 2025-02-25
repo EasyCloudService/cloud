@@ -21,7 +21,7 @@ public final class EasyCloudLoader {
     @SneakyThrows
     public static void main(String[] args) {
         var storage = Path.of("storage");
-        var libaries = storage.resolve("libs");
+        var libaries = storage.resolve("libaries");
         storage.toFile().mkdirs();
         libaries.toFile().mkdirs();
 
@@ -60,7 +60,7 @@ public final class EasyCloudLoader {
 
         var thread = new Thread(() -> {
             try {
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;storage/libs/*;", "dev.easycloud.service.EasyCloudBootstrap")
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;storage/libaries/*;", "dev.easycloud.service.EasyCloudBootstrap")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)

@@ -16,7 +16,6 @@ public class TerminalReadingThread extends Thread {
 
         this.terminal = terminal;
         this.lineReader = this.terminal.lineReader();
-
     }
 
     @Getter

@@ -63,9 +63,7 @@ public final class EasyCloudAgent {
                 .bootSync();
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
-        this.netServer.track(ServiceConnectPacket.class, (channel, packet) -> {
-            System.out.println("Service connected: " + packet.serviceId());
-        });
+
 
         log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 

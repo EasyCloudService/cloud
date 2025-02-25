@@ -27,6 +27,8 @@ public final class SimpleSetupService implements SetupService {
 
     @Override
     public CompletableFuture<SetupServiceResult> publish() {
+        SetupService.running.add(this);
+
         EasyCloudAgent.instance().terminal().clear();
 
         log.info(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to cancel the setup.").toString());
@@ -41,26 +43,27 @@ public final class SimpleSetupService implements SetupService {
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
             if (tempSetupList.isEmpty()) {
-                EasyCloudAgent.instance().terminal().clear();
-                log.info("Setup is completed.");
+                SetupService.running.remove(this);
+                EasyCloudAgent.instance().terminal().revert();
                 future.complete(new SetupServiceResult(this.answers));
                 return;
             }
             var current = this.tempSetupList.getFirst();
             if (!this.error) {
-                log.info(ansi().bgRgb(LogType.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
+                this.print(ansi().bgRgb(LogType.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
-                    log.info(ansi().a("* For possible answers use tab complete").toString());
+                    this.print(ansi().a("* For possible answers use tab complete").toString());
                     current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
                 }
             }
 
             EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
+                    SetupService.running.remove(this);
                     TerminalCompleter.TEMP_VALUES().clear();
-                    EasyCloudAgent.instance().terminal().clear();
-                    log.info(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup canceled.").toString());
+                    EasyCloudAgent.instance().terminal().revert();
+                    this.print(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup was canceled.").toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
                     return;
                 }
@@ -73,7 +76,7 @@ public final class SimpleSetupService implements SetupService {
                 this.error = false;
                 TerminalCompleter.TEMP_VALUES().clear();
 
-                log.info(ansi().fgRgb(LogType.GRAY.rgb()).a("> ").a(line).reset().toString());
+                this.print(ansi().fgRgb(LogType.GRAY.rgb()).a("> ").a(line).reset().toString());
 
                 this.tempSetupList.remove(current);
                 this.answers.put(current, line.replace(" ", ""));
@@ -81,6 +84,10 @@ public final class SimpleSetupService implements SetupService {
                 this.trigger(future);
             });
         }).start();
+    }
+
+    private void print(String text) {
+        log.info("SETUP: {}", text);
     }
 
 }
