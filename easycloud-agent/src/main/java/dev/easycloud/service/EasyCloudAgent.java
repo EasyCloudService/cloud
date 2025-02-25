@@ -4,7 +4,9 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.GroupFactory;
 import dev.easycloud.service.group.SimpleGroupFactory;
 import dev.easycloud.service.command.CommandHandler;
+import dev.easycloud.service.packet.connection.ServiceConnectPacket;
 import dev.easycloud.service.platform.PlatformFactory;
+import dev.easycloud.service.security.NetLineSecurity;
 import dev.easycloud.service.service.ServiceFactory;
 import dev.easycloud.service.service.SimpleServiceFactory;
 import dev.easycloud.service.service.resources.Service;
@@ -13,7 +15,10 @@ import dev.easycloud.service.terminal.LogType;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.NetChannel;
 import dev.httpmarco.netline.NetComp;
+import dev.httpmarco.netline.request.ResponderRegisterPacket;
+import dev.httpmarco.netline.request.ResponsePacket;
 import dev.httpmarco.netline.security.SecurityHandler;
+import dev.httpmarco.netline.server.NetServer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -24,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -41,9 +47,14 @@ public final class EasyCloudAgent {
     private final GroupFactory groupFactory;
     private final PlatformFactory platformFactory;
 
+    private final String privateKey;
+    private final NetServer netServer;
 
+    @SneakyThrows
     public EasyCloudAgent() {
         instance = this;
+
+        this.privateKey = "key-" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
 
         long timeSinceStart = System.currentTimeMillis();
         FileFactory.removeDirectory(Path.of("services"));
@@ -51,26 +62,24 @@ public final class EasyCloudAgent {
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        Net.line()
-                .server()
-                .config(config -> {
-                    config.hostname("0.0.0.0");
-                    config.port(5200);
-                });
-        Net.line().server().withSecurityPolicy(new SecurityHandler() {
-            @Override
-            public void detectUnauthorizedAccess(NetChannel netChannel) {
-                log.warn("Unauthorized access from {}.", netChannel.hostname());
-            }
+        System.out.println(Class.forName("dev.easycloud.service.packet.connection.ServiceConnectPacket"));
 
-            @Override
-            public boolean authenticate(NetChannel netChannel) {
-                // TODO Implement authentication
-                return true;
-            }
+        this.netServer = Net.line().server();
+        this.netServer
+                .config(config -> {
+                    config.hostname("127.0.0.1");
+                    config.port(5200);
+                })
+                .bootSync();
+        
+        this.netServer.track(ServiceConnectPacket.class, (channel, packet) -> {
+            System.out.println("Service connected: " + packet.serviceId());
         });
 
-        log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
+        this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
+
+
+        log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
         this.commandHandler = new CommandHandler();
 

@@ -1,10 +1,12 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -69,8 +72,10 @@ public final class SimpleServiceFactory implements ServiceFactory {
         service.directory().toFile().mkdirs();
         service.directory().resolve("plugins").toFile().mkdirs();
 
+        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().privateKey()));
+
         try {
-            Files.copy(storagePath.resolve("jars").resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"));
+            Files.copy(storagePath.resolve("jars").resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin.", exception);
             return;

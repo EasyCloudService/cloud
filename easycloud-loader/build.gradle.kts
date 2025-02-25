@@ -31,8 +31,7 @@ tasks.withType<Jar> {
         from(zipTree(file.absoluteFile))
     }
 
-    from(project(":easycloud-agent").tasks.jar)
-    from(project(":easycloud-api").tasks.jar)
+    from(project(":easycloud-agent").tasks.getByPath(":easycloud-agent:shadowJar"))
     from(project(":easycloud-plugin").tasks.getByPath(":easycloud-plugin:shadowJar"))
 
     manifest {

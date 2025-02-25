@@ -9,13 +9,10 @@ allprojects {
     }
 
     dependencies {
-        "compileOnly"("com.google.code.gson:gson:2.11.0")
+        "compileOnly"("com.google.code.gson:gson:2.12.1")
 
-        "compileOnly"("org.projectlombok:lombok:1.18.34")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.34")
-
-        "testCompileOnly"("org.projectlombok:lombok:1.18.34")
-        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.34")
+        "compileOnly"("org.projectlombok:lombok:1.18.36")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.36")
     }
 
     tasks.withType<JavaCompile>().configureEach {

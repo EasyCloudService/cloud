@@ -30,6 +30,7 @@ public final class EasyCloudLoader {
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
 
+
         print("Loading dependencies...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
@@ -39,14 +40,16 @@ public final class EasyCloudLoader {
         manager.loadAll(executor, classLoader).join();
 
         print("Extracting jars...");
-        List.of("easycloud-agent.jar", "easycloud-api.jar", "easycloud-plugin.jar").forEach(it -> {
+        List.of("easycloud-agent.jar", "easycloud-plugin.jar").forEach(it -> {
             try {
-                Files.copy(ClassLoader.getSystemClassLoader().getResourceAsStream(it), storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
+                var file = ClassLoader.getSystemClassLoader().getResourceAsStream(it);
+                Files.copy(file, storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }
             classLoader.appendFileToClasspath(storage.resolve("jars").resolve(it));
         });
+
         Thread.currentThread().setContextClassLoader(classLoader);
 
         print("Booting EasyCloudAgent...");
