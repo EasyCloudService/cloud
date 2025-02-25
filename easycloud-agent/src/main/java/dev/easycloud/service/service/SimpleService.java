@@ -89,7 +89,9 @@ public final class SimpleService implements Service {
 
             try {
                 this.process.waitFor();
-                FileFactory.remove(this.directory);
+                if(!this.group.data().isStatic()) {
+                    FileFactory.remove(this.directory);
+                }
                 EasyCloudAgent.instance().serviceHandler().services().remove(this);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
