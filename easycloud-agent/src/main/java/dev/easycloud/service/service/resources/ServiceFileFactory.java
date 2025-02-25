@@ -1,7 +1,6 @@
 package dev.easycloud.service.service.resources;
 
 import dev.easycloud.service.EasyCloudAgent;
-import dev.easycloud.service.group.resources.Group;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.yaml.snakeyaml.Yaml;
@@ -9,7 +8,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 

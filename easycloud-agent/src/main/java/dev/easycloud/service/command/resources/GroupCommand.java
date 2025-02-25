@@ -60,6 +60,27 @@ public final class GroupCommand extends Command {
                 .add(new SetupData<>("static", "Should the group be static?", List.of("true", "false")))
                 .publish()
                 .thenAccept(it -> {
+                    var memory = it.result("memory", Integer.class);
+                    if(memory < 128) {
+                        log.error("Memory must be at least 128mb.");
+                        return;
+                    }
+                    var maxPlayers = it.result("maxPlayers", Integer.class);
+                    if(maxPlayers < 1) {
+                        log.error("Max players must be at least 1.");
+                        return;
+                    }
+                    var always = it.result("always", Integer.class);
+                    if(always < 1) {
+                        log.error("Always must be at least 1.");
+                        return;
+                    }
+                    var maximum = it.result("maximum", Integer.class);
+                    if(maximum != -1 && maximum < 2) {
+                        log.error("Maximum must be at least 2.");
+                        return;
+                    }
+
                     var group = new Group(
                             false,
                             it.result("name", String.class),
@@ -77,7 +98,7 @@ public final class GroupCommand extends Command {
 
     private void launch(String[] args) {
         SetupService.simple()
-                .add(new SetupData<String>("group", "What should the group be?", EasyCloudAgent.instance().groupHandler().groups().stream().map(Group::name).toList()))
+                .add(new SetupData<>("group", "What should the group be?", EasyCloudAgent.instance().groupHandler().groups().stream().map(Group::name).toList()))
                 .add(new SetupData<>("amount", "What should the amount be?", null))
                 .publish()
                 .thenAccept(it -> {

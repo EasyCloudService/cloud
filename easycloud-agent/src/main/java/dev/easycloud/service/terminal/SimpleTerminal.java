@@ -149,10 +149,12 @@ public final class SimpleTerminal {
                           |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                           |___ |  | ___]   |   |___ |___ |__| |__| |__/
                         """)*/
-                .reset().a("        Contributors: ")
+                .reset().a("    Contributors: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
-                .reset().a(" and ")
+                .reset().a(", ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
+                .reset().a(" and ")
+                .fgRgb(LogType.PRIMARY.rgb()).a("Swerion")
                 .reset().a("\n").toString();
 
         for (String s : layout.split("\n")) {
