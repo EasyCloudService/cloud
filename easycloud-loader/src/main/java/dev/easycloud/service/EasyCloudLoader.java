@@ -1,7 +1,7 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.dependency.DependencyLoader;
-import dev.easycloud.service.terminal.SimpleTerminal;
+import dev.easycloud.service.update.UpdateServiceHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,15 +20,9 @@ public final class EasyCloudLoader {
         storage.toFile().mkdirs();
         libaries.toFile().mkdirs();
 
-        SimpleTerminal.clear();
+        copyFile("EasyCloudUpdater.class", libaries.resolve("EasyCloudUpdater.class"));
 
-        System.out.println("""
-                  ┌──────────────────────────────────┐
-                  │                                  │
-                  │       Cloud is up to date        │
-                  │                                  │
-                  └──────────────────────────────────┘
-                """);
+        new UpdateServiceHandler();
 
         new DependencyLoader();
 

@@ -1,0 +1,77 @@
+package dev.easycloud.service.update;
+
+import lombok.Getter;
+import lombok.SneakyThrows;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.regex.Pattern;
+
+public final class UpdateGithubService {
+    private final String URL = "https://api.github.com/repos/EasyCloudService/cloud/releases/latest";
+    @Getter
+    private final GithubReleaseInformation information;
+
+    @SneakyThrows
+    public UpdateGithubService() {
+        var url = new URL(this.URL);
+        var conn = (HttpURLConnection) url.openConnection();
+
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Accept", "application/json");
+
+        var responseCode = conn.getResponseCode();
+        if (responseCode != 200) {
+            throw new RuntimeException("Failed to check for updates: " + responseCode);
+        }
+
+        var reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        var response = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            response.append(line).append("\n");
+        }
+        reader.close();
+
+        var jsonResponse = response.toString();
+        //System.out.println(jsonResponse);
+        this.information = parseJson(jsonResponse);
+    }
+
+    private GithubReleaseInformation parseJson(String jsonResponse) {
+        var tagPattern = Pattern.compile("\"name\":\"(.*?)\"");
+        var tagMatcher = tagPattern.matcher(jsonResponse);
+        String latestVersion = null;
+        if (tagMatcher.find()) {
+            latestVersion = tagMatcher.group(1);
+        }
+
+        var assetPattern = Pattern.compile("\"browser_download_url\":\"(.*?easycloud-loader.jar)\"");
+        var assetMatcher = assetPattern.matcher(jsonResponse);
+        String downloadUrl = null;
+        if (assetMatcher.find()) {
+            downloadUrl = assetMatcher.group(1);
+        }
+        return new GithubReleaseInformation(latestVersion, downloadUrl);
+    }
+
+    private String extractValue(String json, String regex) {
+        return json.matches(".*" + regex + ".*") ? json.replaceAll(".*" + regex + ".*", "$1") : null;
+    }
+
+    public void download() {
+        var name = "tmp-loader.jar";
+        try (var in = new BufferedInputStream(new URL(this.information.getDownloadUrl()).openStream());
+             var fileOutputStream = new FileOutputStream(name)) {
+            byte dataBuffer[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+            System.out.println("Download finished: " + name);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+}
