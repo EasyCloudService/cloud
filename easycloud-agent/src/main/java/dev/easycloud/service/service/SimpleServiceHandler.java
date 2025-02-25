@@ -41,7 +41,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
         templatePath.resolve("global").resolve("server").toFile().mkdirs();
         templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
-        EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, packet -> {
+        EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, (client, packet) -> {
             var service = get(packet.serviceId());
             if (service == null) {
                 return;
@@ -50,6 +50,9 @@ public final class SimpleServiceHandler implements ServiceHandler {
             service.state(ServiceState.ONLINE);
             if(service.group().platform().type().equals(PlatformType.SERVER)) {
                 EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
+            }
+            if(service.group().platform().type().equals(PlatformType.PROXY)) {
+                this.services.forEach(it -> client.send(new RegisterServerPacket(it.id(), new InetSocketAddress(it.port()))));
             }
             log.info("Service {} is now ready.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
         });
@@ -63,7 +66,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
             if(service.group().platform().type().equals(PlatformType.SERVER)) {
                 EasyCloudAgent.instance().netServer().broadcast(new UnregisterServerPacket(service.id()));
             }
-            log.info("Service {} has been shutdown.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
+            this.shutdown(service);
         });
     }
 
@@ -107,7 +110,6 @@ public final class SimpleServiceHandler implements ServiceHandler {
         }
 
         service.shutdown();
-        log.info("Service {} is now shutting down.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
     }
 
     @Override

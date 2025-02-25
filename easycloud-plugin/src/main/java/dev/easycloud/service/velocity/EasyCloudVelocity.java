@@ -69,6 +69,6 @@ public final class EasyCloudVelocity {
         this.server.getAllServers().stream()
                 .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
                 .findFirst()
-                .ifPresentOrElse(event::setInitialServer, () -> event.getPlayer().disconnect(Component.text("§cNo fallback server!")));
+                .ifPresentOrElse(event::setInitialServer, () -> event.getPlayer().disconnect(Component.text("§cNo fallback server found!")));
     }
 }

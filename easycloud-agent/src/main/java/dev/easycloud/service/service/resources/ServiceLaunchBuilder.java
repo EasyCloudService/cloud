@@ -27,6 +27,7 @@ public final class ServiceLaunchBuilder {
         arguments.add("platform.jar");
         if (service.group().platform().type().equals(PlatformType.SERVER)) {
             arguments.add("--max-players=" + service.group().data().maxPlayers());
+            arguments.add("--online-mode=false");
             arguments.add("nogui");
         }
         arguments.add("--port=" + service.port());

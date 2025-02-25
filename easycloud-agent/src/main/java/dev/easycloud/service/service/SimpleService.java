@@ -1,6 +1,7 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.scheduler.AdvancedScheduler;
 import dev.easycloud.service.service.resources.Service;
@@ -84,6 +85,7 @@ public final class SimpleService implements Service {
         if (this.group.data().isStatic()) {
             new AdvancedScheduler((Void) -> {
                 if (!this.process.isAlive()) {
+                    FileFactory.remove(this.directory);
                     EasyCloudAgent.instance().serviceHandler().services().remove(this);
                     return false;
                 }
@@ -91,6 +93,7 @@ public final class SimpleService implements Service {
             }).run(1000);
         } else {
             this.process.destroyForcibly();
+            FileFactory.remove(this.directory);
             EasyCloudAgent.instance().serviceHandler().services().remove(this);
         }
     }
