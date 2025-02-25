@@ -75,11 +75,6 @@ public final class GroupCommand extends Command {
                         log.error("Always must be at least 1.");
                         return;
                     }
-                    var maximum = it.result("maximum", Integer.class);
-                    if(maximum != -1 && maximum < 2) {
-                        log.error("Maximum must be at least 2.");
-                        return;
-                    }
 
                     var group = new Group(
                             false,
