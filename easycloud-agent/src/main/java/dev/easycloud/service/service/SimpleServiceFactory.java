@@ -77,7 +77,7 @@ public final class SimpleServiceFactory implements ServiceFactory {
         try {
             Files.copy(storagePath.resolve("jars").resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
-            log.error("Failed to copy server plugin.", exception);
+            log.error("Failed to copy server plugin. ({})", service.id(), exception);
             return;
         }
 

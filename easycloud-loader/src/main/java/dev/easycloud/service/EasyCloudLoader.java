@@ -19,8 +19,10 @@ public final class EasyCloudLoader {
 
     @SneakyThrows
     public static void main(String[] args) {
-        var classLoader = new ClassPathLoader();
+        var classPathLoader = new ClassPathLoader();
         var storage = Path.of("storage");
+
+        Thread.currentThread().setContextClassLoader(classPathLoader);
 
         print("Starting EasyCloudLoader...");
 
@@ -30,33 +32,41 @@ public final class EasyCloudLoader {
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
 
-
         print("Loading dependencies...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
                 new StandardRepository("https://repo1.maven.org/maven2/"),
                 new StandardRepository("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         )).join();
-        manager.loadAll(executor, classLoader).join();
+       // manager.relocateAll(executor).join();
+        manager.loadAll(executor, classPathLoader).join();
 
         print("Extracting jars...");
-        List.of("easycloud-agent.jar", "easycloud-plugin.jar").forEach(it -> {
-            try {
-                var file = ClassLoader.getSystemClassLoader().getResourceAsStream(it);
-                Files.copy(file, storage.resolve("jars").resolve(it), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException exception) {
-                throw new RuntimeException(exception);
-            }
-            classLoader.appendFileToClasspath(storage.resolve("jars").resolve(it));
-        });
-
-        Thread.currentThread().setContextClassLoader(classLoader);
+        copyStreamFile("easycloud-api.jar", classPathLoader);
+        copyStreamFile("easycloud-agent.jar", classPathLoader);
+        copyStreamFile("easycloud-plugin.jar", classPathLoader);
 
         print("Booting EasyCloudAgent...");
-        Class.forName("dev.easycloud.service.EasyCloudAgent", true, classLoader).getConstructor().newInstance();
+
+        Class.forName("dev.easycloud.service.EasyCloudAgent", true, classPathLoader).getConstructor().newInstance();
+        //System.out.println(Class.forName("dev.easycloud.service.packet.connection.ServiceConnectPacket"));
     }
 
     private static void print(String message) {
         System.out.println("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] INFO: " + message);
+    }
+
+    private static void copyStreamFile(String name, ClassPathLoader classPathLoader) {
+        var storage = Path.of("storage");
+        try {
+            var file = ClassLoader.getSystemClassLoader().getResourceAsStream(name);
+            if(file == null) {
+                throw new RuntimeException("Resource " + name + " not found!");
+            }
+            Files.copy(file, storage.resolve("jars").resolve(name), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+        classPathLoader.appendFileToClasspath(storage.resolve("jars").resolve(name));
     }
 }

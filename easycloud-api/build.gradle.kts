@@ -6,6 +6,6 @@ dependencies {
     compileOnly("dev.httpmarco:netline:1.0.0-SNAPSHOT")
 }
 
-/*tasks.jar {
+tasks.jar {
     archiveFileName.set("easycloud-api.jar")
-}*/
+}

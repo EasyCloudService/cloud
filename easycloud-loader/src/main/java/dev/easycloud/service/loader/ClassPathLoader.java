@@ -22,6 +22,6 @@ public final class ClassPathLoader extends URLClassLoader implements ClasspathAp
     @Override
     @SneakyThrows
     public void appendFileToClasspath(@NotNull Path path) {
-        addURL(path.toAbsolutePath().toUri().toURL());
+        this.addURL(path.toAbsolutePath().toUri().toURL());
     }
 }

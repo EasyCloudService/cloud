@@ -1,15 +1,9 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 repositories {
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
-plugins {
-    id("com.gradleup.shadow") version ("9.0.0-beta8")
-}
-
 dependencies {
-    implementation(project(":easycloud-api"))
+    compileOnly(project(":easycloud-api"))
 
     compileOnly("org.jline:jline:3.26.3")
     compileOnly("org.fusesource.jansi:jansi:2.2.0")
@@ -23,6 +17,6 @@ dependencies {
     compileOnly("org.jetbrains:annotations:15.0")
 }
 
-tasks.withType<ShadowJar> {
+tasks.jar {
     archiveFileName.set("easycloud-agent.jar")
 }

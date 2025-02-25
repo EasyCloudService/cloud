@@ -22,7 +22,6 @@ dependencies {
     runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 
     runtimeDownload("org.jetbrains:annotations:15.0")
-
 }
 
 tasks.withType<Jar> {
@@ -31,7 +30,8 @@ tasks.withType<Jar> {
         from(zipTree(file.absoluteFile))
     }
 
-    from(project(":easycloud-agent").tasks.getByPath(":easycloud-agent:shadowJar"))
+    from(project(":easycloud-api").tasks.jar)
+    from(project(":easycloud-agent").tasks.jar)
     from(project(":easycloud-plugin").tasks.getByPath(":easycloud-plugin:shadowJar"))
 
     manifest {

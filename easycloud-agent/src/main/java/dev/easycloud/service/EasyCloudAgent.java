@@ -13,22 +13,14 @@ import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
 import dev.httpmarco.netline.Net;
-import dev.httpmarco.netline.NetChannel;
-import dev.httpmarco.netline.NetComp;
-import dev.httpmarco.netline.request.ResponderRegisterPacket;
-import dev.httpmarco.netline.request.ResponsePacket;
-import dev.httpmarco.netline.security.SecurityHandler;
 import dev.httpmarco.netline.server.NetServer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -71,12 +63,12 @@ public final class EasyCloudAgent {
                     config.port(5200);
                 })
                 .bootSync();
-        
+
+        this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
+
         this.netServer.track(ServiceConnectPacket.class, (channel, packet) -> {
             System.out.println("Service connected: " + packet.serviceId());
         });
-
-        this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
 
 
         log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
