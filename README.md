@@ -1,8 +1,6 @@
-
-![Logo](https://easycloudservice.de/cdn/banner.png)
 # EasyCloudService
 
-Under development!
+## SNAPSHOT downloadable
 
 ## FAQ
 
