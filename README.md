@@ -5,8 +5,9 @@
 ## ❓ FAQ
 
 ### 🔹 I want AutoUpdates, what can I do?
-To enable them, open the `start-script` (`start.bat` or `start.sh`) and add the following argument `-Dauto.updates=true` to the end.
-It should look like this: `java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true` \
+To enable them, open the `start-script` (`start.bat` or `start.sh`) and add the following argument \
+`-Dauto.updates=true` to the end.
+It should look like this: `java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true`
 
 ### 🔹 How do I set up a group?
 ```java
