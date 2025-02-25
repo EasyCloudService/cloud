@@ -8,6 +8,8 @@ import java.util.List;
 public interface ServiceHandler {
     List<Service> services();
 
+    Service get(String id);
+
     void launch(Group group);
     void launch(Group group, int count);
 

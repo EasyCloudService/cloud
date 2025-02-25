@@ -2,6 +2,7 @@ package dev.easycloud.service.paper;
 
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
+import dev.easycloud.service.network.packet.ServiceShutdownPacket;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.client.NetClient;
@@ -30,5 +31,11 @@ public final class EasyCloudPaper extends JavaPlugin {
         this.getLogger().info("NetLine is connecting to 127.0.0.1:5200...");
 
         this.netClient.send(new ServiceReadyPacket(this.configuration.id(), Bukkit.getPort()));
+    }
+
+    @Override
+    public void onDisable() {
+        this.netClient.send(new ServiceShutdownPacket(this.configuration.id()));
+        this.netClient.closeSync();
     }
 }

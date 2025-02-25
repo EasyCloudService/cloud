@@ -72,8 +72,6 @@ public final class GroupCommand extends Command {
                                     Boolean.parseBoolean(it.result("static", String.class))
                             ));
                     EasyCloudAgent.instance().groupHandler().create(group);
-
-                    log.info("{} has successfully been created.", ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
                 });
     }
 

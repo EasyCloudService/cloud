@@ -4,10 +4,15 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.platform.Platform;
+import dev.easycloud.service.platform.types.PaperPlatformInitializer;
 import dev.easycloud.service.terminal.LogType;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fusesource.jansi.Ansi;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,12 +77,40 @@ public final class SimpleGroupHandler implements GroupHandler {
     }
 
     @Override
+    @SneakyThrows
     public void create(Group group) {
         this.groups.add(group);
 
         this.refresh();
-        group.enabled(true);
-        FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+        var storagePath = Path.of("storage");
+        if(!group.data().isStatic()) {
+            var templatePath = Path.of("template").resolve("server").resolve(group.name());
+            templatePath.toFile().mkdirs();
+
+            if(group.platform().initilizerId().equals("paper")) {
+                new Thread(() -> {
+                    try {
+                        Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
+                        var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
+                                .directory(templatePath.toFile())
+                                .start();
+                        service.waitFor();
+
+                        Files.delete(templatePath.resolve("tmp.jar"));
+
+                        group.enabled(true);
+                        FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+                        log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
+                    } catch (IOException | InterruptedException exception) {
+                        throw new RuntimeException(exception);
+                    }
+                }).start();
+            }
+        } else {
+            group.enabled(true);
+            FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+            log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
+        }
     }
 
     @Override

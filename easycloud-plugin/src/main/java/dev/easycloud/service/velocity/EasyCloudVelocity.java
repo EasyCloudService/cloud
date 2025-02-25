@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
+import dev.easycloud.service.network.packet.proxy.UnregisterServerPacket;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.client.NetClient;
@@ -45,7 +46,12 @@ public final class EasyCloudVelocity {
 
         this.netClient.track(RegisterServerPacket.class, packet -> {
             this.server.registerServer(new ServerInfo(packet.id(), packet.address()));
-            this.logger.info("Service {} is ready on port {}.", packet.id(), packet.address().getPort());
+            this.logger.info("Service {} is connected to port {}.", packet.id(), packet.address().getPort());
+        });
+
+        this.netClient.track(UnregisterServerPacket.class, packet -> {
+            this.server.unregisterServer(this.server.getServer(packet.id()).orElseThrow().getServerInfo());
+            this.logger.info("Service {} is disconnected.", packet.id());
         });
     }
 

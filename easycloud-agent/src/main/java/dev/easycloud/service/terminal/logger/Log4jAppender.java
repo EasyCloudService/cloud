@@ -82,7 +82,6 @@ public final class Log4jAppender extends AbstractAppender {
     private String format(String message) {
         return message
                 .replace("ready", ansi().fgRgb(LogType.SUCCESS.rgb()).a("ready").reset().toString())
-                .replace("successfully", ansi().fgRgb(LogType.SUCCESS.rgb()).a("successfully").reset().toString())
                 .replace("success", ansi().fgRgb(LogType.SUCCESS.rgb()).a("success").reset().toString())
                 .replace("canceled", ansi().fgRgb(LogType.ERROR.rgb()).a("canceled").reset().toString())
                 .replace("completed", ansi().fgRgb(LogType.SUCCESS.rgb()).a("completed").reset().toString())

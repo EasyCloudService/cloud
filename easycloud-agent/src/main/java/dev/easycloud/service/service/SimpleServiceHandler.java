@@ -4,7 +4,9 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
+import dev.easycloud.service.network.packet.ServiceShutdownPacket;
 import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
+import dev.easycloud.service.network.packet.proxy.UnregisterServerPacket;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.resources.Service;
@@ -34,15 +36,28 @@ public final class SimpleServiceHandler implements ServiceHandler {
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
 
         EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, packet -> {
-            var service = this.services.stream().filter(it -> it.id().equals(packet.serviceId())).findFirst().orElse(null);
+            var service = get(packet.serviceId());
             if (service == null) {
-                log.error("Service {} not found.", packet.serviceId());
                 return;
             }
+
             service.state(ServiceState.ONLINE);
             if(service.group().platform().type().equals(PlatformType.SERVER)) {
                 EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
             }
+            log.info("Service {} is now ready.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
+        });
+
+        EasyCloudAgent.instance().netServer().track(ServiceShutdownPacket.class, packet -> {
+            var service = get(packet.serviceId());
+            if (service == null) {
+                return;
+            }
+
+            if(service.group().platform().type().equals(PlatformType.SERVER)) {
+                EasyCloudAgent.instance().netServer().broadcast(new UnregisterServerPacket(service.id()));
+            }
+            log.info("Service {} has been shutdown.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
         });
     }
 
@@ -65,7 +80,22 @@ public final class SimpleServiceHandler implements ServiceHandler {
     }
 
     @Override
+    public Service get(String id) {
+        var service = this.services.stream().filter(it -> it.id().equals(id)).findFirst().orElse(null);
+        if (service == null) {
+            log.error("Service {} not found.", id);
+            return null;
+        }
+        return service;
+    }
+
+    @Override
     public void launch(Group group) {
+        if(!group.enabled()) {
+            log.error("Group {} is currently disabled.", group.name());
+            return;
+        }
+
         var port = this.freePort();
         if(group.platform().type().equals(PlatformType.PROXY)) {
             port = 25565;
