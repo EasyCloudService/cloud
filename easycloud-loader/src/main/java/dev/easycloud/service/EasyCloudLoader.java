@@ -60,7 +60,12 @@ public final class EasyCloudLoader {
 
         var thread = new Thread(() -> {
             try {
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;storage/libaries/*;", "dev.easycloud.service.EasyCloudBootstrap")
+                var fileArg = "easycloud-agent.jar;storage/libaries/*;";
+                if(!isWindows()) {
+                    fileArg = fileArg.replace(";", ":");
+                }
+
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", fileArg, "dev.easycloud.service.EasyCloudBootstrap")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)
@@ -86,6 +91,10 @@ public final class EasyCloudLoader {
                 break;
             }
         }
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
     private static void clear() {
