@@ -21,7 +21,7 @@ public final class EasyCloudLoader {
     @SneakyThrows
     public static void main(String[] args) {
         var storage = Path.of("storage");
-        var libaries = Path.of("libs");
+        var libaries = storage.resolve("libs");
         storage.toFile().mkdirs();
         libaries.toFile().mkdirs();
 
