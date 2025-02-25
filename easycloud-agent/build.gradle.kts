@@ -18,10 +18,6 @@ dependencies {
 }
 
 
-tasks.withType<Jar> {
+tasks.jar {
     archiveFileName.set("easycloud-agent.jar")
-
-    manifest {
-        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudAgent"
-    }
 }

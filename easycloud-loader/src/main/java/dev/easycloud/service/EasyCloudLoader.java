@@ -1,14 +1,11 @@
 package dev.easycloud.service;
 
-import dev.easycloud.service.loader.ClassPathLoader;
 import dev.vankka.dependencydownload.DependencyManager;
 import dev.vankka.dependencydownload.repository.StandardRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -23,39 +20,47 @@ public final class EasyCloudLoader {
 
     @SneakyThrows
     public static void main(String[] args) {
-        var classPathLoader = new ClassPathLoader();
         var storage = Path.of("storage");
-
-        Thread.currentThread().setContextClassLoader(classPathLoader);
-
-        print("Starting EasyCloudLoader...");
-
-        var logs = Path.of("logs");
-        logs.toFile().mkdirs();
+        var libaries = Path.of("libs");
         storage.toFile().mkdirs();
+        libaries.toFile().mkdirs();
+
+        clear();
+        System.out.println("""
+                  ┌──────────────────────────────────┐
+                  │                                  │
+                  │      Checking for update...      │
+                  │                                  │
+                  └──────────────────────────────────┘
+                """);
+        clear();
+        System.out.println("""
+                  ┌──────────────────────────────────┐
+                  │                                  │
+                  │       Cloud is up to date        │
+                  │                                  │
+                  └──────────────────────────────────┘
+                """);
 
         var executor = Executors.newCachedThreadPool();
-        var manager = new DependencyManager(storage.resolve("dependencies"));
+        var manager = new DependencyManager(libaries);
 
-        print("Downloading dependencies...");
+        print("Updating libaries...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
                 new StandardRepository("https://repo1.maven.org/maven2/"),
                 new StandardRepository("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         )).join();
+        print("Libaries are up to date!");
 
-        print("Extracting files...");
         copyFile("easycloud-plugin.jar", storage.resolve("easycloud-plugin.jar"));
-        copyFile("easycloud-api.jar", storage.resolve("dependencies").resolve("dev.easycloud.service-impl-stable.jar"));
+        copyFile("easycloud-api.jar", libaries.resolve("dev.easycloud.service-impl-stable.jar"));
 
         copyFile("easycloud-agent.jar", Path.of("easycloud-agent.jar"));
 
-        print("Booting EasyCloudAgent...");
         var thread = new Thread(() -> {
             try {
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;storage/dependencies/*;", "dev.easycloud.service.EasyCloudBootstrap")
-                        .redirectOutput(logs.resolve("latest.log").toFile())
-                        .redirectError(logs.resolve("latest-error.log").toFile())
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;libaries/*;", "dev.easycloud.service.EasyCloudBootstrap")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)
@@ -83,7 +88,12 @@ public final class EasyCloudLoader {
         }
     }
 
-    private static void print(String message) {
+    private static void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static void print(String message) {
         System.out.println("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] INFO: " + message);
     }
 
