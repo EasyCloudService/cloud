@@ -82,20 +82,19 @@ public final class SimpleService implements Service {
     public void shutdown() {
         this.execute("stop");
         log.info("Service {} will be shutdown...", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
-        if (this.group.data().isStatic()) {
-            new AdvancedScheduler((Void) -> {
-                if (!this.process.isAlive()) {
-                    FileFactory.remove(this.directory);
-                    EasyCloudAgent.instance().serviceHandler().services().remove(this);
-                    return false;
-                }
-                return true;
-            }).run(1000);
-        } else {
-            this.process.destroyForcibly();
-            FileFactory.remove(this.directory);
-            EasyCloudAgent.instance().serviceHandler().services().remove(this);
-        }
+        new Thread(() -> {
+            if (!this.group.data().isStatic()) {
+                this.process.destroyForcibly();
+            }
+
+            try {
+                this.process.waitFor();
+                FileFactory.remove(this.directory);
+                EasyCloudAgent.instance().serviceHandler().services().remove(this);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
     }
 
     public void print(String line) {

@@ -168,7 +168,11 @@ public final class SimpleServiceHandler implements ServiceHandler {
             FileFactory.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
             FileFactory.copy(templatePath.resolve("proxy").resolve(service.group().name()), service.directory());
 
-            FileFactory.writeRaw(service.directory().resolve("forwarding.secret"), List.of(EasyCloudAgent.instance().securityKey()));
+            var secretPath = service.directory().resolve("forwarding.secret");
+            if(Files.exists(secretPath)) {
+                Files.delete(secretPath);
+            }
+            Files.write(secretPath, EasyCloudAgent.instance().securityKey().getBytes());
         } else {
             FileFactory.copy(templatePath.resolve("global").resolve("server"), service.directory());
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
