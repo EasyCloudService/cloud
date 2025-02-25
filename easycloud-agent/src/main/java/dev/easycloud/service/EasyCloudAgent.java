@@ -83,7 +83,12 @@ public final class EasyCloudAgent {
 
         this.terminal.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            this.shutdown();
+
+            while (true) {
+            }
+        }));
     }
 
     @SneakyThrows
