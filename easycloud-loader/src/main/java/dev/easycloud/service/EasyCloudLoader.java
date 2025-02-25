@@ -4,6 +4,7 @@ import dev.easycloud.service.loader.ClassPathLoader;
 import dev.vankka.dependencydownload.DependencyManager;
 import dev.vankka.dependencydownload.repository.StandardRepository;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public final class EasyCloudLoader {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
@@ -47,12 +49,15 @@ public final class EasyCloudLoader {
 
         copyFile("easycloud-agent.jar", Path.of(""));
 
+        var logs = Path.of("logs");
+        logs.toFile().mkdirs();
+
         print("Booting EasyCloudAgent...");
         var thread = new Thread(() -> {
             try {
                 var process = new ProcessBuilder("java", "-cp", "easycloud-agent.jar;storage/dependencies/*;", "dev.easycloud.service.EasyCloudBootstrap")
-                        /*.redirectOutput(new File("easycloud-agent.log"))
-                        .redirectError(new File("easycloud-agent.log"))*/
+                        .redirectOutput(logs.resolve("latest.log").toFile())
+                        .redirectError(logs.resolve("latest-error.log").toFile())
                         .redirectErrorStream(true)
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
@@ -60,13 +65,24 @@ public final class EasyCloudLoader {
                         .start();
 
                 process.waitFor();
-
             } catch (IOException | InterruptedException exception) {
                 throw new RuntimeException(exception);
             }
         });
         thread.setDaemon(false);
         thread.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            print("Shutting down EasyCloudLoader...");
+            thread.interrupt();
+        }));
+
+        while (true) {
+            if(!thread.isAlive()) {
+                System.exit(0);
+                break;
+            }
+        }
     }
 
     private static void print(String message) {
