@@ -9,10 +9,7 @@ import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
 import dev.easycloud.service.network.packet.proxy.UnregisterServerPacket;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
-import dev.easycloud.service.service.resources.Service;
-import dev.easycloud.service.service.resources.ServiceDataConfiguration;
-import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
-import dev.easycloud.service.service.resources.ServiceState;
+import dev.easycloud.service.service.resources.*;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -177,6 +174,8 @@ public final class SimpleServiceHandler implements ServiceHandler {
             FileFactory.copy(templatePath.resolve("global").resolve("server"), service.directory());
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
+
+        ServiceFileFactory.insert(service, service.directory());
 
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().securityKey()));
 

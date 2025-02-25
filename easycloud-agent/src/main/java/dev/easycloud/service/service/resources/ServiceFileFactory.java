@@ -1,6 +1,7 @@
-package dev.easycloud.service.group.resources;
+package dev.easycloud.service.service.resources;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.group.resources.Group;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.yaml.snakeyaml.Yaml;
@@ -8,23 +9,26 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
 @UtilityClass
-public final class GroupFilesFactory {
+public final class ServiceFileFactory {
 
     @SneakyThrows
-    public void insert(Group group, Path templatePath) {
-        if(group.platform().initilizerId().equals("paper")) {
-            var configPath = templatePath.resolve("config");
+    public void insert(Service service, Path path) {
+        if(service.group().platform().initilizerId().equals("paper")) {
+            var configPath = path.resolve("config");
             configPath.toFile().mkdirs();
             paper(configPath);
             return;
         }
 
-        if(group.platform().initilizerId().equals("velocity")) {
-            Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("velocity.toml"), templatePath.resolve("velocity.toml"));
+        if(service.group().platform().initilizerId().equals("velocity")) {
+            if(!Files.exists(path.resolve("velocity.toml"))) {
+                Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("velocity.toml"), path.resolve("velocity.toml"));
+            }
             return;
         }
     }
@@ -48,7 +52,12 @@ public final class GroupFilesFactory {
         Map<String, Object> yamlData = new HashMap<>();
         yamlData.put("proxies", proxies);
 
-        try (FileWriter writer = new FileWriter(path.resolve("paper-global.yml").toFile())) {
+        var file = path.resolve("paper-global.yml").toFile();
+        if(file.exists()) {
+            file.delete();
+        }
+
+        try (FileWriter writer = new FileWriter(file)) {
             yaml.dump(yamlData, writer);
         } catch (Exception exception) {
             throw new RuntimeException(exception);

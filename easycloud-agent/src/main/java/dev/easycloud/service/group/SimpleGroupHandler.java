@@ -3,10 +3,8 @@ package dev.easycloud.service.group;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.group.resources.GroupFilesFactory;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
-import dev.easycloud.service.platform.types.PaperPlatformInitializer;
 import dev.easycloud.service.terminal.LogType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -87,8 +85,6 @@ public final class SimpleGroupHandler implements GroupHandler {
         var storagePath = Path.of("storage");
         var templatePath = Path.of("template").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
         templatePath.toFile().mkdirs();
-
-        GroupFilesFactory.insert(group, templatePath);
 
         if (!group.data().isStatic()) {
             new Thread(() -> {

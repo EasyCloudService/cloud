@@ -45,7 +45,7 @@ public final class EasyCloudAgent {
     public EasyCloudAgent() {
         instance = this;
 
-        this.securityKey = "key-" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
+        this.securityKey = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
 
         long timeSinceStart = System.currentTimeMillis();
         FileFactory.remove(Path.of("services"));
