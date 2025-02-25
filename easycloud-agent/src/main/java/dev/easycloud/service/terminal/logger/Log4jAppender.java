@@ -75,8 +75,8 @@ public final class Log4jAppender extends AbstractAppender {
 
         if(!EasyCloudAgent.instance().terminal().screenPrinting() && SetupService.running.isEmpty()) {
             System.out.println(PATTERN.toString());
-            EasyCloudAgent.instance().terminal().history().add(PATTERN.toString());
         }
+        EasyCloudAgent.instance().terminal().history().add(PATTERN.toString());
     }
 
     private String format(String message) {

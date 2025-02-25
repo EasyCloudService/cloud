@@ -38,17 +38,17 @@ public final class EasyCloudAgent {
     private final GroupHandler groupHandler;
     private final PlatformHandler platformHandler;
 
-    private final String privateKey;
+    private final String securityKey;
     private final NetServer netServer;
 
     @SneakyThrows
     public EasyCloudAgent() {
         instance = this;
 
-        this.privateKey = "key-" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
+        this.securityKey = "key-" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
 
         long timeSinceStart = System.currentTimeMillis();
-        FileFactory.removeDirectory(Path.of("services"));
+        FileFactory.remove(Path.of("services"));
 
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
@@ -61,7 +61,7 @@ public final class EasyCloudAgent {
                 })
                 .bootSync();
 
-        this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
+        this.netServer.withSecurityPolicy(new NetLineSecurity(this.securityKey));
         log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
         this.commandHandler = new CommandHandler();

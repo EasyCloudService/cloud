@@ -15,6 +15,7 @@ import dev.easycloud.service.service.resources.ServiceLaunchBuilder;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -34,6 +35,11 @@ public final class SimpleServiceHandler implements ServiceHandler {
 
     public SimpleServiceHandler() {
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
+
+        var templatePath = Path.of("template");
+        templatePath.resolve("global").resolve("all").toFile().mkdirs();
+        templatePath.resolve("global").resolve("server").toFile().mkdirs();
+        templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
         EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, packet -> {
             var service = get(packet.serviceId());
@@ -62,6 +68,10 @@ public final class SimpleServiceHandler implements ServiceHandler {
     }
 
     public void refresh() {
+        for (SimpleService service : this.services.stream().map(it -> (SimpleService) it).filter(it -> it.process() == null || !it.process().isAlive()).toList()) {
+            this.shutdown(service);
+        }
+
         for (Group group : EasyCloudAgent.instance().groupHandler().groups().stream().filter(Group::enabled).toList()) {
             var always = group.data().always();
             var max = group.data().maximum();
@@ -87,6 +97,17 @@ public final class SimpleServiceHandler implements ServiceHandler {
             return null;
         }
         return service;
+    }
+
+    @Override
+    public void shutdown(Service service) {
+        if (service == null) {
+            log.error("Service is null.");
+            return;
+        }
+
+        service.shutdown();
+        log.info("Service {} is now shutting down.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
     }
 
     @Override
@@ -130,14 +151,28 @@ public final class SimpleServiceHandler implements ServiceHandler {
         }
     }
 
+    @SneakyThrows
     private boolean prepare(Service service) {
         var storagePath = Path.of("storage");
+        var templatePath = Path.of("template");
         var group = service.group();
 
         service.directory().toFile().mkdirs();
         service.directory().resolve("plugins").toFile().mkdirs();
 
-        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().privateKey()));
+        FileFactory.copy(templatePath.resolve("global").resolve("all"), service.directory());
+
+        if(group.platform().type().equals(PlatformType.PROXY)) {
+            FileFactory.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
+            FileFactory.copy(templatePath.resolve("proxy").resolve(service.group().name()), service.directory());
+
+            FileFactory.writeRaw(service.directory().resolve("forwarding.secret"), List.of(EasyCloudAgent.instance().securityKey()));
+        } else {
+            FileFactory.copy(templatePath.resolve("global").resolve("server"), service.directory());
+            FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
+        }
+
+        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().securityKey()));
 
         try {
             Files.copy(storagePath.resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);

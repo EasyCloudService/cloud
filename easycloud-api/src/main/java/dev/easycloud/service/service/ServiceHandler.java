@@ -10,6 +10,8 @@ public interface ServiceHandler {
 
     Service get(String id);
 
+    void shutdown(Service service);
+
     void launch(Group group);
     void launch(Group group, int count);
 

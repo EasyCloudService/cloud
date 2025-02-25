@@ -5,6 +5,8 @@ repositories {
 dependencies {
     compileOnly(project(":easycloud-api"))
 
+    compileOnly("org.yaml:snakeyaml:2.4")
+
     compileOnly("org.jline:jline:3.26.3")
     compileOnly("org.fusesource.jansi:jansi:2.2.0")
 

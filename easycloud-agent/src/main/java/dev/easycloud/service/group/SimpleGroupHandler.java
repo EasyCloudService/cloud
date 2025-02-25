@@ -3,7 +3,9 @@ package dev.easycloud.service.group;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.group.resources.GroupFilesFactory;
 import dev.easycloud.service.platform.Platform;
+import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.platform.types.PaperPlatformInitializer;
 import dev.easycloud.service.terminal.LogType;
 import lombok.SneakyThrows;
@@ -29,7 +31,7 @@ public final class SimpleGroupHandler implements GroupHandler {
         this.groups = new ArrayList<>();
 
         var pathFile = this.GROUPS_PATH.toFile();
-        if(!pathFile.exists()) {
+        if (!pathFile.exists()) {
             pathFile.mkdirs();
         }
 
@@ -42,14 +44,14 @@ public final class SimpleGroupHandler implements GroupHandler {
     public void refresh() {
         List<Platform> platforms = new ArrayList<>();
         for (Group group : this.groups) {
-            if(platforms.contains(group.platform())) {
+            if (platforms.contains(group.platform())) {
                 continue;
             }
             platforms.add(group.platform());
         }
 
         var platformPath = Path.of("storage").resolve("platforms");
-        if(!platformPath.toFile().exists()) {
+        if (!platformPath.toFile().exists()) {
             platformPath.toFile().mkdirs();
         }
 
@@ -61,11 +63,11 @@ public final class SimpleGroupHandler implements GroupHandler {
                     .orElseThrow();
             var jarPath = platformPath.resolve(platform.initilizerId() + "-" + platform.version() + ".jar");
 
-            if(!jarPath.toFile().exists()) {
+            if (!jarPath.toFile().exists()) {
                 log.info("Downloading {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset());
 
                 var downloadUrl = initializer.buildDownload(platform.version());
-                if(downloadUrl == null) {
+                if (downloadUrl == null) {
                     log.error("Failed to download platform. Invalid download url/version.");
                     return;
                 }
@@ -83,12 +85,14 @@ public final class SimpleGroupHandler implements GroupHandler {
 
         this.refresh();
         var storagePath = Path.of("storage");
-        if(!group.data().isStatic()) {
-            var templatePath = Path.of("template").resolve("server").resolve(group.name());
-            templatePath.toFile().mkdirs();
+        var templatePath = Path.of("template").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
+        templatePath.toFile().mkdirs();
 
-            if(group.platform().initilizerId().equals("paper")) {
-                new Thread(() -> {
+        GroupFilesFactory.insert(group, templatePath);
+
+        if (!group.data().isStatic()) {
+            new Thread(() -> {
+                if (group.platform().initilizerId().equals("paper")) {
                     try {
                         Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
                         var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
@@ -97,15 +101,15 @@ public final class SimpleGroupHandler implements GroupHandler {
                         service.waitFor();
 
                         Files.delete(templatePath.resolve("tmp.jar"));
-
-                        group.enabled(true);
-                        FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
-                        log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
                     } catch (IOException | InterruptedException exception) {
                         throw new RuntimeException(exception);
                     }
-                }).start();
-            }
+                }
+
+                group.enabled(true);
+                FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+                log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
+            }).start();
         } else {
             group.enabled(true);
             FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);

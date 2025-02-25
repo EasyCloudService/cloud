@@ -11,6 +11,7 @@ dependencies {
     implementation("dev.vankka:dependencydownload-runtime:1.3.1")
 
     // define all dependencies that should be downloaded at runtime
+    runtimeDownload("org.yaml:snakeyaml:2.4")
     runtimeDownload("com.google.code.gson:gson:2.11.0")
     runtimeDownload("org.jline:jline:3.26.3")
     runtimeDownload("org.fusesource.jansi:jansi:2.2.0")
