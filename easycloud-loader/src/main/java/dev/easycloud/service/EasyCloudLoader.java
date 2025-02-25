@@ -5,7 +5,9 @@ import dev.vankka.dependencydownload.DependencyManager;
 import dev.vankka.dependencydownload.repository.StandardRepository;
 import lombok.SneakyThrows;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -32,41 +34,54 @@ public final class EasyCloudLoader {
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
 
-        print("Loading dependencies...");
+        print("Downloading dependencies...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));
         manager.downloadAll(executor, List.of(
                 new StandardRepository("https://repo1.maven.org/maven2/"),
                 new StandardRepository("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         )).join();
-       // manager.relocateAll(executor).join();
-        manager.loadAll(executor, classPathLoader).join();
 
-        print("Extracting jars...");
-        copyStreamFile("easycloud-api.jar", classPathLoader);
-        copyStreamFile("easycloud-agent.jar", classPathLoader);
-        copyStreamFile("easycloud-plugin.jar", classPathLoader);
+        print("Extracting files...");
+        copyFile("easycloud-plugin.jar", storage);
+        copyFile("easycloud-api.jar", storage.resolve("dependencies"));
+
+        copyFile("easycloud-agent.jar", Path.of(""));
 
         print("Booting EasyCloudAgent...");
+        var thread = new Thread(() -> {
+            try {
+                var process = new ProcessBuilder("java", "-cp", "easycloud-agent.jar;storage/dependencies/*;", "dev.easycloud.service.EasyCloudBootstrap")
+                        /*.redirectOutput(new File("easycloud-agent.log"))
+                        .redirectError(new File("easycloud-agent.log"))*/
+                        .redirectErrorStream(true)
+                        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                        .redirectError(ProcessBuilder.Redirect.INHERIT)
+                        .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                        .start();
 
-        Class.forName("dev.easycloud.service.EasyCloudAgent", true, classPathLoader).getConstructor().newInstance();
-        //System.out.println(Class.forName("dev.easycloud.service.packet.connection.ServiceConnectPacket"));
+                process.waitFor();
+
+            } catch (IOException | InterruptedException exception) {
+                throw new RuntimeException(exception);
+            }
+        });
+        thread.setDaemon(false);
+        thread.start();
     }
 
     private static void print(String message) {
         System.out.println("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] INFO: " + message);
     }
 
-    private static void copyStreamFile(String name, ClassPathLoader classPathLoader) {
-        var storage = Path.of("storage");
+    private static void copyFile(String name, Path path) {
         try {
             var file = ClassLoader.getSystemClassLoader().getResourceAsStream(name);
-            if(file == null) {
+            if (file == null) {
                 throw new RuntimeException("Resource " + name + " not found!");
             }
-            Files.copy(file, storage.resolve("jars").resolve(name), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file, path.resolve(name), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-        classPathLoader.appendFileToClasspath(storage.resolve("jars").resolve(name));
     }
 }

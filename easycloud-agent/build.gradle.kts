@@ -17,6 +17,11 @@ dependencies {
     compileOnly("org.jetbrains:annotations:15.0")
 }
 
-tasks.jar {
+
+tasks.withType<Jar> {
     archiveFileName.set("easycloud-agent.jar")
+
+    manifest {
+        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudAgent"
+    }
 }

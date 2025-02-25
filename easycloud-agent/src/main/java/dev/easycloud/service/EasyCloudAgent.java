@@ -54,8 +54,6 @@ public final class EasyCloudAgent {
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        System.out.println(Class.forName("dev.easycloud.service.packet.connection.ServiceConnectPacket"));
-
         this.netServer = Net.line().server();
         this.netServer
                 .config(config -> {

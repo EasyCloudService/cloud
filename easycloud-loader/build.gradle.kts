@@ -38,7 +38,7 @@ tasks.withType<Jar> {
         attributes["Main-Class"] = "dev.easycloud.service.EasyCloudLoader"
     }
 
-    archiveFileName.set("easycloudservice.jar")
+    archiveFileName.set("easycloud-loader.jar")
     dependsOn(
         tasks.named("generateRuntimeDownloadResourceForRuntimeDownloadOnly"),
         tasks.named("generateRuntimeDownloadResourceForRuntimeDownload")
