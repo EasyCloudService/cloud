@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.scheduler.AdvancedScheduler;
 import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,8 @@ public final class SimpleService implements Service {
     private final String id;
     private final Group group;
 
+    private ServiceState state;
+
     private final int port;
     private final Path directory;
 
@@ -44,6 +47,11 @@ public final class SimpleService implements Service {
         this.logStream = false;
 
         this.logCache = new ArrayList<>();
+    }
+
+    @Override
+    public void state(ServiceState serviceState) {
+        this.state = serviceState;
     }
 
     public void process(Process process) {
@@ -72,7 +80,7 @@ public final class SimpleService implements Service {
     @Override
     public void shutdown() {
         this.execute("stop");
-        log.info("Service {} will be shutdown.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
+        log.info("Service {} will be shutdown...", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
         if (this.group.data().isStatic()) {
             new AdvancedScheduler((Void) -> {
                 if (!this.process.isAlive()) {

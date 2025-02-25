@@ -8,6 +8,9 @@ public interface Service {
     String id();
     Group group();
 
+    ServiceState state();
+    void state(ServiceState state);
+
     int port();
     Path directory();
 

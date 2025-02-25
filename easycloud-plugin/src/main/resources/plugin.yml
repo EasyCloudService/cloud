@@ -1,0 +1,7 @@
+name: EasyCloud-Paper
+version: 1.0
+main: dev.easycloud.service.paper.EasyCloudPaper
+author: EasyCloud
+description: EasyCloud Paper Plugin
+api-version: "1.8"
+load: POSTWORLD

@@ -9,16 +9,19 @@ import lombok.ToString;
 @Getter
 @ToString
 @AllArgsConstructor
-public final class ServiceConnectPacket extends Packet {
+public final class ServiceReadyPacket extends Packet {
     private String serviceId;
+    private int port;
 
     @Override
     public void read(PacketBuffer buffer) {
         this.serviceId = buffer.readString();
+        this.port = buffer.readInt();
     }
 
     @Override
     public void write(PacketBuffer buffer) {
         buffer.writeString(this.serviceId);
+        buffer.writeInt(this.port);
     }
 }

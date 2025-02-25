@@ -4,7 +4,6 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.GroupHandler;
 import dev.easycloud.service.group.SimpleGroupHandler;
 import dev.easycloud.service.command.CommandHandler;
-import dev.easycloud.service.network.packet.ServiceConnectPacket;
 import dev.easycloud.service.platform.PlatformHandler;
 import dev.easycloud.service.network.NetLineSecurity;
 import dev.easycloud.service.service.ServiceHandler;
@@ -63,8 +62,6 @@ public final class EasyCloudAgent {
                 .bootSync();
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
-
-
         log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
         this.commandHandler = new CommandHandler();

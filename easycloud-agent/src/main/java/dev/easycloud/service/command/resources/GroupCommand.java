@@ -90,11 +90,8 @@ public final class GroupCommand extends Command {
                     }
 
                     var amount = it.result("amount", Integer.class);
+                    log.info("{} queued {} services to launch...", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset(), amount);
                     EasyCloudAgent.instance().serviceHandler().launch(group, amount);
-
-
-
-                    log.info("{} queued " + amount + " services to launch..", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset());
                 });
     }
 }
