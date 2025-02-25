@@ -1,6 +1,6 @@
 # EasyCloudService
 
-## [SNAPSHOT downloadable](https://github.com/EasyCloudService/cloud/releases)
+## [Download](https://github.com/EasyCloudService/cloud/releases)
 
 ## FAQ
 
