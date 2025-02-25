@@ -1,4 +1,4 @@
-package dev.easycloud.service.packet.connection;
+package dev.easycloud.service.network.packet;
 
 import dev.httpmarco.netline.packet.Packet;
 import dev.httpmarco.netline.packet.PacketBuffer;

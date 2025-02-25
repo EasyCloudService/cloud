@@ -1,14 +1,14 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.group.GroupFactory;
-import dev.easycloud.service.group.SimpleGroupFactory;
+import dev.easycloud.service.group.GroupHandler;
+import dev.easycloud.service.group.SimpleGroupHandler;
 import dev.easycloud.service.command.CommandHandler;
-import dev.easycloud.service.packet.connection.ServiceConnectPacket;
-import dev.easycloud.service.platform.PlatformFactory;
-import dev.easycloud.service.security.NetLineSecurity;
-import dev.easycloud.service.service.ServiceFactory;
-import dev.easycloud.service.service.SimpleServiceFactory;
+import dev.easycloud.service.network.packet.ServiceConnectPacket;
+import dev.easycloud.service.platform.PlatformHandler;
+import dev.easycloud.service.network.NetLineSecurity;
+import dev.easycloud.service.service.ServiceHandler;
+import dev.easycloud.service.service.SimpleServiceHandler;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
@@ -35,9 +35,9 @@ public final class EasyCloudAgent {
     private final SimpleTerminal terminal;
     private final CommandHandler commandHandler;
 
-    private final ServiceFactory serviceFactory;
-    private final GroupFactory groupFactory;
-    private final PlatformFactory platformFactory;
+    private final ServiceHandler serviceHandler;
+    private final GroupHandler groupHandler;
+    private final PlatformHandler platformHandler;
 
     private final String privateKey;
     private final NetServer netServer;
@@ -63,29 +63,26 @@ public final class EasyCloudAgent {
                 .bootSync();
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.privateKey));
-
         this.netServer.track(ServiceConnectPacket.class, (channel, packet) -> {
             System.out.println("Service connected: " + packet.serviceId());
         });
-
 
         log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
         this.commandHandler = new CommandHandler();
 
-        this.serviceFactory = new SimpleServiceFactory();
-        this.groupFactory = new SimpleGroupFactory();
+        this.serviceHandler = new SimpleServiceHandler();
+        this.groupHandler = new SimpleGroupHandler();
 
-        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupFactory.groups().size() + " groups").reset());
+        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupHandler.groups().size() + " groups").reset());
 
-        this.platformFactory = new PlatformFactory();
-        this.platformFactory.refresh();
+        this.platformHandler = new PlatformHandler();
+        this.platformHandler.refresh();
 
-        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformFactory.platforms().size() + " platforms").reset());
+        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformHandler.platforms().size() + " platforms").reset());
 
-        this.groupFactory.refresh();
+        this.groupHandler.refresh();
 
-        //this.terminal.clear();
         log.info("It took {} to start the cloud.", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
         log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
 
@@ -96,7 +93,7 @@ public final class EasyCloudAgent {
     public void shutdown() {
         log.info("Shutting down services...");
 
-        for (Service service : new ArrayList<>(this.serviceFactory.services())) {
+        for (Service service : new ArrayList<>(this.serviceHandler.services())) {
             service.shutdown();
         }
 

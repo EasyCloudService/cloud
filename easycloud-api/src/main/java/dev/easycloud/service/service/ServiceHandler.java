@@ -5,7 +5,7 @@ import dev.easycloud.service.service.resources.Service;
 
 import java.util.List;
 
-public interface ServiceFactory {
+public interface ServiceHandler {
     List<Service> services();
 
     void launch(Group group);

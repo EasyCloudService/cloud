@@ -6,7 +6,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.packet.connection.ServiceConnectPacket;
+import dev.easycloud.service.network.packet.ServiceConnectPacket;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.client.NetClient;

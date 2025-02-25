@@ -5,8 +5,6 @@ import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.scheduler.AdvancedScheduler;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.LogType;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -78,14 +76,14 @@ public final class SimpleService implements Service {
         if (this.group.data().isStatic()) {
             new AdvancedScheduler((Void) -> {
                 if (!this.process.isAlive()) {
-                    EasyCloudAgent.instance().serviceFactory().services().remove(this);
+                    EasyCloudAgent.instance().serviceHandler().services().remove(this);
                     return false;
                 }
                 return true;
             }).run(1000);
         } else {
             this.process.destroyForcibly();
-            EasyCloudAgent.instance().serviceFactory().services().remove(this);
+            EasyCloudAgent.instance().serviceHandler().services().remove(this);
         }
     }
 

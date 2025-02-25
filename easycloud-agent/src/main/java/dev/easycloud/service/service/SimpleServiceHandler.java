@@ -22,16 +22,16 @@ import java.util.concurrent.TimeUnit;
 import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
-public final class SimpleServiceFactory implements ServiceFactory {
+public final class SimpleServiceHandler implements ServiceHandler {
     @Getter
     private final List<Service> services = new ArrayList<>();
 
-    public SimpleServiceFactory() {
+    public SimpleServiceHandler() {
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
     }
 
     public void refresh() {
-        for (Group group : EasyCloudAgent.instance().groupFactory().groups()) {
+        for (Group group : EasyCloudAgent.instance().groupHandler().groups().stream().filter(Group::enabled).toList()) {
             var always = group.data().always();
             var max = group.data().maximum();
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
@@ -50,11 +50,6 @@ public final class SimpleServiceFactory implements ServiceFactory {
 
     @Override
     public void launch(Group group) {
-        this.launch(group, 1);
-    }
-
-    @Override
-    public void launch(Group group, int count) {
         var port = this.freePort();
         if(group.platform().type().equals(PlatformType.PROXY)) {
             port = 25565;
@@ -65,9 +60,33 @@ public final class SimpleServiceFactory implements ServiceFactory {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
-        var storagePath = Path.of("storage");
         var directory = Path.of(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new SimpleService(group.name() + "-" + id, group, port, directory);
+
+        var result = this.prepare(service);
+        if (!result) {
+            log.error("Failed to prepare service.");
+            return;
+        }
+
+        var process = ServiceLaunchBuilder.create(service);
+        service.process(process);
+
+        log.info("Service {} launched on port {}.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset());
+
+        this.services.add(service);
+    }
+
+    @Override
+    public void launch(Group group, int count) {
+        for (int i = 0; i < count; i++) {
+            this.launch(group);
+        }
+    }
+
+    private boolean prepare(Service service) {
+        var storagePath = Path.of("storage");
+        var group = service.group();
 
         service.directory().toFile().mkdirs();
         service.directory().resolve("plugins").toFile().mkdirs();
@@ -78,7 +97,7 @@ public final class SimpleServiceFactory implements ServiceFactory {
             Files.copy(storagePath.resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin. ({})", service.id(), exception);
-            return;
+            return false;
         }
 
         if(!service.directory().resolve("platform.jar").toFile().exists()) {
@@ -86,16 +105,10 @@ public final class SimpleServiceFactory implements ServiceFactory {
                 Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {
                 log.error("Failed to copy platform jar.", exception);
-                return;
+                return false;
             }
         }
-
-        var process = ServiceLaunchBuilder.create(service);
-        service.process(process);
-
-        log.info("Service {} launched on port {}.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset());
-
-        this.services.add(service);
+        return true;
     }
 
     private int freePort() {

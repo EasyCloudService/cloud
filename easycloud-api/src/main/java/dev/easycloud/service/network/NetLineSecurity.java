@@ -1,4 +1,4 @@
-package dev.easycloud.service.security;
+package dev.easycloud.service.network;
 
 import dev.httpmarco.netline.NetChannel;
 import dev.httpmarco.netline.security.SecurityHandler;

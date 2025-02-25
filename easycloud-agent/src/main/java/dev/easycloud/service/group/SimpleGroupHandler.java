@@ -15,12 +15,12 @@ import java.util.List;
 import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
-public final class SimpleGroupFactory implements GroupFactory {
+public final class SimpleGroupHandler implements GroupHandler {
     private final List<Group> groups;
 
     private final Path GROUPS_PATH = Path.of("storage").resolve("groups");
 
-    public SimpleGroupFactory() {
+    public SimpleGroupHandler() {
         this.groups = new ArrayList<>();
 
         var pathFile = this.GROUPS_PATH.toFile();
@@ -49,7 +49,7 @@ public final class SimpleGroupFactory implements GroupFactory {
         }
 
         platforms.forEach(platform -> {
-            var initializer = EasyCloudAgent.instance().platformFactory().initializers()
+            var initializer = EasyCloudAgent.instance().platformHandler().initializers()
                     .stream()
                     .filter(it -> it.id().equals(platform.initilizerId()))
                     .findFirst()
@@ -76,6 +76,7 @@ public final class SimpleGroupFactory implements GroupFactory {
         this.groups.add(group);
 
         this.refresh();
+        group.enabled(true);
         FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
     }
 

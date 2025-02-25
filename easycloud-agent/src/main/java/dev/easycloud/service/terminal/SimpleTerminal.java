@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -37,6 +39,7 @@ public final class SimpleTerminal {
 
     private final Terminal terminal;
     private final LineReaderImpl lineReader;
+    private final List<String> history = new ArrayList<>();
 
     private TerminalReadingThread readingThread;
 
@@ -93,6 +96,11 @@ public final class SimpleTerminal {
         System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
     }
 
+    public void revert() {
+        this.clear();
+        this.history.forEach(System.out::println);
+    }
+
     private void print(String message) {
         this.terminal.puts(InfoCmp.Capability.carriage_return);
         this.terminal.writer().println(message);
@@ -127,15 +135,21 @@ public final class SimpleTerminal {
     }
 
     public void redraw() {
-        var layout = ansi().a("""
+        var layout = ansi()
+                .fgRgb(LogType.PRIMARY.rgb()).a("  ______                 ").reset().a("  _____ _                 _  \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a(" |  ____|                ").reset().a(" / ____| |               | | \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a(" | |__   __ _ ___ _   _  ").reset().a("| |    | | ___  _   _  __| | \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a(" |  __| / _` / __| | | | ").reset().a("| |    | |/ _ \\| | | |/ _` | \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a(" | |___| (_| \\__ \\ |_| | ").reset().a("| |____| | (_) | |_| | (_| | \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a(" |______\\__,_|___/\\__, | ").reset().a(" \\_____|_|\\___/ \\__,_|\\__,_| \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("                  |___/                       [DEBUG]\n").reset()
+
+                /*.a("""
                           ____ ____ ____ _   _ ____ _    ____ _  _ ___
                           |___ |__| [__   \\_/  |    |    |  | |  | |  \\
                           |___ |  | ___]   |   |___ |___ |__| |__| |__/
-                        """)
-                .reset().a("  * Current version: ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("DEVELOPMENT")
-                .reset().a("\n")
-                .reset().a("  * Contributors: ")
+                        """)*/
+                .reset().a("        Contributors: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(" and ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")

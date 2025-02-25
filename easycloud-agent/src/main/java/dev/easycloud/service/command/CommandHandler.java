@@ -25,7 +25,7 @@ public final class CommandHandler {
 
     public void execute(String command, String[] args) {
         if(EasyCloudAgent.instance().terminal().screenPrinting()) {
-            var service = EasyCloudAgent.instance().serviceFactory().services().stream().filter(it -> it instanceof SimpleService)
+            var service = EasyCloudAgent.instance().serviceHandler().services().stream().filter(it -> it instanceof SimpleService)
                     .map(it -> (SimpleService) it)
                     .filter(SimpleService::logStream)
                     .findFirst()
@@ -37,13 +37,14 @@ public final class CommandHandler {
 
             if(command.equalsIgnoreCase("exit") || service == null) {
                 EasyCloudAgent.instance().terminal().screenPrinting(false);
-                EasyCloudAgent.instance().terminal().clear();
+
                 if(service != null) {
                     service.logStream(false);
                 }
 
                 TerminalCompleter.enabled(true);
-                log.info("Screen printing is disabled. You can now use the terminal.");
+                EasyCloudAgent.instance().terminal().revert();
+                //log.info("Screen printing is disabled. You can now use the terminal.");
                 return;
             }
 

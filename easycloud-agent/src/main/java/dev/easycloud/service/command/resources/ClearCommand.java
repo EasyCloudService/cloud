@@ -13,5 +13,6 @@ public final class ClearCommand extends Command {
     @Override
     public void executeBase() {
         EasyCloudAgent.instance().terminal().clear();
+        EasyCloudAgent.instance().terminal().history().clear();
     }
 }
