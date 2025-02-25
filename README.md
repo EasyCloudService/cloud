@@ -5,7 +5,7 @@
 ## ❓ FAQ
 
 ### 🔹 I want AutoUpdates, what can I do?
-To enable them, open the `start-script` (`start.bat` or `start.sh`) and add the following argument `eaup` to the end. \
+To enable them, open the `start-script` (`start.bat` or `start.sh`) and add the following argument `eaup` to the end.
 It should look like this: `java -jar ..... eaup` \
 EAUP means Enable-Auto-Updates-Please
 
