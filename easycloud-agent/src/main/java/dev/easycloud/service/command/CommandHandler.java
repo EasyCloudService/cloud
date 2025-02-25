@@ -20,7 +20,7 @@ public final class CommandHandler {
 
     public CommandHandler() {
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand()));
+        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand(), new ReloadCommand()));
     }
 
     public void execute(String command, String[] args) {

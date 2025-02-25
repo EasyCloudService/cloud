@@ -28,6 +28,12 @@ public final class SimpleGroupHandler implements GroupHandler {
     public SimpleGroupHandler() {
         this.groups = new ArrayList<>();
 
+        this.scan();
+    }
+
+    public void scan() {
+        this.groups.clear();
+
         var pathFile = this.GROUPS_PATH.toFile();
         if (!pathFile.exists()) {
             pathFile.mkdirs();
