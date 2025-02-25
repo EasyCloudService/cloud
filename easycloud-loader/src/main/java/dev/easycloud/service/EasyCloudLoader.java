@@ -30,8 +30,9 @@ public final class EasyCloudLoader {
 
         print("Starting EasyCloudLoader...");
 
+        var logs = Path.of("logs");
+        logs.toFile().mkdirs();
         storage.toFile().mkdirs();
-        storage.resolve("jars").toFile().mkdirs();
 
         var executor = Executors.newCachedThreadPool();
         var manager = new DependencyManager(storage.resolve("dependencies"));
@@ -44,21 +45,17 @@ public final class EasyCloudLoader {
         )).join();
 
         print("Extracting files...");
-        copyFile("easycloud-plugin.jar", storage);
-        copyFile("easycloud-api.jar", storage.resolve("dependencies"));
+        copyFile("easycloud-plugin.jar", storage.resolve("easycloud-plugin.jar"));
+        copyFile("easycloud-api.jar", storage.resolve("dependencies").resolve("dev.easycloud.service-impl-stable.jar"));
 
-        copyFile("easycloud-agent.jar", Path.of(""));
-
-        var logs = Path.of("logs");
-        logs.toFile().mkdirs();
+        copyFile("easycloud-agent.jar", Path.of("easycloud-agent.jar"));
 
         print("Booting EasyCloudAgent...");
         var thread = new Thread(() -> {
             try {
-                var process = new ProcessBuilder("java", "-cp", "easycloud-agent.jar;storage/dependencies/*;", "dev.easycloud.service.EasyCloudBootstrap")
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", "easycloud-agent.jar;storage/dependencies/*;", "dev.easycloud.service.EasyCloudBootstrap")
                         .redirectOutput(logs.resolve("latest.log").toFile())
                         .redirectError(logs.resolve("latest-error.log").toFile())
-                        .redirectErrorStream(true)
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)
@@ -73,8 +70,9 @@ public final class EasyCloudLoader {
         thread.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            print("Shutting down EasyCloudLoader...");
-            thread.interrupt();
+            if(thread.isAlive()) {
+                thread.interrupt();
+            }
         }));
 
         while (true) {
@@ -95,7 +93,7 @@ public final class EasyCloudLoader {
             if (file == null) {
                 throw new RuntimeException("Resource " + name + " not found!");
             }
-            Files.copy(file, path.resolve(name), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file, path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
