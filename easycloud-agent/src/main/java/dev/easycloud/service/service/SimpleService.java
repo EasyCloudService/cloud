@@ -82,6 +82,8 @@ public final class SimpleService implements Service {
     public void shutdown() {
         this.execute("stop");
         log.info("Service {} will be shutdown...", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
+        EasyCloudAgent.instance().terminal().exitScreen(this);
+
         new Thread(() -> {
             if (!this.group.data().isStatic()) {
                 this.process.destroyForcibly();
@@ -93,8 +95,8 @@ public final class SimpleService implements Service {
                     FileFactory.remove(this.directory);
                 }
                 EasyCloudAgent.instance().serviceHandler().services().remove(this);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            } catch (InterruptedException exception) {
+                throw new RuntimeException(exception);
             }
         }).start();
     }

@@ -16,6 +16,10 @@ public final class PlatformHandler {
         this.initializers.add(new VelocityPlatformInitializer());
     }
 
+    public PlatformInitializer initializer(String id) {
+        return this.initializers.stream().filter(it -> it.id().equals(id)).findFirst().orElse(null);
+    }
+
     public void refresh() {
         this.platforms.clear();
         for (PlatformInitializer initializer : this.initializers) {

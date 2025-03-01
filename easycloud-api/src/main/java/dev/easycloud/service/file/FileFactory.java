@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.easycloud.service.file.resources.FileEntity;
 import lombok.SneakyThrows;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -16,7 +17,8 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
 public final class FileFactory {
-    public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Yaml YAML = new Yaml();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static String name(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(FileEntity.class)) {

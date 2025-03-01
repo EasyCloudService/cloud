@@ -36,15 +36,7 @@ public final class CommandHandler {
             }
 
             if(command.equalsIgnoreCase("exit") || service == null) {
-                EasyCloudAgent.instance().terminal().screenPrinting(false);
-
-                if(service != null) {
-                    service.logStream(false);
-                }
-
-                TerminalCompleter.enabled(true);
-                EasyCloudAgent.instance().terminal().revert();
-                //log.info("Screen printing is disabled. You can now use the terminal.");
+                EasyCloudAgent.instance().terminal().exitScreen(service);
                 return;
             }
 

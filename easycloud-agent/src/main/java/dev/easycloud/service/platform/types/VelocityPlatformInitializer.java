@@ -2,13 +2,17 @@ package dev.easycloud.service.platform.types;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.request.RequestFactory;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +37,14 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
             versionList.add(version.getAsString());
         }
         return versionList;
+    }
+
+    @Override
+    @SneakyThrows
+    public void initialize(Path path) {
+        if(!Files.exists(path.resolve("velocity.toml"))) {
+            Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("velocity.toml"), path.resolve("velocity.toml"));
+        }
     }
 
     @Override

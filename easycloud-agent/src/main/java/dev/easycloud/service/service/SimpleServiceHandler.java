@@ -175,8 +175,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
 
-        ServiceFileFactory.insert(service, service.directory());
-
+        EasyCloudAgent.instance().platformHandler().initializer(group.platform().initilizerId()).initialize(service.directory());
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().securityKey()));
 
         try {

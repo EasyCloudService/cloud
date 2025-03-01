@@ -1,6 +1,7 @@
 package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.stream.SimpleLoggingStream;
@@ -134,6 +135,17 @@ public final class SimpleTerminal {
         }
     }
 
+    public void exitScreen(SimpleService service) {
+        EasyCloudAgent.instance().terminal().screenPrinting(false);
+
+        if(service != null) {
+            service.logStream(false);
+        }
+
+        TerminalCompleter.enabled(true);
+        EasyCloudAgent.instance().terminal().revert();
+    }
+
     public void redraw() {
         var layout = ansi()
                 .fgRgb(LogType.PRIMARY.rgb()).a("  ______                 ").reset().a("  _____ _                 _  \n").reset()
@@ -144,11 +156,6 @@ public final class SimpleTerminal {
                 .fgRgb(LogType.PRIMARY.rgb()).a(" |______\\__,_|___/\\__, | ").reset().a(" \\_____|_|\\___/ \\__,_|\\__,_| \n").reset()
                 .fgRgb(LogType.PRIMARY.rgb()).a("                  |___/                       [DEBUG]\n").reset()
 
-                /*.a("""
-                          ____ ____ ____ _   _ ____ _    ____ _  _ ___
-                          |___ |__| [__   \\_/  |    |    |  | |  | |  \\
-                          |___ |  | ___]   |   |___ |___ |__| |__| |__/
-                        """)*/
                 .reset().a("    Contributors: ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(", ")
@@ -163,9 +170,5 @@ public final class SimpleTerminal {
         this.terminal.writer().println("");
 
         this.update();
-    }
-
-    public void setReadingThread(TerminalReadingThread readingThread) {
-        this.readingThread = readingThread;
     }
 }

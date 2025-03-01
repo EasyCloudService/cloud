@@ -3,6 +3,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("dev.httpmarco:netline:1.0.0-SNAPSHOT")
 }
 
