@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class ShutdownCommand extends Command {
     public ShutdownCommand() {
-        super("shutdown", "Shutdown the cloud.", "stop");
+        super("shutdown", "command.shutdown.info", "stop");
     }
 
     @Override

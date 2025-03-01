@@ -17,11 +17,11 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Log4j2
 public final class GroupCommand extends Command {
     public GroupCommand() {
-        super("group", "Manage groups.", "g");
+        super("group", "command.group.info", "g");
 
-        addSubCommand(new SubCommand("list", "List all groups.", this::list));
-        addSubCommand(new SubCommand("setup", "Start group setup.", this::setup));
-        addSubCommand(new SubCommand("launch", "Launch group amount.", this::launch));
+        addSubCommand(new SubCommand("list", "command.group.list.info", this::list));
+        addSubCommand(new SubCommand("setup", "command.group.setup.info", this::setup));
+        addSubCommand(new SubCommand("launch", "command.group.launch.info", this::launch));
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class GroupCommand extends Command {
     private void list(String[] args) {
         var groups = EasyCloudAgent.instance().groupProvider().groups();
         if(groups.isEmpty()) {
-            log.error("No groups found.");
+            log.error(this.i18nProvider().get("command.group.list.noFound"));
             return;
         }
 
@@ -51,28 +51,28 @@ public final class GroupCommand extends Command {
 
     private void setup(String[] args) {
         SetupService.simple()
-                .add(new SetupData<String>("name", "What should the name be?", null))
-                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformProvider().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
-                .add(new SetupData<>("memory", "How much memory should the group have?", null))
-                .add(new SetupData<>("maxPlayers", "How many players should be online (max)", null))
-                .add(new SetupData<>("always", "How much services should always be online?", null))
-                .add(new SetupData<>("maximum", "How much services should be online maximal? (-1 = no limit)", null))
-                .add(new SetupData<>("static", "Should the group be static?", List.of("true", "false")))
+                .add(new SetupData<String>("name", this.i18nProvider().get("command.group.setup.name"), null))
+                .add(new SetupData<>("platform", this.i18nProvider().get("command.group.setup.platform"), EasyCloudAgent.instance().platformProvider().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
+                .add(new SetupData<>("memory", this.i18nProvider().get("command.group.setup.memory"), null))
+                .add(new SetupData<>("maxPlayers", this.i18nProvider().get("command.group.setup.maxPlayers"), null))
+                .add(new SetupData<>("always", this.i18nProvider().get("command.group.setup.always"), null))
+                .add(new SetupData<>("maximum", this.i18nProvider().get("command.group.setup.maximum"), null))
+                .add(new SetupData<>("static", this.i18nProvider().get("command.group.setup.static"), List.of("true", "false")))
                 .publish()
                 .thenAccept(it -> {
                     var memory = it.result("memory", Integer.class);
-                    if(memory < 128) {
-                        log.error("Memory must be at least 128mb.");
+                    if(memory < 512) {
+                        log.error(this.i18nProvider().get("command.group.setup.memory.invalid"));
                         return;
                     }
                     var maxPlayers = it.result("maxPlayers", Integer.class);
                     if(maxPlayers < 1) {
-                        log.error("Max players must be at least 1.");
+                        log.error(this.i18nProvider().get("command.group.setup.maxPlayers.invalid"));
                         return;
                     }
                     var always = it.result("always", Integer.class);
-                    if(always < 1) {
-                        log.error("Always must be at least 1.");
+                    if(always < 0) {
+                        log.error(this.i18nProvider().get("command.group.setup.always.invalid"));
                         return;
                     }
 
@@ -94,18 +94,18 @@ public final class GroupCommand extends Command {
 
     private void launch(String[] args) {
         SetupService.simple()
-                .add(new SetupData<>("group", "What should the group be?", EasyCloudAgent.instance().groupProvider().groups().stream().map(Group::name).toList()))
-                .add(new SetupData<>("amount", "What should the amount be?", null))
+                .add(new SetupData<>("group", this.i18nProvider().get("command.group.launch.group"), EasyCloudAgent.instance().groupProvider().groups().stream().map(Group::name).toList()))
+                .add(new SetupData<>("amount", this.i18nProvider().get("command.group.launch.amount"), null))
                 .publish()
                 .thenAccept(it -> {
                     var group = EasyCloudAgent.instance().groupProvider().get(it.result("group", String.class));
                     if(group == null) {
-                        log.error("Group not found.");
+                        log.error(this.i18nProvider().get("command.group.notFound"));
                         return;
                     }
 
                     var amount = it.result("amount", Integer.class);
-                    log.info("{} queued {} services to launch...", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset(), amount);
+                    log.info(this.i18nProvider().get("command.group.launch.success", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset(), amount));
                     EasyCloudAgent.instance().serviceProvider().launch(group, amount);
                 });
     }

@@ -94,10 +94,10 @@ public final class EasyCloudAgent {
         this.platformProvider.refresh();
         this.groupProvider.refresh();
 
-        log.info(this.i18nProvider.get("netline.running"), ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
+        log.info(this.i18nProvider.get("netline.running", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
 
-        log.info(this.i18nProvider.get("agent.found"), ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupProvider.groups().size() + " groups").reset());
-        log.info(this.i18nProvider.get("agent.found"), ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformProvider.platforms().size() + " platforms").reset());
+        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupProvider.groups().size() + " groups").reset()));
+        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformProvider.platforms().size() + " platforms").reset()));
 
         log.info(this.i18nProvider.get("agent.startup", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
         log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset()));

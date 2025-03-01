@@ -11,19 +11,21 @@ import static org.jline.jansi.Ansi.ansi;
 @Slf4j
 public final class ReloadCommand extends Command {
     public ReloadCommand() {
-        super("reload", "Reload the configs.", "refresh");
+        super("reload", "command.reload.info", "refresh");
     }
 
     @Override
     public void executeBase() {
-        log.info("Reloading platforms...");
         EasyCloudAgent.instance().platformProvider().refresh();
-        log.info("Reloading groups...");
         ((SimpleGroupProvider) EasyCloudAgent.instance().groupProvider()).scan();
+
+        log.info(this.i18nProvider().get("command.reload.platforms", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudAgent.instance().platformProvider().platforms().size() + " platforms").reset()));
+        log.info(this.i18nProvider().get("command.reload.groups", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudAgent.instance().groupProvider().groups().size() + " groups").reset()));
+
         EasyCloudAgent.instance().groupProvider().groups().forEach(group -> {
-            log.info(" * Found group: {}", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset());
+            log.info(this.i18nProvider().get("command.reload.groups.found", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset()));
         });
 
-        log.info("Reloaded platforms and groups.");
+        log.info(this.i18nProvider().get("command.reload.done"));
     }
 }

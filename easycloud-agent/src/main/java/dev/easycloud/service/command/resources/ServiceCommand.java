@@ -13,16 +13,16 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Log4j2
 public final class ServiceCommand extends Command {
     public ServiceCommand() {
-        super("service", "Manage service.", "ser");
+        super("service", "command.service.info");
 
-        addSubCommand(new SubCommand("shutdown", "Shutdown a service.", this::shutdown));
-        addSubCommand(new SubCommand("screen", "Open a service screen.", this::screen));
+        addSubCommand(new SubCommand("shutdown", "command.service.shutdown.info", this::shutdown));
+        addSubCommand(new SubCommand("screen", "command.service.screen.info", this::screen));
 
     }
 
     @Override
     public void executeBase() {
-        log.error("Wrong usage.");
+        log.error(this.i18nProvider().get("global.wrongUsage"));
         log.info("service [shutdown] [name]");
         log.info("service [screen] [name]");
     }
@@ -34,7 +34,7 @@ public final class ServiceCommand extends Command {
         }
         var service = EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
-            log.error("Service not found.");
+            log.error(i18nProvider().get("command.service.notFound"));
             return;
         }
 
@@ -48,7 +48,7 @@ public final class ServiceCommand extends Command {
         }
         var service = (SimpleService) EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
-            log.error("Service not found.");
+            log.error(i18nProvider().get("command.service.notFound"));
             return;
         }
 
@@ -61,6 +61,6 @@ public final class ServiceCommand extends Command {
         service.logCache().forEach(service::print);
 
         service.logStream(true);
-        log.info("SERVICE_LOG: Service screen opened. Use {} to close.", ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset());
+        log.info("SERVICE_LOG: " + this.i18nProvider().get("command.service.screenOpen"), ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset());
     }
 }

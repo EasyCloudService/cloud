@@ -6,8 +6,9 @@ import dev.easycloud.service.command.Command;
 import java.util.List;
 
 public final class ClearCommand extends Command {
+
     public ClearCommand() {
-        super("clear", "Clear the terminal.","clr");
+        super("clear", "command.clear.info","clr");
     }
 
     @Override
