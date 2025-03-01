@@ -5,8 +5,6 @@ import dev.easycloud.service.command.Command;
 import dev.easycloud.service.terminal.LogType;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-
 import static org.fusesource.jansi.Ansi.ansi;
 
 @Slf4j
@@ -17,6 +15,6 @@ public final class HelpCommand extends Command {
 
     @Override
     public void executeBase() {
-        EasyCloudAgent.instance().commandHandler().commands().forEach(it -> log.info("[{}] - {}", ansi().fgRgb(LogType.WHITE.rgb()).a(it.name()).reset(), it.description()));
+        EasyCloudAgent.instance().commandProvider().commands().forEach(it -> log.info("[{}] - {}", ansi().fgRgb(LogType.WHITE.rgb()).a(it.name()).reset(), it.description()));
     }
 }

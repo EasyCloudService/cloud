@@ -5,7 +5,7 @@ import dev.easycloud.service.service.resources.Service;
 
 import java.util.List;
 
-public interface ServiceHandler {
+public interface ServiceProvider {
     List<Service> services();
 
     Service get(String id);

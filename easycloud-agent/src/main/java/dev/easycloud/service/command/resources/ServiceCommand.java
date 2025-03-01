@@ -32,7 +32,7 @@ public final class ServiceCommand extends Command {
             this.executeBase();
             return;
         }
-        var service = EasyCloudAgent.instance().serviceHandler().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
+        var service = EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
             log.error("Service not found.");
             return;
@@ -46,7 +46,7 @@ public final class ServiceCommand extends Command {
             this.executeBase();
             return;
         }
-        var service = (SimpleService) EasyCloudAgent.instance().serviceHandler().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
+        var service = (SimpleService) EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it.id().equals(args[1])).findFirst().orElse(null);
         if(service == null) {
             log.error("Service not found.");
             return;

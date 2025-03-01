@@ -43,7 +43,7 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
     @SneakyThrows
     public void initialize(Path path) {
         if(!Files.exists(path.resolve("velocity.toml"))) {
-            Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("velocity.toml"), path.resolve("velocity.toml"));
+            Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml"), path.resolve("velocity.toml"));
         }
     }
 

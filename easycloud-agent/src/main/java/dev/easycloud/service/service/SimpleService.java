@@ -3,7 +3,6 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.scheduler.AdvancedScheduler;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.LogType;
@@ -91,10 +90,10 @@ public final class SimpleService implements Service {
 
             try {
                 this.process.waitFor();
-                if(!this.group.data().isStatic()) {
+                if (!this.group.data().isStatic()) {
                     FileFactory.remove(this.directory);
                 }
-                EasyCloudAgent.instance().serviceHandler().services().remove(this);
+                EasyCloudAgent.instance().serviceProvider().services().remove(this);
             } catch (InterruptedException exception) {
                 throw new RuntimeException(exception);
             }
@@ -114,7 +113,7 @@ public final class SimpleService implements Service {
             try (var reader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if(this.logStream) {
+                    if (this.logStream) {
                         this.print(line);
                     }
                     this.logCache.add(line);

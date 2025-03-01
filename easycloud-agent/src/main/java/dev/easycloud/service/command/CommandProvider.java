@@ -3,7 +3,6 @@ package dev.easycloud.service.command;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.command.resources.*;
 import dev.easycloud.service.service.SimpleService;
-import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
@@ -15,27 +14,27 @@ import java.util.List;
 @Log4j2
 @Getter
 @Accessors(fluent = true)
-public final class CommandHandler {
+public final class CommandProvider {
     private final List<Command> commands;
 
-    public CommandHandler() {
+    public CommandProvider() {
         this.commands = new ArrayList<>();
         this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand(), new ReloadCommand()));
     }
 
     public void execute(String command, String[] args) {
-        if(EasyCloudAgent.instance().terminal().screenPrinting()) {
-            var service = EasyCloudAgent.instance().serviceHandler().services().stream().filter(it -> it instanceof SimpleService)
+        if (EasyCloudAgent.instance().terminal().screenPrinting()) {
+            var service = EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it instanceof SimpleService)
                     .map(it -> (SimpleService) it)
                     .filter(SimpleService::logStream)
                     .findFirst()
                     .orElse(null);
 
-            if(service == null) {
+            if (service == null) {
                 log.error("No service is running.");
             }
 
-            if(command.equalsIgnoreCase("exit") || service == null) {
+            if (command.equalsIgnoreCase("exit") || service == null) {
                 EasyCloudAgent.instance().terminal().exitScreen(service);
                 return;
             }

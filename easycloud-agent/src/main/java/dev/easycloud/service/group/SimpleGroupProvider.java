@@ -20,12 +20,12 @@ import java.util.List;
 import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
-public final class SimpleGroupHandler implements GroupHandler {
+public final class SimpleGroupProvider implements GroupProvider {
     private final List<Group> groups;
 
-    private final Path GROUPS_PATH = Path.of("storage").resolve("groups");
+    private final Path GROUPS_PATH = Path.of("resources").resolve("groups");
 
-    public SimpleGroupHandler() {
+    public SimpleGroupProvider() {
         this.groups = new ArrayList<>();
 
         this.scan();
@@ -54,13 +54,13 @@ public final class SimpleGroupHandler implements GroupHandler {
             platforms.add(group.platform());
         }
 
-        var platformPath = Path.of("storage").resolve("platforms");
+        var platformPath = Path.of("resources").resolve("platforms");
         if (!platformPath.toFile().exists()) {
             platformPath.toFile().mkdirs();
         }
 
         platforms.forEach(platform -> {
-            var initializer = EasyCloudAgent.instance().platformHandler().initializers()
+            var initializer = EasyCloudAgent.instance().platformProvider().initializers()
                     .stream()
                     .filter(it -> it.id().equals(platform.initilizerId()))
                     .findFirst()
@@ -88,15 +88,16 @@ public final class SimpleGroupHandler implements GroupHandler {
         this.groups.add(group);
 
         this.refresh();
-        var storagePath = Path.of("storage");
-        var templatePath = Path.of("template").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
+        var resourcesPath = Path.of("resources");
+        var localPath = Path.of("local");
+        var templatePath = localPath.resolve("templates").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
         templatePath.toFile().mkdirs();
 
         if (!group.data().isStatic()) {
             new Thread(() -> {
                 if (group.platform().initilizerId().equals("paper")) {
                     try {
-                        Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
+                        Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
                         var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
                                 .directory(templatePath.toFile())
                                 .start();

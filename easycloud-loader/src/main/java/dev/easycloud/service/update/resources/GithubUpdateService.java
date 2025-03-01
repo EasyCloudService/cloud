@@ -1,4 +1,4 @@
-package dev.easycloud.service.update;
+package dev.easycloud.service.update.resources;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -8,13 +8,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.regex.Pattern;
 
-public final class UpdateGithubService {
+public final class GithubUpdateService {
     private final String URL = "https://api.github.com/repos/EasyCloudService/cloud/releases/latest";
     @Getter
-    private final GithubReleaseInformation information;
+    private final ReleaseInformation information;
 
     @SneakyThrows
-    public UpdateGithubService() {
+    public GithubUpdateService() {
         var url = new URL(this.URL);
         var conn = (HttpURLConnection) url.openConnection();
 
@@ -35,11 +35,10 @@ public final class UpdateGithubService {
         reader.close();
 
         var jsonResponse = response.toString();
-        //System.out.println(jsonResponse);
         this.information = parseJson(jsonResponse);
     }
 
-    private GithubReleaseInformation parseJson(String jsonResponse) {
+    private ReleaseInformation parseJson(String jsonResponse) {
         var tagPattern = Pattern.compile("\"name\":\"(.*?)\"");
         var tagMatcher = tagPattern.matcher(jsonResponse);
         String latestVersion = null;
@@ -53,11 +52,7 @@ public final class UpdateGithubService {
         if (assetMatcher.find()) {
             downloadUrl = assetMatcher.group(1);
         }
-        return new GithubReleaseInformation(latestVersion, downloadUrl);
-    }
-
-    private String extractValue(String json, String regex) {
-        return json.matches(".*" + regex + ".*") ? json.replaceAll(".*" + regex + ".*", "$1") : null;
+        return new ReleaseInformation(latestVersion, downloadUrl);
     }
 
     public void download() {

@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public final class PlatformHandler {
+public final class PlatformProvider {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<PlatformInitializer> initializers = new ArrayList<>();
 
-    public PlatformHandler() {
+    public PlatformProvider() {
         this.initializers.add(new PaperPlatformInitializer());
         this.initializers.add(new VelocityPlatformInitializer());
     }

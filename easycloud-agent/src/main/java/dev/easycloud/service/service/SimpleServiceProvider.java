@@ -3,19 +3,16 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.network.packet.ServiceReadyPacket;
-import dev.easycloud.service.network.packet.ServiceShutdownPacket;
-import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
-import dev.easycloud.service.network.packet.proxy.UnregisterServerPacket;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
+import dev.easycloud.service.service.listener.ServiceReadyListener;
+import dev.easycloud.service.service.listener.ServiceShutdownListener;
 import dev.easycloud.service.service.resources.*;
 import dev.easycloud.service.terminal.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -26,45 +23,20 @@ import java.util.concurrent.TimeUnit;
 import static org.jline.jansi.Ansi.ansi;
 
 @Slf4j
-public final class SimpleServiceHandler implements ServiceHandler {
+public final class SimpleServiceProvider implements ServiceProvider {
     @Getter
     private final List<Service> services = new ArrayList<>();
 
-    public SimpleServiceHandler() {
+    public SimpleServiceProvider() {
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
 
-        var templatePath = Path.of("template");
+        var templatePath = Path.of("local").resolve("templates");
         templatePath.resolve("global").resolve("all").toFile().mkdirs();
         templatePath.resolve("global").resolve("server").toFile().mkdirs();
         templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
-        EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, (client, packet) -> {
-            var service = get(packet.serviceId());
-            if (service == null) {
-                return;
-            }
-
-            service.state(ServiceState.ONLINE);
-            if(service.group().platform().type().equals(PlatformType.SERVER)) {
-                EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
-            }
-            if(service.group().platform().type().equals(PlatformType.PROXY)) {
-                this.services.forEach(it -> client.send(new RegisterServerPacket(it.id(), new InetSocketAddress(it.port()))));
-            }
-            log.info("Service {} is now ready.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
-        });
-
-        EasyCloudAgent.instance().netServer().track(ServiceShutdownPacket.class, packet -> {
-            var service = get(packet.serviceId());
-            if (service == null) {
-                return;
-            }
-
-            if(service.group().platform().type().equals(PlatformType.SERVER)) {
-                EasyCloudAgent.instance().netServer().broadcast(new UnregisterServerPacket(service.id()));
-            }
-            this.shutdown(service);
-        });
+        new ServiceReadyListener();
+        new ServiceShutdownListener();
     }
 
     public void refresh() {
@@ -72,7 +44,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
             this.shutdown(service);
         }
 
-        for (Group group : EasyCloudAgent.instance().groupHandler().groups().stream().filter(Group::enabled).toList()) {
+        for (Group group : EasyCloudAgent.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
             var always = group.data().always();
             var max = group.data().maximum();
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
@@ -126,7 +98,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
-        var directory = Path.of(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
+        var directory = Path.of("local").resolve(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new SimpleService(group.name() + "-" + id, group, port, directory);
 
         var result = this.prepare(service);
@@ -152,8 +124,8 @@ public final class SimpleServiceHandler implements ServiceHandler {
 
     @SneakyThrows
     private boolean prepare(Service service) {
-        var storagePath = Path.of("storage");
-        var templatePath = Path.of("template");
+        var resourcesPath = Path.of("resources");
+        var templatePath = Path.of("local").resolve("templates");
         var group = service.group();
 
         service.directory().toFile().mkdirs();
@@ -175,11 +147,11 @@ public final class SimpleServiceHandler implements ServiceHandler {
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
 
-        EasyCloudAgent.instance().platformHandler().initializer(group.platform().initilizerId()).initialize(service.directory());
+        EasyCloudAgent.instance().platformProvider().initializer(group.platform().initilizerId()).initialize(service.directory());
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().securityKey()));
 
         try {
-            Files.copy(storagePath.resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(resourcesPath.resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin. ({})", service.id(), exception);
             return false;
@@ -187,7 +159,7 @@ public final class SimpleServiceHandler implements ServiceHandler {
 
         if(!service.directory().resolve("platform.jar").toFile().exists()) {
             try {
-                Files.copy(storagePath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
+                Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {
                 log.error("Failed to copy platform jar.", exception);
                 return false;

@@ -32,7 +32,7 @@ public final class TerminalCompleter implements Completer {
 
         var args = parsedLine.line().split(" ", -1);
         if (args.length >= 2) {
-            var command = EasyCloudAgent.instance().commandHandler()
+            var command = EasyCloudAgent.instance().commandProvider()
                     .commands()
                     .stream().filter(it -> it.name().equals(args[0]) || it.aliases().stream().anyMatch(it2 -> it2.equalsIgnoreCase(args[0])))
                     .findFirst()
@@ -54,7 +54,7 @@ public final class TerminalCompleter implements Completer {
             return;
         }
 
-        EasyCloudAgent.instance().commandHandler()
+        EasyCloudAgent.instance().commandProvider()
                 .commands()
                 .forEach(it -> {
                     list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true));

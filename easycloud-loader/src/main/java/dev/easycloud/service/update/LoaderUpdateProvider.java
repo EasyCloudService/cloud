@@ -1,15 +1,16 @@
 package dev.easycloud.service.update;
 
 import dev.easycloud.service.terminal.SimpleTerminal;
+import dev.easycloud.service.update.resources.GithubUpdateService;
 import lombok.SneakyThrows;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class UpdateServiceHandler {
+public class LoaderUpdateProvider {
 
     @SneakyThrows
-    public UpdateServiceHandler() {
+    public LoaderUpdateProvider() {
         SimpleTerminal.clear();
         System.out.println("""
                   ┌──────────────────────────────────┐
@@ -19,9 +20,9 @@ public class UpdateServiceHandler {
                   └──────────────────────────────────┘
                 """);
 
-        var updateService = new UpdateGithubService();
-        var storage = Path.of("storage");
-        var versionFile = storage.resolve("version.key");
+
+        var updateService = new GithubUpdateService();
+        var versionFile = Path.of("local").resolve("version.key");
         if (Files.exists(versionFile)) {
             var currentVersion = Files.readString(versionFile);
             if (updateService.getInformation().getLatestVersion().equals(currentVersion)) {
@@ -59,7 +60,7 @@ public class UpdateServiceHandler {
                   └──────────────────────────────────┘
                 """);
             Files.write(versionFile, updateService.getInformation().getLatestVersion().getBytes());
-            new ProcessBuilder("java", "EasyCloudUpdater").directory(storage.resolve("libaries").toFile()).start();
+            new ProcessBuilder("java", "EasyCloudUpdater").directory(Path.of("resources").resolve("libaries").toFile()).start();
             System.exit(0);
             return;
         }

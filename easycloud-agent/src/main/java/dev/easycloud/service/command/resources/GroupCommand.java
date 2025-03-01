@@ -34,7 +34,7 @@ public final class GroupCommand extends Command {
     }
 
     private void list(String[] args) {
-        var groups = EasyCloudAgent.instance().groupHandler().groups();
+        var groups = EasyCloudAgent.instance().groupProvider().groups();
         if(groups.isEmpty()) {
             log.error("No groups found.");
             return;
@@ -52,7 +52,7 @@ public final class GroupCommand extends Command {
     private void setup(String[] args) {
         SetupService.simple()
                 .add(new SetupData<String>("name", "What should the name be?", null))
-                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformHandler().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
+                .add(new SetupData<>("platform", "What should the platform be?", EasyCloudAgent.instance().platformProvider().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
                 .add(new SetupData<>("memory", "How much memory should the group have?", null))
                 .add(new SetupData<>("maxPlayers", "How many players should be online (max)", null))
                 .add(new SetupData<>("always", "How much services should always be online?", null))
@@ -79,7 +79,7 @@ public final class GroupCommand extends Command {
                     var group = new Group(
                             false,
                             it.result("name", String.class),
-                            EasyCloudAgent.instance().platformHandler().platforms().stream().filter(platform -> (platform.initilizerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow(),
+                            EasyCloudAgent.instance().platformProvider().platforms().stream().filter(platform -> (platform.initilizerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow(),
                             new GroupData(
                                     it.result("memory", Integer.class),
                                     it.result("maxPlayers", Integer.class),
@@ -88,17 +88,17 @@ public final class GroupCommand extends Command {
                                     Boolean.parseBoolean(it.result("static", String.class))
                             ));
 
-                    EasyCloudAgent.instance().groupHandler().create(group);
+                    EasyCloudAgent.instance().groupProvider().create(group);
                 });
     }
 
     private void launch(String[] args) {
         SetupService.simple()
-                .add(new SetupData<>("group", "What should the group be?", EasyCloudAgent.instance().groupHandler().groups().stream().map(Group::name).toList()))
+                .add(new SetupData<>("group", "What should the group be?", EasyCloudAgent.instance().groupProvider().groups().stream().map(Group::name).toList()))
                 .add(new SetupData<>("amount", "What should the amount be?", null))
                 .publish()
                 .thenAccept(it -> {
-                    var group = EasyCloudAgent.instance().groupHandler().get(it.result("group", String.class));
+                    var group = EasyCloudAgent.instance().groupProvider().get(it.result("group", String.class));
                     if(group == null) {
                         log.error("Group not found.");
                         return;
@@ -106,7 +106,7 @@ public final class GroupCommand extends Command {
 
                     var amount = it.result("amount", Integer.class);
                     log.info("{} queued {} services to launch...", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset(), amount);
-                    EasyCloudAgent.instance().serviceHandler().launch(group, amount);
+                    EasyCloudAgent.instance().serviceProvider().launch(group, amount);
                 });
     }
 }

@@ -1,4 +1,4 @@
-package dev.easycloud.service.dependency;
+package dev.easycloud.service;
 
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.vankka.dependencydownload.DependencyManager;
@@ -14,7 +14,7 @@ public final class DependencyLoader {
     @SneakyThrows
     public DependencyLoader() {
         var executor = Executors.newCachedThreadPool();
-        var manager = new DependencyManager(Path.of("storage").resolve("libaries"));
+        var manager = new DependencyManager(Path.of("resources").resolve("libaries"));
 
         SimpleTerminal.print("Updating libaries...");
         manager.loadFromResource(ClassLoader.getSystemClassLoader().getResource("runtimeDownloadOnly.txt"));

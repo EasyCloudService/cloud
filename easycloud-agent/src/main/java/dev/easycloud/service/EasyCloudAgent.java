@@ -1,13 +1,14 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.group.GroupHandler;
-import dev.easycloud.service.group.SimpleGroupHandler;
-import dev.easycloud.service.command.CommandHandler;
-import dev.easycloud.service.platform.PlatformHandler;
+import dev.easycloud.service.group.GroupProvider;
+import dev.easycloud.service.group.SimpleGroupProvider;
+import dev.easycloud.service.command.CommandProvider;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.network.NetLineSecurity;
-import dev.easycloud.service.service.ServiceHandler;
-import dev.easycloud.service.service.SimpleServiceHandler;
+import dev.easycloud.service.service.ServiceProvider;
+import dev.easycloud.service.service.SimpleServiceProvider;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.LogType;
@@ -18,8 +19,13 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -32,11 +38,12 @@ public final class EasyCloudAgent {
     private static EasyCloudAgent instance;
 
     private final SimpleTerminal terminal;
-    private final CommandHandler commandHandler;
+    private final I18nProvider i18nProvider;
+    private final CommandProvider commandProvider;
 
-    private final ServiceHandler serviceHandler;
-    private final GroupHandler groupHandler;
-    private final PlatformHandler platformHandler;
+    private final ServiceProvider serviceProvider;
+    private final GroupProvider groupProvider;
+    private final PlatformProvider platformProvider;
 
     private final String securityKey;
     private final NetServer netServer;
@@ -45,13 +52,28 @@ public final class EasyCloudAgent {
     public EasyCloudAgent() {
         instance = this;
 
+        long timeSinceStart = System.currentTimeMillis();
+
         this.securityKey = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
 
-        long timeSinceStart = System.currentTimeMillis();
-        FileFactory.remove(Path.of("services"));
+        var localPath = Path.of("local");
+        var resourcesPath = Path.of("resources");
+        FileFactory.remove(localPath.resolve("services"));
+
+        List.of("de", "en").forEach(s -> {
+            try {
+                var fileName = "i18n_" + s + ".properties";
+                Files.copy(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("i18n/" + fileName)), resourcesPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException exception) {
+                throw new RuntimeException(exception);
+            }
+        });
+
 
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
+
+        this.i18nProvider = new I18nProvider();
 
         this.netServer = Net.line().server();
         this.netServer
@@ -62,37 +84,36 @@ public final class EasyCloudAgent {
                 .bootSync();
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.securityKey));
-        log.info("NetLine is running on {}:{}.", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
-        this.commandHandler = new CommandHandler();
+        this.commandProvider = new CommandProvider();
 
-        this.serviceHandler = new SimpleServiceHandler();
-        this.groupHandler = new SimpleGroupHandler();
+        this.serviceProvider = new SimpleServiceProvider();
+        this.groupProvider = new SimpleGroupProvider();
+        this.platformProvider = new PlatformProvider();
 
-        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupHandler.groups().size() + " groups").reset());
+        this.platformProvider.refresh();
+        this.groupProvider.refresh();
 
-        this.platformHandler = new PlatformHandler();
-        this.platformHandler.refresh();
+        log.info(this.i18nProvider.get("netline.running"), ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset());
 
-        log.info("{} were found.", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformHandler.platforms().size() + " platforms").reset());
+        log.info(this.i18nProvider.get("agent.found"), ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupProvider.groups().size() + " groups").reset());
+        log.info(this.i18nProvider.get("agent.found"), ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformProvider.platforms().size() + " platforms").reset());
 
-        this.groupHandler.refresh();
-
-        log.info("It took {} to start the cloud.", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset());
-        log.info("The cloud is ready. Type {} to get started.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset());
+        log.info(this.i18nProvider.get("agent.startup", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
+        log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset()));
 
         this.terminal.start();
     }
 
     @SneakyThrows
     public void shutdown() {
-        log.info("Shutting down services...");
+        log.info(this.i18nProvider.get("services.shutdown.all"));
 
-        for (Service service : new ArrayList<>(this.serviceHandler.services())) {
+        for (Service service : new ArrayList<>(this.serviceProvider.services())) {
             service.shutdown();
         }
 
-        log.info("Shutting down... Goodbye!");
+        log.info(this.i18nProvider.get("agent.shutdown"));
 
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();

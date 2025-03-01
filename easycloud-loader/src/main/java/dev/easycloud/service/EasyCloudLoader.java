@@ -1,7 +1,6 @@
 package dev.easycloud.service;
 
-import dev.easycloud.service.dependency.DependencyLoader;
-import dev.easycloud.service.update.UpdateServiceHandler;
+import dev.easycloud.service.update.LoaderUpdateProvider;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +15,17 @@ public final class EasyCloudLoader {
 
     @SneakyThrows
     public static void main(String[] args) {
-        var storage = Path.of("storage");
-        var libaries = storage.resolve("libaries");
-        storage.toFile().mkdirs();
+        var local = Path.of("local");
+        var resources = Path.of("resources");
+        var libaries = resources.resolve("libaries");
+        local.toFile().mkdirs();
+        resources.toFile().mkdirs();
         libaries.toFile().mkdirs();
 
         copyFile("EasyCloudUpdater.class", libaries.resolve("EasyCloudUpdater.class"));
 
         if(Arrays.stream(args).toList().stream().anyMatch(arg -> arg.equals("-Dauto.updates=true"))) {
-            new UpdateServiceHandler();
+            new LoaderUpdateProvider();
         } else {
             System.out.println("""
                   ┌──────────────────────────────────┐
@@ -38,14 +39,14 @@ public final class EasyCloudLoader {
 
         new DependencyLoader();
 
-        copyFile("easycloud-plugin.jar", storage.resolve("easycloud-plugin.jar"));
+        copyFile("easycloud-plugin.jar", resources.resolve("easycloud-plugin.jar"));
         copyFile("easycloud-api.jar", libaries.resolve("dev.easycloud.service-impl-stable.jar"));
 
         copyFile("easycloud-agent.jar", Path.of("easycloud-agent.jar"));
 
         var thread = new Thread(() -> {
             try {
-                var fileArg = "easycloud-agent.jar;storage/libaries/*;";
+                var fileArg = "easycloud-agent.jar;resources/libaries/*;";
                 if(!isWindows()) {
                     fileArg = fileArg.replace(";", ":");
                 }
