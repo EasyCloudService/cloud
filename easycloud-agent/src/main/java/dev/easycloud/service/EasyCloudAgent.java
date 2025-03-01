@@ -69,10 +69,10 @@ public final class EasyCloudAgent {
             }
         });
 
+        this.i18nProvider = new I18nProvider(this.configuration.locale());
+
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
-
-        this.i18nProvider = new I18nProvider(this.configuration.locale());
 
         this.netServer = Net.line().server();
         this.netServer
