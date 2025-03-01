@@ -31,7 +31,7 @@ public final class SimpleSetupService implements SetupService {
 
         EasyCloudAgent.instance().terminal().clear();
 
-        log.info(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to cancel the setup.").toString());
+        this.print(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to cancel the setup.").toString());
 
         var future = new CompletableFuture<SetupServiceResult>();
         this.trigger(future);

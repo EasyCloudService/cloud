@@ -80,7 +80,7 @@ public final class SimpleService implements Service {
     @Override
     public void shutdown() {
         this.execute("stop");
-        log.info("Service {} will be shutdown...", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset());
+        log.info(EasyCloudAgent.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
         EasyCloudAgent.instance().terminal().exitScreen(this);
 
         new Thread(() -> {

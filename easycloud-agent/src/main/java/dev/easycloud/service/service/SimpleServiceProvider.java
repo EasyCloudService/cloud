@@ -110,7 +110,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
 
-        log.info("Service {} launched on port {}.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset());
+        log.info(EasyCloudAgent.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset()));
 
         this.services.add(service);
     }
@@ -141,14 +141,14 @@ public final class SimpleServiceProvider implements ServiceProvider {
             if(Files.exists(secretPath)) {
                 Files.delete(secretPath);
             }
-            Files.write(secretPath, EasyCloudAgent.instance().securityKey().getBytes());
+            Files.write(secretPath, EasyCloudAgent.instance().configuration().key().getBytes());
         } else {
             FileFactory.copy(templatePath.resolve("global").resolve("server"), service.directory());
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
 
         EasyCloudAgent.instance().platformProvider().initializer(group.platform().initilizerId()).initialize(service.directory());
-        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().securityKey()));
+        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().configuration().key()));
 
         try {
             Files.copy(resourcesPath.resolve("easycloud-plugin.jar"), service.directory().resolve("plugins").resolve("easycloud-plugin.jar"), StandardCopyOption.REPLACE_EXISTING);

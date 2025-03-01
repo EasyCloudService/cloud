@@ -156,11 +156,11 @@ public final class SimpleTerminal {
                 .fgRgb(LogType.PRIMARY.rgb()).a(" |______\\__,_|___/\\__, | ").reset().a(" \\_____|_|\\___/ \\__,_|\\__,_| \n").reset()
                 .fgRgb(LogType.PRIMARY.rgb()).a("                  |___/                       [DEBUG]\n").reset()
 
-                .reset().a("    Contributors: ")
+                .reset().a("    " + EasyCloudAgent.instance().i18nProvider().get("global.contributors") + ": ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
                 .reset().a(", ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
-                .reset().a(" and ")
+                .reset().a(" " + EasyCloudAgent.instance().i18nProvider().get("global.and") + " ")
                 .fgRgb(LogType.PRIMARY.rgb()).a("Swerion")
                 .reset().a("\n").toString();
 

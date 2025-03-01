@@ -58,7 +58,7 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         Map<String, Object> velocity = new HashMap<>();
         velocity.put("enabled", true);
         velocity.put("online-mode", true);
-        velocity.put("secret", EasyCloudAgent.instance().securityKey());
+        velocity.put("secret", EasyCloudAgent.instance().configuration().key());
         proxies.put("velocity", velocity);
 
         Map<String, Object> yamlData;

@@ -26,7 +26,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -45,7 +44,7 @@ public final class EasyCloudAgent {
     private final GroupProvider groupProvider;
     private final PlatformProvider platformProvider;
 
-    private final String securityKey;
+    private final EasyCloudConfiguration configuration;
     private final NetServer netServer;
 
     @SneakyThrows
@@ -54,11 +53,12 @@ public final class EasyCloudAgent {
 
         long timeSinceStart = System.currentTimeMillis();
 
-        this.securityKey = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
-
         var localPath = Path.of("local");
         var resourcesPath = Path.of("resources");
         FileFactory.remove(localPath.resolve("services"));
+
+        FileFactory.writeIfNotExists(localPath, new EasyCloudConfiguration());
+        this.configuration = FileFactory.read(localPath, EasyCloudConfiguration.class);
 
         List.of("de", "en").forEach(s -> {
             try {
@@ -69,11 +69,10 @@ public final class EasyCloudAgent {
             }
         });
 
-
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        this.i18nProvider = new I18nProvider();
+        this.i18nProvider = new I18nProvider(this.configuration.locale());
 
         this.netServer = Net.line().server();
         this.netServer
@@ -83,7 +82,7 @@ public final class EasyCloudAgent {
                 })
                 .bootSync();
 
-        this.netServer.withSecurityPolicy(new NetLineSecurity(this.securityKey));
+        this.netServer.withSecurityPolicy(new NetLineSecurity(this.configuration.key()));
 
         this.commandProvider = new CommandProvider();
 
