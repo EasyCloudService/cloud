@@ -7,7 +7,7 @@ import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.SubCommand;
 import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.List;

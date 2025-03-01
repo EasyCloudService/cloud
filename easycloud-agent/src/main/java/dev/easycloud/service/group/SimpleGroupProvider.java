@@ -5,7 +5,7 @@ import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.Ansi;
@@ -68,7 +68,7 @@ public final class SimpleGroupProvider implements GroupProvider {
             var jarPath = platformPath.resolve(platform.initilizerId() + "-" + platform.version() + ".jar");
 
             if (!jarPath.toFile().exists()) {
-                log.info("Downloading {} platform...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset());
+                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset()));
 
                 var downloadUrl = initializer.buildDownload(platform.version());
                 if (downloadUrl == null) {
@@ -77,7 +77,7 @@ public final class SimpleGroupProvider implements GroupProvider {
                 }
 
                 FileFactory.download(downloadUrl, jarPath);
-                log.info("Platform {} is now ready.", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset());
+                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset()));
             }
         });
     }
@@ -111,12 +111,12 @@ public final class SimpleGroupProvider implements GroupProvider {
 
                 group.enabled(true);
                 FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
-                log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
+                log.info(EasyCloudAgent.instance().i18nProvider().get("group.created", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset()));
             }).start();
         } else {
             group.enabled(true);
             FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
-            log.info("{} has been created.", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset());
+            log.info(EasyCloudAgent.instance().i18nProvider().get("group.created", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset()));
         }
     }
 

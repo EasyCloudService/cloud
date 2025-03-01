@@ -1,4 +1,4 @@
-package dev.easycloud.service.terminal;
+package dev.easycloud.service.terminal.logger;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.service.resources.ServiceState;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -27,11 +27,11 @@ public final class ServiceReadyListener {
                 EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
             }
             if(service.group().platform().type().equals(PlatformType.PROXY)) {
-                EasyCloudAgent.instance().serviceProvider().services().forEach(it -> {
+                EasyCloudAgent.instance().serviceProvider().services().stream().filter(it -> it.state().equals(ServiceState.ONLINE)).forEach(it -> {
                     client.send(new RegisterServerPacket(it.id(), new InetSocketAddress(it.port())));
                 });
             }
-            log.info("Service {} is now ready.", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset());
+            log.info(EasyCloudAgent.instance().i18nProvider().get("service.ready", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset()));
         });
     }
 }

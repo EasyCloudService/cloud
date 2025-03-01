@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 /**
- * Log4j2Stream. Thanks to: https://github.com/HttpMarco/polocloud
+ * Log4j2Stream. Thanks to: https://github.com/HttpMarco
  */
 @AllArgsConstructor
 public final class SimpleLoggingStream extends ByteArrayOutputStream {

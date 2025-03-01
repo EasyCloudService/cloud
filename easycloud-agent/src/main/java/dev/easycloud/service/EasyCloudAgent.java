@@ -11,7 +11,7 @@ import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.SimpleServiceProvider;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.server.NetServer;
 import lombok.Getter;

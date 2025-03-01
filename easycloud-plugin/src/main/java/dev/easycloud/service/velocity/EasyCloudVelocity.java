@@ -17,10 +17,9 @@ import dev.httpmarco.netline.client.NetClient;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
-import java.net.InetSocketAddress;
 import java.nio.file.Path;
 
-@Plugin(id = "easycloud-velocity", name = "EasyCloud-Velocity", version = "1.0", description = "EasyCloud Velocity Plugin")
+@Plugin(id = "easycloud-velocity", name = "EasyCloud-Velocity", version = "1.0", description = "EasyCloud Velocity Plugin", authors = "EasyCloud")
 public final class EasyCloudVelocity {
     private final ProxyServer server;
     private final Logger logger;
@@ -46,16 +45,17 @@ public final class EasyCloudVelocity {
                 })
                 .bootSync();
 
-        logger.info("NetLine is connecting to 127.0.0.1:5200...");
+        this.logger.info("EasyCloudService is starting...");
+        this.logger.info("NetLine is connecting to 127.0.0.1:5200...");
 
         this.netClient.track(RegisterServerPacket.class, packet -> {
             this.server.registerServer(new ServerInfo(packet.id(), packet.address()));
-            this.logger.info("Service {} is connected to port {}.", packet.id(), packet.address().getPort());
+            this.logger.info("Service '{}' is online on port {}.", packet.id(), packet.address().getPort());
         });
 
         this.netClient.track(UnregisterServerPacket.class, packet -> {
             this.server.unregisterServer(this.server.getServer(packet.id()).orElseThrow().getServerInfo());
-            this.logger.info("Service {} is disconnected.", packet.id());
+            this.logger.info("Service '{}' is disconnected.", packet.id());
         });
     }
 

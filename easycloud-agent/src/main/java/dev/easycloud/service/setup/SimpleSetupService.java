@@ -4,7 +4,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.setup.resources.SetupServiceResult;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,7 +58,7 @@ public final class SimpleSetupService implements SetupService {
                 }
             }
 
-            EasyCloudAgent.instance().terminal().readingThread().prioSub(line -> {
+            EasyCloudAgent.instance().terminal().readingThread().priority(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
                     SetupService.running.remove(this);
                     TerminalCompleter.TEMP_VALUES().clear();

@@ -28,7 +28,7 @@ public final class TerminalCompleter implements Completer {
             return;
         }
 
-        if(EasyCloudAgent.instance().terminal().readingThread().prioSub() != null) return;
+        if(EasyCloudAgent.instance().terminal().readingThread().priority() != null) return;
 
         var args = parsedLine.line().split(" ", -1);
         if (args.length >= 2) {

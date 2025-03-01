@@ -3,7 +3,6 @@ package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudAgent;
 import lombok.Getter;
-import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.LineReaderImpl;
 
 import java.util.function.Consumer;
@@ -20,26 +19,19 @@ public class TerminalReadingThread extends Thread {
     }
 
     @Getter
-    private Consumer<String> prioSub = null;
-    public void prioSub(Consumer<String> consumer) {
-        this.prioSub = consumer;
+    private Consumer<String> priority = null;
+    public void priority(Consumer<String> consumer) {
+        this.priority = consumer;
     }
 
     @Override
     public void run() {
         while (!this.isInterrupted()) {
-            String line;
-            try {
-                line = this.lineReader.readLine(this.terminal.prompt());
-            } catch (UserInterruptException exception) {
-                EasyCloudAgent.instance().shutdown();
-                return;
-            }
-
+            var line = this.lineReader.readLine(this.terminal.prompt());
             if (line != null && !line.isEmpty()) {
-                if(prioSub != null) {
-                    prioSub.accept(line);
-                    prioSub = null;
+                if(priority != null) {
+                    priority.accept(line);
+                    priority = null;
                     continue;
                 }
 

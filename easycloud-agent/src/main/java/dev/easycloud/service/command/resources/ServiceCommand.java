@@ -4,7 +4,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.SubCommand;
 import dev.easycloud.service.service.SimpleService;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.extern.log4j.Log4j2;
 
@@ -13,7 +13,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Log4j2
 public final class ServiceCommand extends Command {
     public ServiceCommand() {
-        super("service", "command.service.info");
+        super("service", "command.service.info", "ser");
 
         addSubCommand(new SubCommand("shutdown", "command.service.shutdown.info", this::shutdown));
         addSubCommand(new SubCommand("screen", "command.service.screen.info", this::screen));
@@ -61,6 +61,6 @@ public final class ServiceCommand extends Command {
         service.logCache().forEach(service::print);
 
         service.logStream(true);
-        log.info("SERVICE_LOG: " + this.i18nProvider().get("command.service.screenOpen"), ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset());
+        log.info("SERVICE_LOG: " + this.i18nProvider().get("command.service.screenOpen", ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset()));
     }
 }

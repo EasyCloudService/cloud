@@ -5,7 +5,7 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceState;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +40,9 @@ public final class SimpleService implements Service {
     public SimpleService(String id, Group group, int port, Path directory) {
         this.id = id;
         this.group = group;
+
+        this.state = ServiceState.STARTING;
+
         this.port = port;
         this.directory = directory;
 
@@ -119,7 +122,8 @@ public final class SimpleService implements Service {
                     this.logCache.add(line);
                 }
             } catch (IOException exception) {
-                throw new RuntimeException(exception);
+                this.print(exception.getMessage());
+                //throw new RuntimeException(exception);
             }
         }).start();
     }

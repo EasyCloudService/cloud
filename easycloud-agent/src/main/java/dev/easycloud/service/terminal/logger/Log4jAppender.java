@@ -2,7 +2,6 @@ package dev.easycloud.service.terminal.logger;
 
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.setup.SetupService;
-import dev.easycloud.service.terminal.LogType;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -22,9 +21,8 @@ import java.util.Calendar;
 import static org.fusesource.jansi.Ansi.ansi;
 
 /**
- * Log4j2Appender. Thanks to: https://github.com/HttpMarco/polocloud
+ * Log4j2Appender. Thanks to: https://github.com/HttpMarco
  */
-
 @Plugin(name = "Log4jAppender", category = Core.CATEGORY_NAME, elementType = "appender", printObject = true)
 public final class Log4jAppender extends AbstractAppender {
     private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
@@ -43,7 +41,7 @@ public final class Log4jAppender extends AbstractAppender {
 
         @Override
         public Log4jAppender build() {
-            return new Log4jAppender(getName(), getFilter(), getLayout(), isIgnoreExceptions(), getPropertyArray());
+            return new Log4jAppender(getName(), getFilter(), getLayout(), false, getPropertyArray());
         }
     }
 
@@ -63,17 +61,20 @@ public final class Log4jAppender extends AbstractAppender {
 
         TerminalCompleter.TEMP_VALUES().clear();
 
-        if(event.getMessage().getFormattedMessage().startsWith("SETUP: ")) {
-            System.out.println(PATTERN.toString().replace("SETUP: ", ""));
-            return;
-        }
+        if(!event.getLevel().name().equals("ERROR")) {
+            if (event.getMessage().getFormattedMessage().startsWith("SETUP: ")) {
+                System.out.println(PATTERN.toString().replace("SETUP: ", ""));
+                return;
+            }
 
-        if(event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
-            System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
-            return;
-        }
-
-        if(!EasyCloudAgent.instance().terminal().screenPrinting() && SetupService.running.isEmpty()) {
+            if (event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
+                System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
+                return;
+            }
+            if (!EasyCloudAgent.instance().terminal().screenPrinting() && SetupService.running.isEmpty()) {
+                System.out.println(PATTERN.toString());
+            }
+        } else {
             System.out.println(PATTERN.toString());
         }
         EasyCloudAgent.instance().terminal().history().add(PATTERN.toString());

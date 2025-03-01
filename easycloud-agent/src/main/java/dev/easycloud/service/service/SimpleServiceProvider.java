@@ -8,7 +8,7 @@ import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.listener.ServiceReadyListener;
 import dev.easycloud.service.service.listener.ServiceShutdownListener;
 import dev.easycloud.service.service.resources.*;
-import dev.easycloud.service.terminal.LogType;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

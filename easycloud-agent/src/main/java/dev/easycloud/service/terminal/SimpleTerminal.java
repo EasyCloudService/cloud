@@ -2,8 +2,8 @@ package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.service.SimpleService;
-import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
+import dev.easycloud.service.terminal.logger.LogType;
 import dev.easycloud.service.terminal.stream.SimpleLoggingStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,10 +21,6 @@ import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 import org.jline.widget.TailTipWidgets;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +134,7 @@ public final class SimpleTerminal {
     public void exitScreen(SimpleService service) {
         EasyCloudAgent.instance().terminal().screenPrinting(false);
 
-        if(service != null) {
+        if (service != null) {
             service.logStream(false);
         }
 
