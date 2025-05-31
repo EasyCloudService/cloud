@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$/easycloud-api" />
             <option value="$PROJECT_DIR$/easycloud-loader" />
             <option value="$PROJECT_DIR$/easycloud-plugin" />
-            <option value="$PROJECT_DIR$/test" />
           </set>
         </option>
       </GradleProjectSettings>

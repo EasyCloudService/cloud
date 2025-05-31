@@ -82,6 +82,7 @@ public final class EasyCloudAgent {
                 })
                 .bootSync();
 
+
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.configuration.key()));
 
         this.commandProvider = new CommandProvider();
