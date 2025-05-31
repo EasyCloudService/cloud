@@ -9,6 +9,22 @@ To enable them, open the `start-script` (`start.bat` or `start.sh`) and add the 
 `-Dauto.updates=true` to the end. It should look like this: \
 `java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true`
 
+### 🔹 How can I change the language?
+You can change the language by editing the `local/config.json` file.
+Currently, the following languages are supported: `en, de`
+
+### 🔹 How can I use the API?
+To use the API, you need to add following dependency to your `build.gradle.kts`:
+```kotlin
+dependencies {
+    implementation("com.github.EasyCloudService.cloud:easycloud-plugin:[current_version]")
+}
+```
+Then you can use the API like this:
+```java
+EasyCloudService.instance().serviceProvider().current();
+```
+
 ### 🔹 How do I set up a group?
 ```java
 group setup
