@@ -99,13 +99,16 @@ public class PaperPlatformInitializer implements PlatformInitializer {
         Integer latestBuild = null;
         for (JsonElement element : builds) {
             var build = element.getAsJsonObject();
-            if ("default".equals(build.get("channel").getAsString())) {
+            var channel = build.get("channel").getAsString();
+            if ("default".equals(channel) || "experimental".equals(channel)) {
+                log.info(build.toString());
                 int buildNumber = build.get("build").getAsInt();
                 if (latestBuild == null || buildNumber > latestBuild) {
                     latestBuild = buildNumber;
                 }
             }
         }
+
         return this.url
                 + "/versions/" + version
                 + "/builds/" + latestBuild

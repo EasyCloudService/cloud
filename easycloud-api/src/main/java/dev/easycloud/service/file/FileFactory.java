@@ -88,7 +88,7 @@ public final class FileFactory {
 
     @SneakyThrows
     public static void download(String url, Path output) {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        var connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("GET");
 
         if (connection.getResponseCode() != 200) {
