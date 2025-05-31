@@ -16,6 +16,10 @@ Currently, the following languages are supported: `en,de`
 ### 🔹 How can I use the API?
 To use the API, you need to add following dependency to your `build.gradle.kts`:
 ```kotlin
+repositories {
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+}
 dependencies {
     implementation("com.github.EasyCloudService.cloud:easycloud-plugin:[current_version]")
 }
