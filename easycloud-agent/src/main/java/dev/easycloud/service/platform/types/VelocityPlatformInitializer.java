@@ -79,7 +79,7 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
         List<Platform> tmp = new ArrayList<>();
         var versions = this.versions();
         if(versions == null) {
-            log.error("Failed to fetch PaperMC versions.");
+            log.error(EasyCloudAgent.instance().i18nProvider().get("group.platform.fetch.failed", "Velocity"));
             return new ArrayList<>();
         }
 

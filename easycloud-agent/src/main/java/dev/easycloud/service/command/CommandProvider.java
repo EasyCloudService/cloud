@@ -31,7 +31,7 @@ public final class CommandProvider {
                     .orElse(null);
 
             if (service == null) {
-                log.error("No service is running.");
+                log.error(EasyCloudAgent.instance().i18nProvider().get("command.service.notRunning"));
             }
 
             if (command.equalsIgnoreCase("exit") || service == null) {
@@ -57,7 +57,7 @@ public final class CommandProvider {
                                 .accept(Arrays.copyOfRange(args, 1, args.length));
                     }
                 }, () -> {
-                    log.error("This command does not exist!");
+                    log.error(EasyCloudAgent.instance().i18nProvider().get("command.unknown", command));
                 });
     }
 }

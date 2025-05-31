@@ -72,8 +72,7 @@ public final class SimpleGroupProvider implements GroupProvider {
 
                 var downloadUrl = initializer.buildDownload(platform.version());
                 if (downloadUrl == null) {
-                    log.error("Failed to download platform. Invalid download url/version.");
-                    return;
+                    log.error(EasyCloudAgent.instance().i18nProvider().get("group.platform.download.failed", platform.initilizerId() + "-" + platform.version()));
                 }
 
                 FileFactory.download(downloadUrl, jarPath);

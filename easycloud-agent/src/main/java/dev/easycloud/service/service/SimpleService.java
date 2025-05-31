@@ -74,10 +74,10 @@ public final class SimpleService implements Service {
                 return;
             }
         } catch (Exception exception) {
-            log.error("Stream is not available", exception);
+            log.error(EasyCloudAgent.instance().i18nProvider().get("service.stream.failed", exception));
             return;
         }
-        log.error("Command could not be executed: {}", command);
+        log.error(EasyCloudAgent.instance().i18nProvider().get("service.command.failed", command));
     }
 
     @Override
