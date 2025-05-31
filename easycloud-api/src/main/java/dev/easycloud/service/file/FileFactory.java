@@ -1,5 +1,6 @@
 package dev.easycloud.service.file;
 
+import com.google.gson.ExclusionStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.easycloud.service.file.resources.FileEntity;
@@ -18,7 +19,9 @@ import java.util.stream.Stream;
 @SuppressWarnings("ALL")
 public final class FileFactory {
     public static final Yaml YAML = new Yaml();
+
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON_NO_PRETTY = new GsonBuilder().create();
 
     private static String name(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(FileEntity.class)) {

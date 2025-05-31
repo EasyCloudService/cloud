@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GroupData {
+public final class GroupProperties {
     private int memory;
 
     private int maxPlayers;

@@ -3,6 +3,8 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.network.packet.*;
+import dev.easycloud.service.network.packet.request.*;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.listener.ServiceReadyListener;
@@ -37,6 +39,14 @@ public final class SimpleServiceProvider implements ServiceProvider {
 
         new ServiceReadyListener();
         new ServiceShutdownListener();
+
+        EasyCloudAgent.instance().netServer().track(RequestServiceLaunchPacket.class, packet -> {
+            this.launch(EasyCloudAgent.instance().groupProvider().get(packet.groupName()), packet.amount());
+        });
+        EasyCloudAgent.instance().netServer().track(RequestServiceInformationPacket.class, (channel, packet) -> {
+            log.info("request service info: {}", packet.serviceId());
+            channel.send(new ServiceInformationPacket(this.get(packet.serviceId()), this.services.stream().filter(it -> !it.id().equals(packet.serviceId())).toList()));
+        });
     }
 
     public void refresh() {
@@ -45,8 +55,8 @@ public final class SimpleServiceProvider implements ServiceProvider {
         }
 
         for (Group group : EasyCloudAgent.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
-            var always = group.data().always();
-            var max = group.data().maximum();
+            var always = group.properties().always();
+            var max = group.properties().maximum();
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
             if(always > online) {
@@ -56,7 +66,8 @@ public final class SimpleServiceProvider implements ServiceProvider {
                 this.services.stream()
                         .filter(it -> it.group().name().equals(group.name()))
                         .limit(online - max)
-                        .forEach(Service::shutdown);
+                        .map(it -> (SimpleService) it)
+                        .forEach(SimpleService::shutdown);
             }
         }
     }
@@ -78,7 +89,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
             return;
         }
 
-        service.shutdown();
+        ((SimpleService) service).shutdown();
     }
 
     @Override
@@ -98,7 +109,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
-        var directory = Path.of("local").resolve(group.data().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
+        var directory = Path.of("local").resolve(group.properties().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new SimpleService(group.name() + "-" + id, group, port, directory);
 
         var result = this.prepare(service);
@@ -113,13 +124,6 @@ public final class SimpleServiceProvider implements ServiceProvider {
         log.info(EasyCloudAgent.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset()));
 
         this.services.add(service);
-    }
-
-    @Override
-    public void launch(Group group, int count) {
-        for (int i = 0; i < count; i++) {
-            this.launch(group);
-        }
     }
 
     @SneakyThrows
@@ -147,7 +151,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
             FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
 
-        EasyCloudAgent.instance().platformProvider().initializer(group.platform().initilizerId()).initialize(service.directory());
+        EasyCloudAgent.instance().platformProvider().initializer(group.platform().initializerId()).initialize(service.directory());
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudAgent.instance().configuration().key()));
 
         try {
@@ -159,7 +163,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
 
         if(!service.directory().resolve("platform.jar").toFile().exists()) {
             try {
-                Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
+                Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {
                 log.error("Failed to copy platform jar.", exception);
                 return false;

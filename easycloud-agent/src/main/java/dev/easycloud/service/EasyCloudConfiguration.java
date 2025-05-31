@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @FileEntity(name = "config")
-public class EasyCloudConfiguration {
+public final class EasyCloudConfiguration {
     private final String key = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
     private final Locale locale = Locale.ENGLISH;
 }

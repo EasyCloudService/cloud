@@ -8,11 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Group {
+public final class Group {
     private boolean enabled;
 
     private final String name;
     private final Platform platform;
 
-    private final GroupData data;
+    private final GroupProperties properties;
 }

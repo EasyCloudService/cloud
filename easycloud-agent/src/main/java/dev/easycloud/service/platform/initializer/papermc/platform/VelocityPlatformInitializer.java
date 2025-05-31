@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Getter
-public class VelocityPlatformInitializer extends AbstractPaperMCInitializer {
+public final class VelocityPlatformInitializer extends AbstractPaperMCInitializer {
     private final PlatformType type = PlatformType.PROXY;
 
     public VelocityPlatformInitializer() {

@@ -7,7 +7,7 @@ import org.jline.reader.impl.LineReaderImpl;
 
 import java.util.function.Consumer;
 
-public class TerminalReadingThread extends Thread {
+public final class TerminalReadingThread extends Thread {
     private final SimpleTerminal terminal;
     private final LineReaderImpl lineReader;
 

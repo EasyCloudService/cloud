@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
 import dev.easycloud.service.platform.PlatformType;
+import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +18,12 @@ public final class ServiceReadyListener {
 
     public ServiceReadyListener() {
         EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, (client, packet) -> {
-            var service = EasyCloudAgent.instance().serviceProvider().get(packet.serviceId());
+            var service = EasyCloudAgent.instance().serviceProvider().get(packet.service().id());
             if (service == null) {
                 return;
             }
 
-            service.state(ServiceState.ONLINE);
+            ((SimpleService) service).state(ServiceState.ONLINE);
             if(service.group().platform().type().equals(PlatformType.SERVER)) {
                 EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
             }

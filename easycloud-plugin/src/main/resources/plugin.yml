@@ -1,6 +1,6 @@
 name: EasyCloud-Paper
 version: 1.0
-main: dev.easycloud.service.paper.EasyCloudPaper
+main: dev.easycloud.service.platform.EasyCloudPaper
 author: EasyCloud
 description: EasyCloud Paper Plugin
 api-version: "1.8"

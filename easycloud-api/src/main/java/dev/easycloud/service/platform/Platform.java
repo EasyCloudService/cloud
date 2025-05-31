@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public final class Platform {
-    private final String initilizerId;
+    private final String initializerId;
 
     private final String version;
     private final PlatformType type;

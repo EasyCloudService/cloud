@@ -8,6 +8,7 @@ import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.network.NetLineSecurity;
 import dev.easycloud.service.service.ServiceProvider;
+import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.SimpleServiceProvider;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
@@ -111,7 +112,7 @@ public final class EasyCloudAgent {
         log.info(this.i18nProvider.get("services.shutdown.all"));
 
         for (Service service : new ArrayList<>(this.serviceProvider.services())) {
-            service.shutdown();
+            ((SimpleService) service).shutdown();
         }
 
         log.info(this.i18nProvider.get("agent.shutdown"));

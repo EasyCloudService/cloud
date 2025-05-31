@@ -62,23 +62,23 @@ public final class SimpleGroupProvider implements GroupProvider {
         platforms.forEach(platform -> {
             var initializer = EasyCloudAgent.instance().platformProvider().initializers()
                     .stream()
-                    .filter(it -> it.id().equals(platform.initilizerId()))
+                    .filter(it -> it.id().equals(platform.initializerId()))
                     .findFirst()
                     .orElseThrow();
-            var jarPath = platformPath.resolve(platform.initilizerId() + "-" + platform.version() + ".jar");
+            var jarPath = platformPath.resolve(platform.initializerId() + "-" + platform.version() + ".jar");
 
             if (!jarPath.toFile().exists()) {
-                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset()));
+                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initializerId() + "-" + platform.version()).reset()));
 
                 var downloadUrl = initializer.buildDownload(platform.version());
                 if (downloadUrl == null) {
-                    log.error(EasyCloudAgent.instance().i18nProvider().get("group.platform.download.failed", platform.initilizerId() + "-" + platform.version()));
+                    log.error(EasyCloudAgent.instance().i18nProvider().get("group.platform.download.failed", platform.initializerId() + "-" + platform.version()));
                 }
 
                 FileFactory.download(downloadUrl, jarPath);
 
                 log.info("DEBUG 11");
-                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initilizerId() + "-" + platform.version()).reset()));
+                log.info(EasyCloudAgent.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initializerId() + "-" + platform.version()).reset()));
             }
         });
     }
@@ -94,11 +94,11 @@ public final class SimpleGroupProvider implements GroupProvider {
         var templatePath = localPath.resolve("templates").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
         templatePath.toFile().mkdirs();
 
-        if (!group.data().isStatic()) {
+        if (!group.properties().isStatic()) {
             new Thread(() -> {
-                if (group.platform().initilizerId().equals("paper")) {
+                if (group.platform().initializerId().equals("paper")) {
                     try {
-                        Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initilizerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
+                        Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
                         var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
                                 .directory(templatePath.toFile())
                                 .start();

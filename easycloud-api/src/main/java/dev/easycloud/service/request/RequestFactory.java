@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @UtilityClass
-public class RequestFactory {
+public final class RequestFactory {
 
     @SneakyThrows
     public String getRequest(String url) {

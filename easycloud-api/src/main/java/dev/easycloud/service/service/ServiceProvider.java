@@ -10,9 +10,21 @@ public interface ServiceProvider {
 
     Service get(String id);
 
+    default void shutdown(String id) {
+        var service = this.get(id);
+        if (service != null) {
+            this.shutdown(service);
+        } else {
+            throw new IllegalArgumentException("Service with id " + id + " not found.");
+        }
+    }
     void shutdown(Service service);
 
     void launch(Group group);
-    void launch(Group group, int count);
+    default void launch(Group group, int count) {
+        for (int i = 0; i < count; i++) {
+            this.launch(group);
+        }
+    }
 
 }

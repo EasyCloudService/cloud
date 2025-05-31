@@ -30,7 +30,7 @@ public final class SimpleService implements Service {
     private ServiceState state;
 
     private final int port;
-    private final Path directory;
+    private final String directoryRaw;
 
     private Process process;
     private boolean logStream;
@@ -44,7 +44,7 @@ public final class SimpleService implements Service {
         this.state = ServiceState.STARTING;
 
         this.port = port;
-        this.directory = directory;
+        this.directoryRaw = directory.toString();
 
         this.process = null;
         this.logStream = false;
@@ -52,7 +52,6 @@ public final class SimpleService implements Service {
         this.logCache = new ArrayList<>();
     }
 
-    @Override
     public void state(ServiceState serviceState) {
         this.state = serviceState;
     }
@@ -64,7 +63,6 @@ public final class SimpleService implements Service {
         this.printStream(process.getErrorStream());
     }
 
-    @Override
     public void execute(String command) {
         var outputStream = process.getOutputStream();
         try {
@@ -80,21 +78,20 @@ public final class SimpleService implements Service {
         log.error(EasyCloudAgent.instance().i18nProvider().get("service.command.failed", command));
     }
 
-    @Override
     public void shutdown() {
         this.execute("stop");
         log.info(EasyCloudAgent.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
         EasyCloudAgent.instance().terminal().exitScreen(this);
 
         new Thread(() -> {
-            if (!this.group.data().isStatic()) {
+            if (!this.group.properties().isStatic()) {
                 this.process.destroyForcibly();
             }
 
             try {
                 this.process.waitFor();
-                if (!this.group.data().isStatic()) {
-                    FileFactory.remove(this.directory);
+                if (!this.group.properties().isStatic()) {
+                    FileFactory.remove(this.directory());
                 }
                 EasyCloudAgent.instance().serviceProvider().services().remove(this);
             } catch (InterruptedException exception) {

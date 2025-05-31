@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Slf4j
 @Getter
-public class PaperPlatformInitializer extends AbstractPaperMCInitializer {
+public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
     private final PlatformType type = PlatformType.SERVER;
 
     public PaperPlatformInitializer() {

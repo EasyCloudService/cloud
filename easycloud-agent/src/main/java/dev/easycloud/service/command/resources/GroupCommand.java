@@ -2,7 +2,7 @@ package dev.easycloud.service.command.resources;
 
 import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.group.resources.GroupData;
+import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.SubCommand;
 import dev.easycloud.service.setup.SetupService;
@@ -43,8 +43,8 @@ public final class GroupCommand extends Command {
         groups.forEach(it -> {
             log.info("");
             log.info(ansi().fgRgb(LogType.PRIMARY.rgb()).a(it.name()).reset());
-            log.info("* Memory: {}", it.data().memory() + "mb");
-            log.info("* Platform: {}", it.platform().initilizerId() + "_" + it.platform().version());
+            log.info("* Memory: {}", it.properties().memory() + "mb");
+            log.info("* Platform: {}", it.platform().initializerId() + "_" + it.platform().version());
         });
         log.info("");
     }
@@ -52,7 +52,7 @@ public final class GroupCommand extends Command {
     private void setup(String[] args) {
         SetupService.simple()
                 .add(new SetupData<String>("name", this.i18nProvider().get("command.group.setup.name"), null))
-                .add(new SetupData<>("platform", this.i18nProvider().get("command.group.setup.platform"), EasyCloudAgent.instance().platformProvider().platforms().stream().map(it -> it.initilizerId() + "-" + it.version()).toList()))
+                .add(new SetupData<>("platform", this.i18nProvider().get("command.group.setup.platform"), EasyCloudAgent.instance().platformProvider().platforms().stream().map(it -> it.initializerId() + "-" + it.version()).toList()))
                 .add(new SetupData<>("memory", this.i18nProvider().get("command.group.setup.memory"), null))
                 .add(new SetupData<>("maxPlayers", this.i18nProvider().get("command.group.setup.maxPlayers"), null))
                 .add(new SetupData<>("always", this.i18nProvider().get("command.group.setup.always"), null))
@@ -79,8 +79,8 @@ public final class GroupCommand extends Command {
                     var group = new Group(
                             false,
                             it.result("name", String.class),
-                            EasyCloudAgent.instance().platformProvider().platforms().stream().filter(platform -> (platform.initilizerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow(),
-                            new GroupData(
+                            EasyCloudAgent.instance().platformProvider().platforms().stream().filter(platform -> (platform.initializerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow(),
+                            new GroupProperties(
                                     it.result("memory", Integer.class),
                                     it.result("maxPlayers", Integer.class),
                                     it.result("always", Integer.class),

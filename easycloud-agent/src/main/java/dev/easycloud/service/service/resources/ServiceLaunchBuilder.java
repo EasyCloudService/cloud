@@ -20,13 +20,13 @@ public final class ServiceLaunchBuilder {
     public Process create(Service service) {
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
-        arguments.add("-Xmx" + service.group().data().memory() + "M");
+        arguments.add("-Xmx" + service.group().properties().memory() + "M");
         arguments.addAll(ARGUMENTS);
         arguments.add("-Dcom.mojang.eula.agree=true");
         arguments.add("-jar");
         arguments.add("platform.jar");
         if (service.group().platform().type().equals(PlatformType.SERVER)) {
-            arguments.add("--max-players=" + service.group().data().maxPlayers());
+            arguments.add("--max-players=" + service.group().properties().maxPlayers());
             arguments.add("--online-mode=false");
             arguments.add("nogui");
         }

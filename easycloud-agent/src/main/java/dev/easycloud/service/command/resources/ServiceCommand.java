@@ -38,7 +38,7 @@ public final class ServiceCommand extends Command {
             return;
         }
 
-        service.shutdown();
+        ((SimpleService) service).shutdown();
     }
 
     private void screen(String[] args) {

@@ -5,7 +5,7 @@ import dev.httpmarco.netline.security.SecurityHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class NetLineSecurity implements SecurityHandler {
+public final class NetLineSecurity implements SecurityHandler {
     private final String privateKey;
 
     @Override
