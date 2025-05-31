@@ -21,7 +21,7 @@ import java.util.Map;
 public class PaperPlatformInitializer extends AbstractPaperMCInitializer {
     private final PlatformType type = PlatformType.SERVER;
 
-    public PaperPlatformInitializer(String id) {
+    public PaperPlatformInitializer() {
         super("paper");
     }
 

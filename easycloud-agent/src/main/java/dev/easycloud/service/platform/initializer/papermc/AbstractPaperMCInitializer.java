@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractPaperMCInitializer implements PlatformInitializer {
     protected final String id;
-    protected final String url = "https://api.papermc.io/v2/projects/" + this.id;
+    protected final String url = "https://api.papermc.io/v2/projects/" + id();
 
     protected List<String> versions() {
         var response = RequestFactory.getRequest(this.url);
