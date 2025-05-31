@@ -84,6 +84,7 @@ public final class EasyCloudAgent {
 
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.configuration.key()));
+        this.terminal.clear();
 
         this.commandProvider = new CommandProvider();
 
