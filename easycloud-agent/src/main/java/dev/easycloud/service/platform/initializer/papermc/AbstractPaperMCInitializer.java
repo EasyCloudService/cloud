@@ -1,29 +1,25 @@
-package dev.easycloud.service.platform.types;
+package dev.easycloud.service.platform.initializer.papermc;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.platform.Platform;
-import dev.easycloud.service.platform.PlatformType;
+import dev.easycloud.service.platform.PlatformInitializer;
 import dev.easycloud.service.request.RequestFactory;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Getter
-public class VelocityPlatformInitializer implements PlatformInitializer {
-    private final String id = "velocity";
-    private final String url = "https://api.papermc.io/v2/projects/velocity";
-    private final PlatformType type = PlatformType.PROXY;
+@Slf4j
+@AllArgsConstructor
+public abstract class AbstractPaperMCInitializer implements PlatformInitializer {
+    protected final String id;
+    protected final String url = "https://api.papermc.io/v2/projects/" + this.id;
 
-    private List<String> versions() {
+    protected List<String> versions() {
         var response = RequestFactory.getRequest(this.url);
         if(response == null) {
             return null;
@@ -40,14 +36,6 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
     }
 
     @Override
-    @SneakyThrows
-    public void initialize(Path path) {
-        if(!Files.exists(path.resolve("velocity.toml"))) {
-            Files.copy(EasyCloudAgent.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml"), path.resolve("velocity.toml"));
-        }
-    }
-
-    @Override
     public String buildDownload(String version) {
         var apiUrl = this.url + "/versions/" + version + "/builds";
         var response = RequestFactory.getRequest(apiUrl);
@@ -61,31 +49,19 @@ public class VelocityPlatformInitializer implements PlatformInitializer {
         Integer latestBuild = null;
         for (JsonElement element : builds) {
             var build = element.getAsJsonObject();
-            if ("default".equals(build.get("channel").getAsString())) {
+            var channel = build.get("channel").getAsString();
+            if ("default".equals(channel) || "experimental".equals(channel)) {
+                log.info(build.toString());
                 int buildNumber = build.get("build").getAsInt();
                 if (latestBuild == null || buildNumber > latestBuild) {
                     latestBuild = buildNumber;
                 }
             }
         }
+
         return this.url
                 + "/versions/" + version
                 + "/builds/" + latestBuild
-                + "/downloads/velocity-" + version + "-" + latestBuild + ".jar";
-    }
-
-    @Override
-    public List<Platform> platforms() {
-        List<Platform> tmp = new ArrayList<>();
-        var versions = this.versions();
-        if(versions == null) {
-            log.error(EasyCloudAgent.instance().i18nProvider().get("group.platform.fetch.failed", "Velocity"));
-            return new ArrayList<>();
-        }
-
-        versions.forEach(version -> {
-            tmp.add(new Platform(this.id, version, this.type));
-        });
-        return tmp;
+                + "/downloads/" + this.id + "-" + version + "-" + latestBuild + ".jar";
     }
 }

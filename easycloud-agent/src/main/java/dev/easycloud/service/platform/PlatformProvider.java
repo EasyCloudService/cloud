@@ -1,6 +1,7 @@
 package dev.easycloud.service.platform;
 
-import dev.easycloud.service.platform.types.*;
+import dev.easycloud.service.platform.initializer.papermc.platform.PaperPlatformInitializer;
+import dev.easycloud.service.platform.initializer.papermc.platform.VelocityPlatformInitializer;
 import lombok.Getter;
 
 import java.util.ArrayList;

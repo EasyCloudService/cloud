@@ -1,7 +1,4 @@
-package dev.easycloud.service.platform.types;
-
-import dev.easycloud.service.platform.Platform;
-import dev.easycloud.service.platform.PlatformType;
+package dev.easycloud.service.platform;
 
 import java.nio.file.Path;
 import java.util.List;
