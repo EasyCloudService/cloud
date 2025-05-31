@@ -33,7 +33,7 @@ public final class EasyCloudLoader {
                   │  (Auto)Updates are not enabled!  │
                   │                                  │
                   └──────────────────────────────────┘
-                  To enable them, open the 'start-script' and add the following argument 'eaup' to the end.
+                  To enable them, check the documentation on the GitHub page of EasyCloudService.
                 """);
         }
 

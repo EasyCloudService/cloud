@@ -23,24 +23,27 @@ public class LoaderUpdateProvider {
 
         var updateService = new GithubUpdateService();
         var versionFile = Path.of("local").resolve("version.key");
-        if (Files.exists(versionFile)) {
-            var currentVersion = Files.readString(versionFile);
-            if (updateService.getInformation().getLatestVersion().equals(currentVersion)) {
-                SimpleTerminal.clear();
-                System.out.println("""
-                  ┌──────────────────────────────────┐
-                  │                                  │
-                  │       Cloud is up to date        │
-                  │     No updates are available     │
-                  │                                  │
-                  └──────────────────────────────────┘
-                """);
-                return;
-            }
-            Files.deleteIfExists(versionFile);
+        if (!Files.exists(versionFile)) {
+            Files.write(versionFile, "empty".getBytes());
+        }
 
+        var currentVersion = Files.readString(versionFile);
+        if (updateService.getInformation().getLatestVersion().equals(currentVersion)) {
             SimpleTerminal.clear();
             System.out.println("""
+                      ┌──────────────────────────────────┐
+                      │                                  │
+                      │       Cloud is up to date        │
+                      │     No updates are available     │
+                      │                                  │
+                      └──────────────────────────────────┘
+                    """);
+            return;
+        }
+        Files.deleteIfExists(versionFile);
+
+        SimpleTerminal.clear();
+        System.out.println("""
                   ┌──────────────────────────────────┐
                   │                                  │
                   │   Update found! Downloading...   │
@@ -48,10 +51,10 @@ public class LoaderUpdateProvider {
                   └──────────────────────────────────┘
                 """);
 
-            updateService.download();
+        updateService.download();
 
-            SimpleTerminal.clear();
-            System.out.println("""
+        SimpleTerminal.clear();
+        System.out.println("""
                   ┌──────────────────────────────────┐
                   │                                  │
                   │          Update finished         │
@@ -59,11 +62,9 @@ public class LoaderUpdateProvider {
                   │                                  │
                   └──────────────────────────────────┘
                 """);
-            Files.write(versionFile, updateService.getInformation().getLatestVersion().getBytes());
-            new ProcessBuilder("java", "EasyCloudUpdater").directory(Path.of("resources").resolve("libaries").toFile()).start();
-            System.exit(0);
-            return;
-        }
         Files.write(versionFile, updateService.getInformation().getLatestVersion().getBytes());
+        new ProcessBuilder("java", "EasyCloudUpdater").directory(Path.of("resources").resolve("libaries").toFile()).start();
+        System.exit(0);
+        return;
     }
 }
