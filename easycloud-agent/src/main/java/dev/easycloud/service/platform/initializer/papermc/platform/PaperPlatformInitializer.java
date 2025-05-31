@@ -22,7 +22,7 @@ public class PaperPlatformInitializer extends AbstractPaperMCInitializer {
     private final PlatformType type = PlatformType.SERVER;
 
     public PaperPlatformInitializer() {
-        super("paper");
+        super("paper" ,"https://api.papermc.io/v2/projects/paper");
     }
 
     @Override

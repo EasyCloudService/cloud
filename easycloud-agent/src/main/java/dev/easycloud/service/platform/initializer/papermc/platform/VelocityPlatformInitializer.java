@@ -19,7 +19,7 @@ public class VelocityPlatformInitializer extends AbstractPaperMCInitializer {
     private final PlatformType type = PlatformType.PROXY;
 
     public VelocityPlatformInitializer() {
-        super("velocity");
+        super("velocity", "https://api.papermc.io/v2/projects/velocity");
     }
 
     @Override

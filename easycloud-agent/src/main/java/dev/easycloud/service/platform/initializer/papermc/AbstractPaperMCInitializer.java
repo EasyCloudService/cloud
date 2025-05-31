@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractPaperMCInitializer implements PlatformInitializer {
     protected final String id;
-    protected final String url = "https://api.papermc.io/v2/projects/" + id();
+    protected final String url;
 
     protected List<String> versions() {
         var response = RequestFactory.getRequest(this.url);
@@ -51,7 +51,7 @@ public abstract class AbstractPaperMCInitializer implements PlatformInitializer 
             var build = element.getAsJsonObject();
             var channel = build.get("channel").getAsString();
             if ("default".equals(channel) || "experimental".equals(channel)) {
-                log.info(build.toString());
+                //log.info(build.toString());
                 int buildNumber = build.get("build").getAsInt();
                 if (latestBuild == null || buildNumber > latestBuild) {
                     latestBuild = buildNumber;
