@@ -1,5 +1,9 @@
 # EasyCloudService
 
+[![download](https://img.shields.io/badge/documentation-github-4d7a97?style=for-the-badge)](https://github.com/EasyCloudService/cloud/releases)
+[![wiki](https://img.shields.io/badge/documentation-github-4d7a97?style=for-the-badge)](https://github.com)
+[![discord-banner](https://img.shields.io/discord/1235237612931776512?label=discord&style=for-the-badge&color=7289da)](https://discord.gg/bzW4gJCNdN)
+
 ## 📥 [Download](https://github.com/EasyCloudService/cloud/releases)
 
 ## ❓ FAQ
