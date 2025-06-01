@@ -15,3 +15,15 @@ dependencies {
 tasks.jar {
     archiveFileName.set("easycloud-api.jar")
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "dev.easycloud.service"
+            artifactId = "easycloud-api"
+            version = "1.0-SNAPSHOT"
+
+            from(components["java"])
+        }
+    }
+}
