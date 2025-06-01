@@ -6,6 +6,7 @@ repositories {
 }
 
 plugins {
+    id("maven-publish")
     id("com.gradleup.shadow") version ("9.0.0-beta8")
 }
 
@@ -24,4 +25,16 @@ dependencies {
 
 tasks.withType<ShadowJar> {
     archiveFileName.set("easycloud-plugin.jar")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "dev.easycloud.service"
+            artifactId = "easycloud-plugin"
+            version = "1.0-SNAPSHOT"
+
+            from(components["java"])
+        }
+    }
 }
