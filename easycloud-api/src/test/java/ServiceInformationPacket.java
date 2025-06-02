@@ -1,16 +1,12 @@
-package dev.easycloud.service.network.packet;
-
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.network.packet.ServicePacket;
+import dev.easycloud.service.network.packet.SimpleService;
 import dev.easycloud.service.service.resources.Service;
-import dev.easycloud.service.service.resources.ServiceState;
-import dev.httpmarco.netline.packet.Packet;
 import dev.httpmarco.netline.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.nio.file.Path;
 import java.util.List;
 
 @Getter

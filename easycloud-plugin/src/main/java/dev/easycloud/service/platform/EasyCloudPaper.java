@@ -5,7 +5,6 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.ServiceShutdownPacket;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;

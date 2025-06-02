@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class SimpleServiceProvider implements AdvancedServiceProvider {
     private final List<Service> services = new ArrayList<>();
-    private final Service current;
+    private final Service thisService;
 
     @Override
     public Service get(String id) {

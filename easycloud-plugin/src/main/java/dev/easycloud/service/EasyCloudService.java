@@ -1,6 +1,7 @@
 package dev.easycloud.service;
 
-import dev.easycloud.service.network.packet.ServiceInformationPacket;
+import dev.easycloud.service.network.event.EventProvider;
+import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.ServiceShutdownPacket;
 import dev.easycloud.service.network.packet.request.RequestServiceInformationPacket;
@@ -21,6 +22,8 @@ public final class EasyCloudService {
     private static EasyCloudService instance;
 
     private final NetClient netClient;
+    private final EventProvider eventProvider;
+
     private AdvancedServiceProvider serviceProvider = null;
 
     public EasyCloudService(String key, String serviceId) {
@@ -34,18 +37,22 @@ public final class EasyCloudService {
                     config.port(5200);
                 })
                 .bootSync();
+        this.eventProvider = new EventProvider(this.netClient);
 
+        this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
+            System.out.println("[DEBUG] Service is ready: " + event.service().id());
+        });
 
         log.info("NetLine is connected to 127.0.0.1:5200.");
-        this.netClient().track(ServiceInformationPacket.class, packet -> {
+        /*this.netClient().track(ServiceInformationPacket.class, packet -> {
             this.serviceProvider = new SimpleServiceProvider(new SimpleService(packet.service().id(), packet.service().group(), packet.service().state(), packet.service().port(), packet.service().directoryRaw()));
 
             log.info("Received service information. Welcome {}", packet.service().id());
             packet.services().forEach(service -> {
                 this.serviceProvider.services().add(new SimpleService(service.id(), service.group(), service.state(), service.port(), service.directoryRaw()));
             });
-            EasyCloudService.instance().netClient().send(new ServiceReadyPacket(this.serviceProvider.current()));
-        });
+            EasyCloudService.instance().netClient().send(new ServiceReadyPacket(this.serviceProvider.thisService()));
+        });*/
 
         log.info("Waiting for service information...");
         EasyCloudService.instance().netClient().send(new RequestServiceInformationPacket(serviceId));

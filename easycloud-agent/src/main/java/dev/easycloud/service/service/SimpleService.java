@@ -32,10 +32,10 @@ public final class SimpleService implements Service {
     private final int port;
     private final String directoryRaw;
 
-    private Process process;
-    private boolean logStream;
+    private transient Process process;
+    private transient boolean logStream;
 
-    private final List<String> logCache;
+    private transient final List<String> logCache;
 
     public SimpleService(String id, Group group, int port, Path directory) {
         this.id = id;
