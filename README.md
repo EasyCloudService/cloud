@@ -8,8 +8,6 @@
 [![Discord](https://img.shields.io/discord/1235237612931776512?label=Community&style=for-the-badge&logo=discord&color=7289da)](https://discord.gg/bzW4gJCNdN)
 [![Wiki](https://img.shields.io/badge/Docs-Wiki-4d7a97?style=for-the-badge&logo=gitbook)](https://github.com/EasyCloudService/cloud/wiki)
 
-![EasyCloudService Banner](https://via.placeholder.com/800x200/1a1a1a/ffffff?text=EasyCloudService)
-
 **[📥 Download](https://github.com/EasyCloudService/cloud/releases)** • **[📚 Documentation](https://github.com/EasyCloudService/cloud/wiki)** • **[💬 Discord](https://discord.gg/bzW4gJCNdN)** • **[🐛 Issues](https://github.com/EasyCloudService/cloud/issues)**
 
 </div>
@@ -34,7 +32,6 @@
 
 ### 🛠️ **Developer Tools**
 - **🔌 Plugin API** - Extend functionality easily
-- **📱 REST API** - Integrate with any application
 - **🖥️ CLI Interface** - Powerful command-line tools
 - **📈 Analytics** - Built-in performance metrics
 - **🔒 Security First** - Enterprise-grade security
@@ -49,7 +46,7 @@
 
 ### Prerequisites
 - ☕ Java 17 or higher
-- 💾 At least 512MB RAM
+- 💾 At least 4GB RAM
 - 🌐 Internet connection
 
 ### Installation
@@ -73,14 +70,8 @@
 ### 🔄 Enable Auto-Updates
 Add the auto-update flag to your start script:
 
-**Windows (`start.bat`):**
+**(`start.bat`) or (`start.sh`):**
 ```batch
-java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true
-```
-
-**Linux/Mac (`start.sh`):**
-```bash
-#!/bin/bash
 java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true
 ```
 
@@ -108,7 +99,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.EasyCloudService.cloud:easycloud-plugin:[current_version]")
+    compileOnly("com.github.EasyCloudService.cloud:easycloud-api:[current_version]")
+    compileOnly("com.github.EasyCloudService.cloud:easycloud-plugin:[current_version]")
 }
 ```
 
@@ -124,8 +116,15 @@ dependencies {
 <dependencies>
     <dependency>
         <groupId>com.github.EasyCloudService.cloud</groupId>
+        <artifactId>easycloud-api</artifactId>
+        <version>[current_version]</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.github.EasyCloudService.cloud</groupId>
         <artifactId>easycloud-plugin</artifactId>
         <version>[current_version]</version>
+        <scope>provided</scope>
     </dependency>
 </dependencies>
 ```
@@ -134,12 +133,9 @@ dependencies {
 ```java
 // Get current service instance
 ServiceProvider provider = EasyCloudService.instance().serviceProvider();
-CloudService currentService = provider.current();
+var service = provider.thisService();
 
-// Create and manage services
-currentService.start();
-currentService.stop();
-currentService.restart();
+service.shutdown();
 ```
 
 ---
@@ -155,22 +151,22 @@ currentService.restart();
 <tr>
 <td><code>group setup</code></td>
 <td>Initialize a new service group</td>
-<td><code>group setup webserver</code></td>
+<td><code>group setup</code></td>
 </tr>
 <tr>
 <td><code>service screen [name]</code></td>
 <td>Attach to service console</td>
-<td><code>service screen minecraft-01</code></td>
+<td><code>service screen Lobby-1</code></td>
 </tr>
 <tr>
-<td><code>service start [name]</code></td>
-<td>Start a specific service</td>
-<td><code>service start web-proxy</code></td>
+<td><code>service start</code></td>
+<td>Start a specific group</td>
+<td><code>service start</code></td>
 </tr>
 <tr>
-<td><code>service stop [name]</code></td>
+<td><code>service stop</code></td>
 <td>Stop a specific service</td>
-<td><code>service stop web-proxy</code></td>
+<td><code>service stop</code></td>
 </tr>
 </table>
 
@@ -181,10 +177,9 @@ currentService.restart();
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | **Java** | 17+ | 21+ |
-| **RAM** | 512MB | 2GB+ |
-| **Storage** | 100MB | 1GB+ |
-| **CPU** | 1 Core | 2+ Cores |
-| **Network** | 1 Mbps | 10+ Mbps |
+| **RAM** | 4GB | 16GB+ |
+| **Storage** | 5GB | 25GB+ |
+| **CPU** | 2 Cores | 4+ Cores |
 
 ---
 
@@ -193,9 +188,9 @@ currentService.restart();
 We love contributions! Here's how you can help:
 
 1. **🍴 Fork** the repository
-2. **🌿 Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **💻 Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **📤 Push** to the branch (`git push origin feature/amazing-feature`)
+2. **🌿 Create** a feature branch
+3. **💻 Commit** your changes
+4. **📤 Push** to the branch
 5. **🔄 Open** a Pull Request
 
 ### Development Setup
@@ -206,11 +201,7 @@ git clone https://github.com/EasyCloudService/cloud.git
 # Navigate to project directory
 cd cloud
 
-# Build the project
-./gradlew build
-
-# Run tests
-./gradlew test
+# Then Build the jar from the loader module and run it
 ```
 
 ---
@@ -227,12 +218,9 @@ Found a bug? Have a great idea? We want to hear from you!
 
 ## 📋 Roadmap
 
-- [ ] 🔄 **Auto-Updater** - Seamless updates without downtime
-- [ ] 🐳 **Docker Support** - Containerized deployments  
 - [ ] 📊 **Web Dashboard** - Beautiful management interface
-- [ ] 🔌 **Plugin Marketplace** - Community-driven extensions
-- [ ] ☁️ **Multi-Cloud Support** - AWS, Azure, GCP integration
-- [ ] 📱 **Mobile App** - Manage services on the go
+- [ ] 🔌 **Module "Marketplace"** - Community-driven modules
+- [ ] ☁️ **Multi-Cloud Support** - Clustering
 
 ---
 
