@@ -226,7 +226,7 @@ Found a bug? Have a great idea? We want to hear from you!
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache2 License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
