@@ -55,3 +55,5 @@ Yes, EasyCloudService is completely free to use.
 ### 🔹 Can I download EasyCloudService?
 Yes, but the cloud service is still under development.  
 Check out the latest [Releases](https://github.com/EasyCloudService/cloud/releases).
+
+
