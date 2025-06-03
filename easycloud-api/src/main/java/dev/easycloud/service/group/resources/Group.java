@@ -15,4 +15,5 @@ public final class Group {
     private final Platform platform;
 
     private final GroupProperties properties;
+    
 }

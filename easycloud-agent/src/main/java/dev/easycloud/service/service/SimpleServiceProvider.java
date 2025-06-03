@@ -111,7 +111,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
-        var directory = Path.of("local").resolve(group.properties().isStatic() ? "static" : "services").resolve(group.name() + "-" + id);
+        var directory = Path.of("local").resolve(group.properties().saveFiles() ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new SimpleService(group.name() + "-" + id, group, port, directory);
 
         var result = this.prepare(service);

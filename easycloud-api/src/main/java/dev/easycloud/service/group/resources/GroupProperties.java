@@ -13,5 +13,5 @@ public final class GroupProperties {
     private int always;
     private int maximum;
 
-    private boolean isStatic;
+    private boolean saveFiles;
 }

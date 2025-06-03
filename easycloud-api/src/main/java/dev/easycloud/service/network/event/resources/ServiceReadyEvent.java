@@ -6,6 +6,7 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public final class ServiceReadyEvent extends Event {
     private final Service service;
 }

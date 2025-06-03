@@ -84,13 +84,13 @@ public final class SimpleService implements Service {
         EasyCloudAgent.instance().terminal().exitScreen(this);
 
         new Thread(() -> {
-            if (!this.group.properties().isStatic()) {
+            if (!this.group.properties().saveFiles()) {
                 this.process.destroyForcibly();
             }
 
             try {
                 this.process.waitFor();
-                if (!this.group.properties().isStatic()) {
+                if (!this.group.properties().saveFiles()) {
                     FileFactory.remove(this.directory());
                 }
                 EasyCloudAgent.instance().serviceProvider().services().remove(this);

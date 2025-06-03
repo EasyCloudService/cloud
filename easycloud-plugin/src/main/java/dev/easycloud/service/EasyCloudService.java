@@ -1,13 +1,17 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.packet.ServiceReadyPacket;
 import dev.easycloud.service.network.packet.ServiceShutdownPacket;
 import dev.easycloud.service.network.packet.request.RequestServiceInformationPacket;
+import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.service.AdvancedServiceProvider;
 import dev.easycloud.service.service.SimpleService;
-import dev.easycloud.service.service.SimpleServiceProvider;
+import dev.easycloud.service.service.resources.Service;
 import dev.httpmarco.netline.Net;
 import dev.httpmarco.netline.client.NetClient;
 import lombok.Getter;
@@ -38,6 +42,10 @@ public final class EasyCloudService {
                 })
                 .bootSync();
         this.eventProvider = new EventProvider(this.netClient);
+
+        Event.registerTypeAdapter(Service.class, SimpleService.class);
+
+        //System.out.println(FileFactory.GSON_NO_PRETTY.fromJson("{\"service\":{\"id\":\"Proxy-1\",\"group\":{\"enabled\":true,\"name\":\"Proxy\",\"platform\":{\"initializerId\":\"velocity\",\"version\":\"3.4.0-SNAPSHOT\",\"type\":\"PROXY\"},\"properties\":{\"memory\":512,\"maxPlayers\":10,\"always\":1,\"maximum\":1,\"isStatic\":false}},\"state\":\"STARTING\",\"port\":25565,\"directoryRaw\":\"local/services/Proxy-1\"}}", ServiceReadyEvent.class));
 
         this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
             System.out.println("[DEBUG] Service is ready: " + event.service().id());

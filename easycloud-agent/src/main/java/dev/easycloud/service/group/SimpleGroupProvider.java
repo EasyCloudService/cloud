@@ -94,7 +94,7 @@ public final class SimpleGroupProvider implements GroupProvider {
         var templatePath = localPath.resolve("templates").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
         templatePath.toFile().mkdirs();
 
-        if (!group.properties().isStatic()) {
+        if (!group.properties().saveFiles()) {
             new Thread(() -> {
                 if (group.platform().initializerId().equals("paper")) {
                     try {

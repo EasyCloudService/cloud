@@ -5,12 +5,14 @@ import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 @AllArgsConstructor
- public final class SimpleService implements Service {
+@NoArgsConstructor(force = true)
+public final class SimpleService implements Service {
     private final String id;
     private final Group group;
 
