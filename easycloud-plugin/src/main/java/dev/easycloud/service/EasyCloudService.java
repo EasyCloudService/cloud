@@ -54,7 +54,7 @@ public final class EasyCloudService {
         this.eventProvider.subscribe(ServiceInformationEvent.class, (netChannel, event) -> {
             this.serviceProvider = new SimpleServiceProvider(event.service());
             event.services().forEach(service -> this.serviceProvider.services().add(service));
-            this.eventProvider.publish(new ServiceReadyEvent(event.service(), new InetSocketAddress(event.service().port())));
+            this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
             System.out.println("Received service information. Detected '" + event.service().id() + "' successfully.");
         });

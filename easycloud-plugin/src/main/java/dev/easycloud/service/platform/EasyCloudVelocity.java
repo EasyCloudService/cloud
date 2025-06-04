@@ -14,6 +14,7 @@ import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 
 @Plugin(id = "easycloud-velocity", name = "EasyCloud-Velocity", version = "1.0", description = "EasyCloud Velocity Plugin", authors = "EasyCloud")
@@ -37,8 +38,8 @@ public final class EasyCloudVelocity {
         new EasyCloudService(this.configuration.key(), this.configuration.id());
 
         EasyCloudService.instance().eventProvider().subscribe(ServiceReadyEvent.class, (channel, event) -> {
-            this.server.registerServer(new ServerInfo(event.service().id(), event.address()));
-            this.logger.info("Service '{}' is online on port {}.", event.service().id(), event.address().getPort());
+            this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().port())));
+            this.logger.info("Service '{}' is online on port {}.", event.service().id(), event.service().port());
         });
 
         EasyCloudService.instance().eventProvider().subscribe(ServiceShutdownEvent.class, (channel, event) -> {

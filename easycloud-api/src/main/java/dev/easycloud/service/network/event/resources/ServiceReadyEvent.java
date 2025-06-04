@@ -11,5 +11,4 @@ import java.net.InetSocketAddress;
 @NoArgsConstructor(force = true)
 public final class ServiceReadyEvent extends Event {
     private final Service service;
-    private final InetSocketAddress address;
 }
