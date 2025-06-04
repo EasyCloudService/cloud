@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.packet.request;
+package packet.request;
 
 import dev.easycloud.service.group.resources.Group;
 import dev.httpmarco.netline.packet.Packet;

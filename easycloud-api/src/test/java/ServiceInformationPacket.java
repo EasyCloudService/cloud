@@ -1,5 +1,5 @@
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.network.packet.ServicePacket;
+import packet.ServicePacket;
 import dev.easycloud.service.network.packet.SimpleService;
 import dev.easycloud.service.service.resources.Service;
 import dev.httpmarco.netline.packet.PacketBuffer;

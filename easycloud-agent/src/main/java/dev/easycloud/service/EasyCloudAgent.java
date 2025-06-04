@@ -5,6 +5,7 @@ import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.SimpleGroupProvider;
 import dev.easycloud.service.command.CommandProvider;
 import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.network.NetLineSecurity;
@@ -87,6 +88,7 @@ public final class EasyCloudAgent {
                 .bootSync();
 
         this.eventProvider = new EventProvider(this.netServer);
+        Event.registerTypeAdapter(Service.class, SimpleService.class);
 
 
         this.netServer.withSecurityPolicy(new NetLineSecurity(this.configuration.key()));

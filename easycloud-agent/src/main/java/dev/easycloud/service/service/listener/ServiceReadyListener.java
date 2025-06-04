@@ -1,8 +1,7 @@
 package dev.easycloud.service.service.listener;
 
 import dev.easycloud.service.EasyCloudAgent;
-import dev.easycloud.service.network.packet.ServiceReadyPacket;
-import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
+import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.resources.ServiceState;
@@ -17,14 +16,11 @@ import static org.jline.jansi.Ansi.ansi;
 public final class ServiceReadyListener {
 
     public ServiceReadyListener() {
-        EasyCloudAgent.instance().netServer().track(ServiceReadyPacket.class, (client, packet) -> {
-            var service = EasyCloudAgent.instance().serviceProvider().get(packet.service().id());
-            if (service == null) {
-                return;
-            }
-
-            ((SimpleService) service).state(ServiceState.ONLINE);
+        EasyCloudAgent.instance().eventProvider().subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
+            var service = (SimpleService) event.service();
+            service.state(ServiceState.ONLINE);
             if(service.group().platform().type().equals(PlatformType.SERVER)) {
+
                 EasyCloudAgent.instance().netServer().broadcast(new RegisterServerPacket(service.id(), new InetSocketAddress(service.port())));
             }
             if(service.group().platform().type().equals(PlatformType.PROXY)) {

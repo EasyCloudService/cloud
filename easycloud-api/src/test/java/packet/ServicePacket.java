@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.packet;
+package packet;
 
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.service.resources.Service;

@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.packet;
+package packet;
 
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.service.resources.Service;

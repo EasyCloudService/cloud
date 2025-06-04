@@ -4,7 +4,6 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
-import dev.easycloud.service.network.packet.request.*;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
@@ -45,7 +44,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
             this.launch(EasyCloudAgent.instance().groupProvider().get(packet.groupName()), packet.amount());
         });
         EasyCloudAgent.instance().netServer().track(RequestServiceInformationPacket.class, (channel, packet) -> {
-            EasyCloudAgent.instance().eventProvider().publish(new ServiceReadyEvent("teadasdasd", new Platform("test", "1", PlatformType.PROXY), this.get(packet.serviceId())));
+            EasyCloudAgent.instance().eventProvider().publish(new ServiceReadyEvent(this.get(packet.serviceId())));
 
             log.info("request service info: {}", packet.serviceId());
             //channel.send(new ServiceInformationPacket(this.get(packet.serviceId()), this.services.stream().filter(it -> !it.id().equals(packet.serviceId())).toList()));

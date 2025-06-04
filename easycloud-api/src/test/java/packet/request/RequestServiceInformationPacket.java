@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.packet.proxy;
+package packet.request;
 
 import dev.httpmarco.netline.packet.Packet;
 import dev.httpmarco.netline.packet.PacketBuffer;
@@ -6,21 +6,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.net.InetSocketAddress;
-
 @Getter
 @ToString
 @AllArgsConstructor
-public final class UnregisterServerPacket extends Packet {
-    private String id;
+public final class RequestServiceInformationPacket extends Packet {
+    private String serviceId;
 
     @Override
     public void read(PacketBuffer buffer) {
-        this.id = buffer.readString();
+        this.serviceId = buffer.readString();
     }
 
     @Override
     public void write(PacketBuffer buffer) {
-        buffer.writeString(this.id);
+        buffer.writeString(this.serviceId);
     }
 }

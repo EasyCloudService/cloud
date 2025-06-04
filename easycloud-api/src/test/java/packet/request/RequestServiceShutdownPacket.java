@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.packet.request;
+package packet.request;
 
 import dev.httpmarco.netline.packet.Packet;
 import dev.httpmarco.netline.packet.PacketBuffer;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @AllArgsConstructor
-public final class RequestServiceInformationPacket extends Packet {
+public final class RequestServiceShutdownPacket extends Packet {
     private String serviceId;
 
     @Override
