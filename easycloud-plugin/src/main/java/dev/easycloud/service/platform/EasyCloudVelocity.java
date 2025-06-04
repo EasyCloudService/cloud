@@ -8,9 +8,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.network.packet.ServiceReadyPacket;
-import dev.easycloud.service.network.packet.proxy.RegisterServerPacket;
-import dev.easycloud.service.network.packet.proxy.UnregisterServerPacket;
+import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
+import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
@@ -37,14 +36,14 @@ public final class EasyCloudVelocity {
 
         new EasyCloudService(this.configuration.key(), this.configuration.id());
 
-        EasyCloudService.instance().netClient().track(RegisterServerPacket.class, packet -> {
-            this.server.registerServer(new ServerInfo(packet.id(), packet.address()));
-            this.logger.info("Service '{}' is online on port {}.", packet.id(), packet.address().getPort());
+        EasyCloudService.instance().eventProvider().subscribe(ServiceReadyEvent.class, (channel, event) -> {
+            this.server.registerServer(new ServerInfo(event.service().id(), event.address()));
+            this.logger.info("Service '{}' is online on port {}.", event.service().id(), event.address().getPort());
         });
 
-        EasyCloudService.instance().netClient().track(UnregisterServerPacket.class, packet -> {
-            this.server.unregisterServer(this.server.getServer(packet.id()).orElseThrow().getServerInfo());
-            this.logger.info("Service '{}' is disconnected.", packet.id());
+        EasyCloudService.instance().eventProvider().subscribe(ServiceShutdownEvent.class, (channel, event) -> {
+            this.server.unregisterServer(this.server.getServer(event.service().id()).orElseThrow().getServerInfo());
+            this.logger.info("Service '{}' is disconnected.", event.service().id());
         });
     }
 

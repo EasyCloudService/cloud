@@ -2,8 +2,7 @@ package dev.easycloud.service.platform;
 
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.network.packet.ServiceReadyPacket;
-import dev.easycloud.service.network.packet.ServiceShutdownPacket;
+import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,7 +21,7 @@ public final class EasyCloudPaper extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        EasyCloudService.instance().netClient().send(new ServiceShutdownPacket(this.configuration.id()));
-        EasyCloudService.instance().netClient().closeSync();
+        EasyCloudService.instance().eventProvider().publish(new ServiceShutdownEvent(EasyCloudService.instance().serviceProvider().thisService()));
+        EasyCloudService.instance().eventProvider().close();
     }
 }

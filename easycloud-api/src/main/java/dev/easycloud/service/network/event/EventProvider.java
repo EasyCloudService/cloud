@@ -44,6 +44,16 @@ public final class EventProvider {
         }
     }
 
+    public void close() {
+        if (this.client != null) {
+            this.client.closeSync();
+        } else if (this.server != null) {
+            this.server.closeSync();
+        } else {
+            throw new IllegalStateException("EventProvider is not initialized with a client or server.");
+        }
+    }
+
     public void publish(Event event) {
         if(this.client != null) {
             this.client.send(event);

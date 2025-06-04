@@ -2,8 +2,6 @@ package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.network.packet.request.RequestServiceLaunchPacket;
-import dev.easycloud.service.network.packet.request.RequestServiceShutdownPacket;
 import dev.easycloud.service.service.resources.Service;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +25,12 @@ public final class SimpleServiceProvider implements AdvancedServiceProvider {
 
     @Override
     public void shutdown(Service service) {
-        EasyCloudService.instance().netClient().send(new RequestServiceShutdownPacket(service.id()));
+        //EasyCloudService.instance().netClient().send(new RequestServiceShutdownPacket(service.id()));
     }
 
     @Override
     public void launch(Group group, int count) {
-        EasyCloudService.instance().netClient().send(new RequestServiceLaunchPacket(group.name(), count));
+        //EasyCloudService.instance().netClient().send(new RequestServiceLaunchPacket(group.name(), count));
     }
 
     @Override

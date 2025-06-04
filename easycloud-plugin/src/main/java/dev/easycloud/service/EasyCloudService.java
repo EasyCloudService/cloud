@@ -6,9 +6,6 @@ import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
-import dev.easycloud.service.network.packet.ServiceReadyPacket;
-import dev.easycloud.service.network.packet.ServiceShutdownPacket;
-import dev.easycloud.service.network.packet.request.RequestServiceInformationPacket;
 import dev.easycloud.service.service.AdvancedServiceProvider;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.SimpleServiceProvider;
@@ -18,6 +15,8 @@ import dev.httpmarco.netline.client.NetClient;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.InetSocketAddress;
 
 @Getter
 @Accessors(fluent = true)
@@ -55,7 +54,7 @@ public final class EasyCloudService {
         this.eventProvider.subscribe(ServiceInformationEvent.class, (netChannel, event) -> {
             this.serviceProvider = new SimpleServiceProvider(event.service());
             event.services().forEach(service -> this.serviceProvider.services().add(service));
-            this.eventProvider.publish(new ServiceReadyEvent(event.service()));
+            this.eventProvider.publish(new ServiceReadyEvent(event.service(), new InetSocketAddress(event.service().port())));
 
             System.out.println("Received service information. Detected '" + event.service().id() + "' successfully.");
         });
