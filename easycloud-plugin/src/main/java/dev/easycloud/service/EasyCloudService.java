@@ -42,7 +42,7 @@ public final class EasyCloudService {
         Event.registerTypeAdapter(Service.class, SimpleService.class);
 
         // Register events
-        this.eventProvider.subscribe(ServiceInformationEvent.class, (netChannel, event) -> {
+        this.eventProvider.socket().read(ServiceInformationEvent.class, (netChannel, event) -> {
             this.serviceProvider = new SimpleServiceProvider(event.service());
             event.services().forEach(service -> this.serviceProvider.services().add(service));
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
@@ -60,14 +60,14 @@ public final class EasyCloudService {
             log.info("Welcome back, @{}.", event.service().id());
         });
 
-        this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
+        this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().add(event.service());
             log.info("Service '{}' is now online.", event.service().id());
         });
 
-        this.eventProvider.subscribe(ServiceShutdownEvent.class, (netChannel, event) -> {
+        this.eventProvider.socket().read(ServiceShutdownEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));

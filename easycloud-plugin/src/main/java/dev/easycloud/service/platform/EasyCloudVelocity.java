@@ -39,19 +39,19 @@ public final class EasyCloudVelocity {
 
         new EasyCloudService(this.configuration.key(), this.configuration.id());
 
-        EasyCloudService.instance().eventProvider().subscribe(ServiceInformationEvent.class, (channel, event) -> {
+        EasyCloudService.instance().eventProvider().socket().read(ServiceInformationEvent.class, (channel, event) -> {
             event.services()
                     .stream()
                     .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id()))
                     .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.port()))));
         });
 
-        EasyCloudService.instance().eventProvider().subscribe(ServiceReadyEvent.class, (channel, event) -> {
+        EasyCloudService.instance().eventProvider().socket().read(ServiceReadyEvent.class, (channel, event) -> {
             if (event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
             this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().port())));
         });
 
-        EasyCloudService.instance().eventProvider().subscribe(ServiceShutdownEvent.class, (channel, event) -> {
+        EasyCloudService.instance().eventProvider().socket().read(ServiceShutdownEvent.class, (channel, event) -> {
             if (event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
             this.server.unregisterServer(this.server.getServer(event.service().id()).orElseThrow().getServerInfo());
         });

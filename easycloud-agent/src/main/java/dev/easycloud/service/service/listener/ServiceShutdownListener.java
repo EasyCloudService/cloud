@@ -7,7 +7,7 @@ import dev.easycloud.service.platform.PlatformType;
 public final class ServiceShutdownListener {
 
     public ServiceShutdownListener() {
-        EasyCloudAgent.instance().eventProvider().subscribe(ServiceShutdownEvent.class, (channel, event) -> {
+        EasyCloudAgent.instance().eventProvider().socket().read(ServiceShutdownEvent.class, (channel, event) -> {
             var service = EasyCloudAgent.instance().serviceProvider().get(event.service().id());
             if (service == null) {
                 return;

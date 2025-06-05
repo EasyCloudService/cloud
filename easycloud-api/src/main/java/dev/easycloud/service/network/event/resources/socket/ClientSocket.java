@@ -43,10 +43,20 @@ public final class ClientSocket implements Socket {
     private void reading() {
         this.socket.read()
                 .map(byteBuf -> {
-                    byte[] data = new byte[byteBuf.readRemaining()];
-                    byteBuf.read(data);
-                    String message = new String(data);
-                    log.info("Received data: {}", message);
+                    byte[] rawData = new byte[byteBuf.readRemaining()];
+                    byteBuf.read(rawData);
+                    var data = new String(rawData);
+
+                    log.info("Received data: {}", rawData);
+
+                    var event = Event.deserialize(data, Event.class);
+                    this.eventHandlers.get(event.getClass()).forEach(it -> {
+                        try {
+                            it.accept(socket, event);
+                        } catch (Exception e) {
+                            log.error("Error processing event: {}", e.getMessage(), e);
+                        }
+                    });
                     return this.socket;
                 })
                 .whenComplete(() -> {

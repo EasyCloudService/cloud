@@ -14,7 +14,7 @@ import static org.jline.jansi.Ansi.ansi;
 public final class ServiceReadyListener {
 
     public ServiceReadyListener() {
-        EasyCloudAgent.instance().eventProvider().subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
+        EasyCloudAgent.instance().eventProvider().socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
             var service = (SimpleService) event.service();
             service.state(ServiceState.ONLINE);
             EasyCloudAgent.instance().eventProvider().publish(event);
