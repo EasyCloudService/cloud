@@ -65,6 +65,5 @@ public final class LoaderUpdateProvider {
         Files.write(versionFile, updateService.getInformation().getLatestVersion().getBytes());
         new ProcessBuilder("java", "EasyCloudUpdater").directory(Path.of("resources").resolve("libaries").toFile()).start();
         System.exit(0);
-        return;
     }
 }

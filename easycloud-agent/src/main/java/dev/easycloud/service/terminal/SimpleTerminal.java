@@ -46,9 +46,9 @@ public final class SimpleTerminal {
     @SneakyThrows
     public SimpleTerminal() {
         this.prompt = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("easyCloud")
+                .fgRgb(LogType.PRIMARY.rgb()).a("agent")
                 .fgRgb(LogType.GRAY.rgb()).a("@")
-                .fgRgb(LogType.WHITE.rgb()).a("agent")
+                .fgRgb(LogType.WHITE.rgb()).a("cloud")
                 .fgRgb(LogType.GRAY.rgb()).a(": ").toString();
 
         AnsiConsole.systemInstall();
@@ -144,6 +144,25 @@ public final class SimpleTerminal {
 
     public void redraw() {
         var layout = ansi()
+                .fgRgb(LogType.PRIMARY.rgb()).a("   _           ").reset().a(" _              \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("  |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("  |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("            /  ").reset().a("\n").reset()
+
+                .reset().a(EasyCloudAgent.instance().i18nProvider().get("global.contributors") + ": ")
+                .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
+                .reset().a(" " + EasyCloudAgent.instance().i18nProvider().get("global.and") + " ")
+                .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
+                .reset().a("\n").toString();
+
+        for (String s : layout.split("\n")) {
+            this.terminal.writer().println("        " + s);
+        }
+        this.terminal.writer().println("");
+
+        this.update();
+
+        /*var layout = ansi()
                 .fgRgb(LogType.PRIMARY.rgb()).a("  ______                 ").reset().a("  _____ _                 _  \n").reset()
                 .fgRgb(LogType.PRIMARY.rgb()).a(" |  ____|                ").reset().a(" / ____| |               | | \n").reset()
                 .fgRgb(LogType.PRIMARY.rgb()).a(" | |__   __ _ ___ _   _  ").reset().a("| |    | | ___  _   _  __| | \n").reset()
@@ -165,6 +184,6 @@ public final class SimpleTerminal {
         }
         this.terminal.writer().println("");
 
-        this.update();
+        this.update();*/
     }
 }

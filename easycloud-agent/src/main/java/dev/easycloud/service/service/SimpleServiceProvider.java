@@ -41,7 +41,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
         new ServiceShutdownListener();
 
         EasyCloudAgent.instance().eventProvider().subscribe(ServiceRequestInformationEvent.class, (channel, event) -> {
-            channel.send(new ServiceInformationEvent(this.get(event.serviceId()), this.services));
+            //channel.send(new ServiceInformationEvent(this.get(event.serviceId()), this.services));
         });
 
 

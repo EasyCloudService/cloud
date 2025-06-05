@@ -17,8 +17,9 @@ dependencies {
     runtimeDownload("org.jline:jline:3.26.3")
     runtimeDownload("org.fusesource.jansi:jansi:2.2.0")
 
-    runtimeDownload("dev.httpmarco:netline:1.0.0-SNAPSHOT")
-    runtimeDownload("io.netty:netty5-all:5.0.0.Alpha5")
+    runtimeDownload("io.activej:activej:6.0-rc2")
+    runtimeDownload("io.activej:activej-net:6.0-rc2")
+    //runtimeDownload("io.netty:netty5-all:5.0.0.Alpha5")
 
     runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")
     runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")

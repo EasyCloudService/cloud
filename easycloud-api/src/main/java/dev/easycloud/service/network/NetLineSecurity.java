@@ -1,5 +1,5 @@
 package dev.easycloud.service.network;
-
+/*
 import dev.httpmarco.netline.NetChannel;
 import dev.httpmarco.netline.security.SecurityHandler;
 import lombok.AllArgsConstructor;
@@ -18,3 +18,4 @@ public final class NetLineSecurity implements SecurityHandler {
         return netChannel.id().startsWith(this.privateKey + "-");
     }
 }
+*/

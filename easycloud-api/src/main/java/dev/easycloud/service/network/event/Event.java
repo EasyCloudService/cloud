@@ -1,8 +1,6 @@
 package dev.easycloud.service.network.event;
 
 import com.google.gson.*;
-import dev.httpmarco.netline.packet.Packet;
-import dev.httpmarco.netline.packet.PacketBuffer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -10,25 +8,11 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public abstract class Event extends Packet {
-    private transient Event deserialized;
-
-    @Override
-    public void read(PacketBuffer packetBuffer) {
-        this.deserialized = Event.deserialize(packetBuffer.readString(), this.getClass());
-    }
-
-    @Override
-    public void write(PacketBuffer packetBuffer) {
-        packetBuffer.writeString(this.serialize());
-    }
-
+public abstract class Event {
     private static Gson tmpGson;
     private final static GsonBuilder builder = new GsonBuilder();
     public static <E, T> void registerTypeAdapter(Class<E> clazz, Class<T> typeAdapterClass) {
-        builder.registerTypeAdapter(clazz, (JsonDeserializer<E>) (json, typeOfT, context) -> {
-            return context.deserialize(json, typeAdapterClass);
-        });
+        builder.registerTypeAdapter(clazz, (JsonDeserializer<E>) (json, typeOfT, context) -> context.deserialize(json, typeAdapterClass));
     }
 
     public static Gson gson() {

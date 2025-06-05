@@ -7,16 +7,14 @@ import dev.easycloud.service.command.CommandProvider;
 import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
+import dev.easycloud.service.network.event.resources.socket.ServerSocket;
 import dev.easycloud.service.platform.PlatformProvider;
-import dev.easycloud.service.network.NetLineSecurity;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.SimpleServiceProvider;
 import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.terminal.SimpleTerminal;
 import dev.easycloud.service.terminal.logger.LogType;
-import dev.httpmarco.netline.Net;
-import dev.httpmarco.netline.server.NetServer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -48,7 +46,6 @@ public final class EasyCloudAgent {
     private final PlatformProvider platformProvider;
 
     private final EasyCloudConfiguration configuration;
-    private final NetServer netServer;
 
     private final EventProvider eventProvider;
 
@@ -79,19 +76,28 @@ public final class EasyCloudAgent {
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        this.netServer = Net.line().server();
-        this.netServer
-                .config(config -> {
-                    config.hostname("127.0.0.1");
-                    config.port(5200);
-                })
-                .bootSync();
+        /*var eventLoop = Eventloop.builder().withCurrentThread().build();
+        this.server = SimpleServer.builder(eventLoop, socket -> {
+                    socket.read().map(byteBuf -> {
+                        byte[] data = new byte[byteBuf.readRemaining()];
+                        byteBuf.read(data);
 
-        this.eventProvider = new EventProvider(this.netServer);
+                        System.out.println("received data: " + new String(data));
+
+                        return socket;
+                    });
+                })
+                .withListenPort(5200)
+                .withAcceptOnce()
+                .build();
+
+        this.server.listen();
+        eventLoop.run();*/
+
+
+        this.eventProvider = new EventProvider(new ServerSocket());
         Event.registerTypeAdapter(Service.class, SimpleService.class);
 
-
-        this.netServer.withSecurityPolicy(new NetLineSecurity(this.configuration.key()));
         this.terminal.clear();
 
         this.commandProvider = new CommandProvider();
@@ -103,13 +109,22 @@ public final class EasyCloudAgent {
         this.platformProvider.refresh();
         this.groupProvider.refresh();
 
+        var groups = new StringBuilder();
+        this.groupProvider.groups().forEach(group -> {
+            if (!groups.isEmpty()) groups.append(", ");
+            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.name().toLowerCase()).reset());
+        });
+        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
+
+        var platformTypes = new StringBuilder();
+        this.platformProvider.initializers().forEach(platform -> {
+            if (!platformTypes.isEmpty()) platformTypes.append(", ");
+            platformTypes.append(ansi().fgRgb(LogType.WHITE.rgb()).a(platform.id()).reset());
+        });
+        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
+
         log.info(this.i18nProvider.get("netline.running", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
-
-        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a(this.groupProvider.groups().size() + " groups").reset()));
-        log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a(this.platformProvider.platforms().size() + " platforms").reset()));
-
-        log.info(this.i18nProvider.get("agent.startup", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
-        log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a("help").reset()));
+        log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
 
         this.terminal.start();
     }

@@ -6,22 +6,15 @@ import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
+import dev.easycloud.service.network.event.resources.socket.ClientSocket;
 import dev.easycloud.service.service.AdvancedServiceProvider;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.SimpleServiceProvider;
 import dev.easycloud.service.service.resources.Service;
-import dev.httpmarco.netline.Net;
-import dev.httpmarco.netline.client.NetClient;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.plexus.util.IOUtil;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Scanner;
 
 @Getter
 @Accessors(fluent = true)
@@ -30,24 +23,17 @@ public final class EasyCloudService {
     @Getter
     private static EasyCloudService instance;
 
-    private final NetClient netClient;
     private final EventProvider eventProvider;
 
     private AdvancedServiceProvider serviceProvider = null;
 
+    @SneakyThrows
     public EasyCloudService(String key, String serviceId) {
         instance = this;
 
         // Initialize the EasyCloudService
-        this.netClient = Net.line().client();
-        this.netClient
-                .config(config -> {
-                    config.id(key + "-" + serviceId);
-                    config.hostname("127.0.0.1");
-                    config.port(5200);
-                })
-                .bootSync();
-        this.eventProvider = new EventProvider(this.netClient);
+        this.eventProvider = new EventProvider(new ClientSocket());
+        this.eventProvider.socket().waitForConnection().get();
 
         log.info("NetLine has successfully connected to 127.0.0.1:5200.");
         log.info("Requesting service information...");

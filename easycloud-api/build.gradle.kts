@@ -8,8 +8,11 @@ plugins {
 }
 
 dependencies {
+    compileOnly("io.activej:activej:6.0-rc2")
+    compileOnly("io.activej:activej-net:6.0-rc2")
+
     compileOnly("org.yaml:snakeyaml:2.4")
-    compileOnly("dev.httpmarco:netline:1.0.0-SNAPSHOT")
+    compileOnly("io.activej:activej:6.0-rc2")
 }
 
 tasks.jar {

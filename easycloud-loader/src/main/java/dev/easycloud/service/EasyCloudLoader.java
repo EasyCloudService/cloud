@@ -59,6 +59,12 @@ public final class EasyCloudLoader {
 
                 process.waitFor();
             } catch (IOException | InterruptedException exception) {
+                if(exception instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                    System.exit(1);
+                    return;
+                }
+
                 throw new RuntimeException(exception);
             }
         });
