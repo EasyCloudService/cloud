@@ -28,6 +28,8 @@ public final class ServerSocket implements Socket {
                     clients.add(socket);
                     log.info("Client connected");
                     this.read(socket);
+
+                    write("TEST");
                 })
                 .withListenPort(5200)
                 .build();
@@ -95,11 +97,11 @@ public final class ServerSocket implements Socket {
             return;
         }
 
-        var buffer = ByteBuf.wrapForReading(message.getBytes());
+        //var buffer = ByteBuf.wrapForReading(message.getBytes());
         for (ITcpSocket client : clients) {
-            client.write(buffer);
+            client.write(ByteBuf.wrapForReading(message.getBytes()));
         }
-        buffer.recycle();
+        //buffer.recycle();
     }
 
     @Override
