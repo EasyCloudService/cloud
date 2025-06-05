@@ -4,9 +4,7 @@ import dev.easycloud.service.EasyCloudAgent;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
-import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
-import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.listener.ServiceReadyListener;
@@ -17,7 +15,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -45,7 +42,6 @@ public final class SimpleServiceProvider implements ServiceProvider {
 
         EasyCloudAgent.instance().eventProvider().subscribe(ServiceRequestInformationEvent.class, (channel, event) -> {
             channel.send(new ServiceInformationEvent(this.get(event.serviceId()), this.services));
-            log.info("request service info: {}", event.serviceId());
         });
 
 

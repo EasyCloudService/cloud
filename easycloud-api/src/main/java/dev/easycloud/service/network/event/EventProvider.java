@@ -29,19 +29,20 @@ public final class EventProvider {
     public <T extends Event> void subscribe(Class<T> event, BiConsumer<NetChannel, T> onEvent) {
         if (!this.eventHandlers.containsKey(event)) {
             this.eventHandlers.put(event, new ArrayList<>());
+
+            if(this.client != null) {
+                this.client.track(event, (netChannel, t) -> {
+                    this.eventHandlers.get(event).forEach(it -> it.accept(netChannel, t.deserialized()));
+                });
+            } else if (this.server != null) {
+                this.server.track(event, (netChannel, t) -> {
+                    this.eventHandlers.get(event).forEach(it -> it.accept(netChannel, t.deserialized()));
+                });
+            } else {
+                throw new IllegalStateException("EventProvider is not initialized with a client or server.");
+            }
         }
         this.eventHandlers.get(event).add((BiConsumer<NetChannel, Event>) onEvent);
-        if(this.client != null) {
-            this.client.track(event, (netChannel, t) -> {
-                this.eventHandlers.get(event).forEach(it -> it.accept(netChannel, t.deserialized()));
-            });
-        } else if (this.server != null) {
-            this.server.track(event, (netChannel, t) -> {
-                this.eventHandlers.get(event).forEach(it -> it.accept(netChannel, t.deserialized()));
-            });
-        } else {
-            throw new IllegalStateException("EventProvider is not initialized with a client or server.");
-        }
     }
 
     public void close() {

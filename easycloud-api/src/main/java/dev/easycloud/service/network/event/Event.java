@@ -20,8 +20,6 @@ public abstract class Event extends Packet {
 
     @Override
     public void write(PacketBuffer packetBuffer) {
-        System.out.println(this.serialize());
-
         packetBuffer.writeString(this.serialize());
     }
 

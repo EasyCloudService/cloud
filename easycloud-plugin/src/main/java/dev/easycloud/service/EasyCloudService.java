@@ -53,18 +53,25 @@ public final class EasyCloudService {
         // Register events
         this.eventProvider.subscribe(ServiceInformationEvent.class, (netChannel, event) -> {
             this.serviceProvider = new SimpleServiceProvider(event.service());
-            event.services().forEach(service -> this.serviceProvider.services().add(service));
+            event.services().forEach(service -> {
+                this.serviceProvider.services().add(service);
+                System.out.println("Service '" + event.service().id() + "' is now ready.");
+            });
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
             System.out.println("Received service information. Detected '" + event.service().id() + "' successfully.");
         });
 
         this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
+            if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
+
             this.serviceProvider.services().add(event.service());
             System.out.println("Service '" + event.service().id() + "' is now ready.");
         });
 
         this.eventProvider.subscribe(ServiceShutdownEvent.class, (netChannel, event) -> {
+            if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
+
             this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
             System.out.println("Service '" + event.service().id() + "' has been shut down.");
         });

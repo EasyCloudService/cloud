@@ -8,6 +8,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
@@ -37,14 +38,26 @@ public final class EasyCloudVelocity {
 
         new EasyCloudService(this.configuration.key(), this.configuration.id());
 
+        EasyCloudService.instance().eventProvider().subscribe(ServiceInformationEvent.class, (channel, event) -> {
+            event.services().forEach(service -> {
+                if(service.id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
+                this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.port())));
+                this.logger.info("CONNECTED: " + service.id() + " at " + service.port() + " DEBUG");
+            });
+        });
+
         EasyCloudService.instance().eventProvider().subscribe(ServiceReadyEvent.class, (channel, event) -> {
+            if(event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
+
             this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().port())));
-            this.logger.info("Service '{}' is online on port {}.", event.service().id(), event.service().port());
+            this.logger.info("CONNECTED DEBUG");
         });
 
         EasyCloudService.instance().eventProvider().subscribe(ServiceShutdownEvent.class, (channel, event) -> {
+            if(event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
+
             this.server.unregisterServer(this.server.getServer(event.service().id()).orElseThrow().getServerInfo());
-            this.logger.info("Service '{}' is disconnected.", event.service().id());
+            this.logger.info("DISCONNECTED DEBUG");
         });
     }
 
