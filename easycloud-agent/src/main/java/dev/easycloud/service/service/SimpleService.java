@@ -100,10 +100,13 @@ public final class SimpleService implements Service {
         }).start();
     }
 
+    @SuppressWarnings("all")
     public void print(String line) {
-        if (line.startsWith("[")) {
+        if (line.startsWith("[") && line.contains(":") && line.split("]:")[0].length() == 14) {
             log.info("SERVICE_LOG: " + line.substring(17));
-        } else {
+        } else if (line.startsWith("[") && line.contains(":") && line.split("] ")[0].length() == 14) {
+            log.info("SERVICE_LOG: " + line.substring(16));
+        }  else {
             log.info("SERVICE_LOG: " + line);
         }
     }

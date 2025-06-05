@@ -49,8 +49,8 @@ public final class EasyCloudService {
                 .bootSync();
         this.eventProvider = new EventProvider(this.netClient);
 
-        System.out.println("NetLine has successfully connected to 127.0.0.1:5200.");
-        System.out.println("Requesting service information...");
+        log.info("NetLine has successfully connected to 127.0.0.1:5200.");
+        log.info("Requesting service information...");
 
         // Register adapters
         Event.registerTypeAdapter(Service.class, SimpleService.class);
@@ -61,7 +61,7 @@ public final class EasyCloudService {
             event.services().forEach(service -> this.serviceProvider.services().add(service));
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
-            System.out.println("""
+            log.info("""
                      
                       ______                 _____ _                 _
                      |  ____|               / ____| |               | |
@@ -71,21 +71,21 @@ public final class EasyCloudService {
                      |______\\__,_|___/\\__, |\\_____|_|\\___/ \\__,_|\\__,_|
                                        __/ |
                                       |___/""");
-            System.out.println("Welcome back, @" + event.service().id() + ".");
+            log.info("Welcome back, @{}.", event.service().id());
         });
 
         this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().add(event.service());
-            System.out.println("Service '" + event.service().id() + "' is now online.");
+            log.info("Service '{}' is now online.", event.service().id());
         });
 
         this.eventProvider.subscribe(ServiceShutdownEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
-            System.out.println("Service '" + event.service().id() + "' has been shut down.");
+            log.info("Service '{}' has been shut down.", event.service().id());
         });
 
 

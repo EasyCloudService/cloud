@@ -14,9 +14,7 @@ public final class EasyCloudPaper extends JavaPlugin {
     @Override
     public void onEnable() {
         this.configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
-
         new EasyCloudService(this.configuration.key(),this.configuration.id());
-        this.getLogger().info("NetLine is connecting to 127.0.0.1:5200...");
     }
 
     @Override
