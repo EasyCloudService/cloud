@@ -62,6 +62,7 @@ public final class EasyCloudService {
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
             System.out.println("""
+                     
                       ______                 _____ _                 _
                      |  ____|               / ____| |               | |
                      | |__   __ _ ___ _   _| |    | | ___  _   _  __| |

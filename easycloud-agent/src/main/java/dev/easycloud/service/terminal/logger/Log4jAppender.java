@@ -82,14 +82,14 @@ public final class Log4jAppender extends AbstractAppender {
 
     private String format(String message) {
         return message
-                .replace(" successfully", ansi().fgRgb(LogType.SUCCESS.rgb()).a(" successfully").reset().toString())
-                .replace(" ready", ansi().fgRgb(LogType.SUCCESS.rgb()).a(" ready").reset().toString())
-                .replace(" online", ansi().fgRgb(LogType.SUCCESS.rgb()).a(" online").reset().toString())
-                .replace(" shut down", ansi().fgRgb(LogType.ERROR.rgb()).a(" shut down").reset().toString())
-                .replace(" success", ansi().fgRgb(LogType.SUCCESS.rgb()).a(" success").reset().toString())
-                .replace(" canceled", ansi().fgRgb(LogType.ERROR.rgb()).a(" canceled").reset().toString())
-                .replace(" completed", ansi().fgRgb(LogType.SUCCESS.rgb()).a(" completed").reset().toString())
-                .replace(" error", ansi().fgRgb(LogType.ERROR.rgb()).a(" error").reset().toString())
-                .replace(" failed", ansi().fgRgb(LogType.ERROR.rgb()).a(" failed").reset().toString());
+                .replaceAll("\\bsuccessfully\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("successfully").reset().toString())
+                .replaceAll("\\bready\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("ready").reset().toString())
+                .replaceAll("\\bonline\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("online").reset().toString())
+                .replaceAll("\\bshut down\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("shut down").reset().toString())
+                .replaceAll("\\bsuccess\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("success").reset().toString())
+                .replaceAll("\\bcanceled\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("canceled").reset().toString())
+                .replaceAll("\\bcompleted\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("completed").reset().toString())
+                .replaceAll("\\berror\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("error").reset().toString())
+                .replaceAll("\\bfailed\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("failed").reset().toString());
     }
 }
