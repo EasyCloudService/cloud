@@ -61,6 +61,5 @@ public final class ServiceCommand extends Command {
         service.logCache().forEach(service::print);
 
         service.logStream(true);
-        log.info("SERVICE_LOG: " + this.i18nProvider().get("command.service.screenOpen", ansi().fgRgb(LogType.ERROR.rgb()).a("exit").reset()));
     }
 }

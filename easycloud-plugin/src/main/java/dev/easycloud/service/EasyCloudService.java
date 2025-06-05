@@ -15,8 +15,13 @@ import dev.httpmarco.netline.client.NetClient;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.plexus.util.IOUtil;
 
-import java.net.InetSocketAddress;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 
 @Getter
 @Accessors(fluent = true)
@@ -53,20 +58,26 @@ public final class EasyCloudService {
         // Register events
         this.eventProvider.subscribe(ServiceInformationEvent.class, (netChannel, event) -> {
             this.serviceProvider = new SimpleServiceProvider(event.service());
-            event.services().forEach(service -> {
-                this.serviceProvider.services().add(service);
-                System.out.println("Service '" + event.service().id() + "' is now ready.");
-            });
+            event.services().forEach(service -> this.serviceProvider.services().add(service));
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
-            System.out.println("Received service information. Detected '" + event.service().id() + "' successfully.");
+            System.out.println("""
+                      ______                 _____ _                 _
+                     |  ____|               / ____| |               | |
+                     | |__   __ _ ___ _   _| |    | | ___  _   _  __| |
+                     |  __| / _` / __| | | | |    | |/ _ \\| | | |/ _` |
+                     | |___| (_| \\__ \\ |_| | |____| | (_) | |_| | (_| |
+                     |______\\__,_|___/\\__, |\\_____|_|\\___/ \\__,_|\\__,_|
+                                       __/ |
+                                      |___/""");
+            System.out.println("Welcome back, @" + event.service().id() + ".");
         });
 
         this.eventProvider.subscribe(ServiceReadyEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().add(event.service());
-            System.out.println("Service '" + event.service().id() + "' is now ready.");
+            System.out.println("Service '" + event.service().id() + "' is now online.");
         });
 
         this.eventProvider.subscribe(ServiceShutdownEvent.class, (netChannel, event) -> {

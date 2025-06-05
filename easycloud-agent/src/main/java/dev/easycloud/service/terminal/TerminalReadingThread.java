@@ -2,10 +2,13 @@ package dev.easycloud.service.terminal;
 
 
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import org.jline.reader.impl.LineReaderImpl;
 
 import java.util.function.Consumer;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 public final class TerminalReadingThread extends Thread {
     private final SimpleTerminal terminal;
@@ -27,7 +30,15 @@ public final class TerminalReadingThread extends Thread {
     @Override
     public void run() {
         while (!this.isInterrupted()) {
-            var line = this.lineReader.readLine(this.terminal.prompt());
+            var prompt = this.terminal.prompt();
+            if(this.terminal.screenPrinting()) {
+                prompt = ansi()
+                        .fgRgb(LogType.WHITE.rgb()).a("service")
+                        .fgRgb(LogType.GRAY.rgb()).a("@")
+                        .fgRgb(LogType.ERROR.rgb()).a("exit")
+                        .fgRgb(LogType.GRAY.rgb()).a(": ").toString();
+            }
+            var line = this.lineReader.readLine(prompt);
             if (line != null && !line.isEmpty()) {
                 if(priority != null) {
                     priority.accept(line);
