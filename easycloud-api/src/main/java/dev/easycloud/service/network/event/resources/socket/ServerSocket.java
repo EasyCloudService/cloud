@@ -1,6 +1,7 @@
 package dev.easycloud.service.network.event.resources.socket;
 
 import dev.easycloud.service.network.event.Event;
+import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
 import io.activej.bytebuf.ByteBuf;
 import io.activej.eventloop.Eventloop;
 import io.activej.net.SimpleServer;
@@ -43,15 +44,29 @@ public final class ServerSocket implements Socket {
             byteBuf.read(byteData);
             var data = new String(byteData);
 
-            if(data.equalsIgnoreCase("Ping")) return socket;
-            var event = Event.deserialize(data, Event.class);
-            this.eventHandlers.get(event.getClass()).forEach(it -> {
-                try {
-                    it.accept(socket, event);
-                } catch (Exception e) {
-                    log.error("Error processing event: {}", e.getMessage(), e);
-                }
-            });
+            if (data.equalsIgnoreCase("Ping")) {
+                socket.write(ByteBuf.wrapForReading("Pong".getBytes()));
+                return socket;
+            }
+
+
+            log.info(data.split("eventId")[1].split("\"")[2]);
+            var eventClass = Class.forName(data.split("eventId")[1].split("\"")[2]);
+            log.info("Found: " + eventClass.getSimpleName());
+
+
+            var event = Event.deserialize(data, (Class<? extends Event>) eventClass);
+            if (this.eventHandlers.containsKey(event.getClass())) {
+                this.eventHandlers.get(event.getClass()).forEach(it -> {
+                    try {
+                        it.accept(socket, event);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.error("Error processing event: {}", e.getMessage(), e);
+                    }
+                });
+            }
+            log.info(event.getClass().getSimpleName());
             log.info("Received: {}", data);
 
             return socket;
@@ -66,6 +81,7 @@ public final class ServerSocket implements Socket {
 
     @Override
     public <T extends Event> void read(Class<T> event, BiConsumer<ITcpSocket, T> onEvent) {
+        log.info("Reading event: {}", event);
         if (!this.eventHandlers.containsKey(event)) {
             this.eventHandlers.put(event, new ArrayList<>());
         }

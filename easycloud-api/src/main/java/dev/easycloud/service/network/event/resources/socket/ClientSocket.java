@@ -2,6 +2,7 @@ package dev.easycloud.service.network.event.resources.socket;
 
 import dev.easycloud.service.network.event.Event;
 import io.activej.bytebuf.ByteBuf;
+import io.activej.bytebuf.ByteBufs;
 import io.activej.eventloop.Eventloop;
 import io.activej.net.SimpleServer;
 import io.activej.net.socket.tcp.ITcpSocket;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +26,13 @@ public final class ClientSocket implements Socket {
 
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
 
+    public ClientSocket() {
+    }
+
+    public ClientSocket(ITcpSocket socket) {
+        this.socket = socket;
+    }
+
     @Override
     public void run() {
         eventloop = Eventloop.builder().withCurrentThread().build();
@@ -31,7 +40,7 @@ public final class ClientSocket implements Socket {
             log.info("Connected to server");
 
             this.socket = socket;
-            this.reading();
+            this.read(socket);
             this.keepAlive();
             waitForConnection.complete(null);
         }).whenException(exception -> {
@@ -40,27 +49,44 @@ public final class ClientSocket implements Socket {
         eventloop.run();
     }
 
-    private void reading() {
-        this.socket.read()
+    private void read(ITcpSocket socket) {
+        socket.read()
                 .map(byteBuf -> {
                     byte[] rawData = new byte[byteBuf.readRemaining()];
                     byteBuf.read(rawData);
                     var data = new String(rawData);
 
-                    log.info("Received data: {}", rawData);
+                    log.info("Received data: {}", data);
 
-                    var event = Event.deserialize(data, Event.class);
-                    this.eventHandlers.get(event.getClass()).forEach(it -> {
-                        try {
-                            it.accept(socket, event);
-                        } catch (Exception e) {
-                            log.error("Error processing event: {}", e.getMessage(), e);
-                        }
-                    });
+                    if (data.equalsIgnoreCase("Pong")) {
+                        return this.socket;
+                    }
+
+                    log.info(data.split("eventId")[1].split("\"")[2]);
+                    var eventClass = Class.forName(data.split("eventId")[1].split("\"")[2]);
+                    log.info("Found: " + eventClass.getSimpleName());
+
+
+                    var event = Event.deserialize(data, (Class<? extends Event>) eventClass);
+                    if (this.eventHandlers.containsKey(event.getClass())) {
+                        this.eventHandlers.get(event.getClass()).forEach(it -> {
+                            try {
+                                it.accept(null, event);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                log.error("Error processing event: {}", e.getMessage(), e);
+                            }
+                        });
+                    }
                     return this.socket;
                 })
                 .whenComplete(() -> {
-                    log.info("Socket closed");
+                    this.read(socket);
+                })
+                .whenException(exception -> {
+                    log.error("Error reading from socket: {}", exception.getMessage(), exception);
+                    exception.printStackTrace();
+                    this.close();
                 });
     }
 
@@ -82,23 +108,24 @@ public final class ClientSocket implements Socket {
 
     @Override
     public void write(String message) {
-        if(this.socket == null) {
+        if (this.socket == null) {
             log.info("Socket is not connected. Cannot send message: {}", message);
             return;
         }
 
         this.eventloop.execute(() -> {
-            var buffer = ByteBuf.wrapForReading(message.getBytes());
-            this.socket.write(buffer);
+            var byteBuffer = ByteBuf.wrapForReading(message.getBytes());
+            this.socket.write(byteBuffer);
         });
     }
 
     @Override
     public void close() {
-        if(this.socket == null) {
+        if (this.socket == null) {
             log.info("Socket is not connected. Cannot close.");
             return;
         }
         this.socket.close();
+        this.socket = null;
     }
 }

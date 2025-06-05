@@ -11,6 +11,9 @@ import lombok.ToString;
 public abstract class Event {
     private static Gson tmpGson;
     private final static GsonBuilder builder = new GsonBuilder();
+
+    private final String eventId = getClass().getName();
+
     public static <E, T> void registerTypeAdapter(Class<E> clazz, Class<T> typeAdapterClass) {
         builder.registerTypeAdapter(clazz, (JsonDeserializer<E>) (json, typeOfT, context) -> context.deserialize(json, typeAdapterClass));
     }

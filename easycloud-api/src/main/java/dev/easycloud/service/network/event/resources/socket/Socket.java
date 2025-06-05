@@ -3,9 +3,6 @@ package dev.easycloud.service.network.event.resources.socket;
 import dev.easycloud.service.network.event.Event;
 import io.activej.net.socket.tcp.ITcpSocket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
