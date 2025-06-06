@@ -57,9 +57,15 @@ public final class GroupCommand extends Command {
                 .add(new SetupData<>("maxPlayers", this.i18nProvider().get("command.group.setup.maxPlayers"), null))
                 .add(new SetupData<>("always", this.i18nProvider().get("command.group.setup.always"), null))
                 .add(new SetupData<>("maximum", this.i18nProvider().get("command.group.setup.maximum"), null))
-                .add(new SetupData<>("static", this.i18nProvider().get("command.group.setup.static"), List.of("true", "false")))
+                .add(new SetupData<>("static", this.i18nProvider().get("command.group.setup.static"), List.of("yes", "no")))
+                .add(new SetupData<>("continue", this.i18nProvider().get("global.setup.continue"), List.of("yes", "no")))
+                .add(new SetupData<>("continue", this.i18nProvider().get("global.setup.continue"), List.of("yes", "no")))
                 .publish()
                 .thenAccept(it -> {
+                    if(!it.result("continue", String.class).equalsIgnoreCase("yes")) {
+                        return;
+                    }
+
                     var memory = it.result("memory", Integer.class);
                     if(memory < 512) {
                         log.error(this.i18nProvider().get("command.group.setup.memory.invalid"));
@@ -85,7 +91,7 @@ public final class GroupCommand extends Command {
                                     it.result("maxPlayers", Integer.class),
                                     it.result("always", Integer.class),
                                     it.result("maximum", Integer.class),
-                                    Boolean.parseBoolean(it.result("static", String.class))
+                                    it.result("static", String.class).equalsIgnoreCase("yes")
                             ));
 
                     EasyCloudCluster.instance().groupProvider().create(group);

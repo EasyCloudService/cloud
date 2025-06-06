@@ -31,7 +31,7 @@ public final class SetupServiceImpl implements SetupService {
 
         EasyCloudCluster.instance().terminal().clear();
 
-        this.print(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to cancel the setup.").toString());
+        this.print(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to abort the setup.").toString());
 
         var future = new CompletableFuture<SetupServiceResult>();
         this.trigger(future);
@@ -50,10 +50,10 @@ public final class SetupServiceImpl implements SetupService {
             }
             var current = this.tempSetupList.getFirst();
             if (!this.error) {
-                this.print(ansi().bgRgb(LogType.PRIMARY.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
+                this.print(ansi().bgRgb(LogType.WHITE.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
-                    this.print(ansi().a("* For possible answers use tab complete").toString());
+                    this.print(ansi().a("* For possible answers use 'tab'").toString());
                     current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
                 }
             }
@@ -63,7 +63,7 @@ public final class SetupServiceImpl implements SetupService {
                     SetupService.running.remove(this);
                     TerminalCompleter.TEMP_VALUES().clear();
                     EasyCloudCluster.instance().terminal().revert();
-                    this.print(ansi().fgRgb(LogType.ERROR.rgb()).a("Setup was canceled.").toString());
+                    this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(EasyCloudCluster.instance().i18nProvider().get("global.setup.cancel")).toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
                     return;
                 }
