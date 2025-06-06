@@ -1,6 +1,11 @@
 package dev.easycloud.service.terminal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dev.easycloud.service.EasyCloudAgent;
+import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.logger.LogType;
@@ -21,10 +26,15 @@ import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 import org.jline.widget.TailTipWidgets;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -91,6 +101,26 @@ public final class SimpleTerminal {
 
         System.setOut(new SimpleLoggingStream(this::print).printStream());
         System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
+
+
+        var url = new URL("https://api.github.com/repos/EasyCloudService/cloud/contributors");
+        try {
+            var mapper = new ObjectMapper().readTree(url);
+            mapper.forEach(node -> {
+                if(node.get("login") == null || node.get("type").asText().equalsIgnoreCase("bot")) {
+                    return;
+                }
+                if(node.get("contributions").asInt() < 15) {
+                    return;
+                }
+
+                this.contributors.add(node.get("login").asText());
+            });
+            if(this.contributors.size() == 1) this.contributors.add("EasyCloud");
+        } catch (Exception exception) {
+            this.contributors.add("FlxwDNS");
+            this.contributors.add("EasyCloud\n\n       Unable to load contributors,\n   please check your internet connection.");
+        }
     }
 
     public void revert() {
@@ -142,48 +172,45 @@ public final class SimpleTerminal {
         EasyCloudAgent.instance().terminal().revert();
     }
 
+    private final List<String> contributors = new ArrayList<>();
     public void redraw() {
-        var layout = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("   _           ").reset().a(" _              \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("  |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("  |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("            /  ").reset().a("\n").reset()
+        var contributorsString = new StringBuilder();
+        for (int i = 0; i < 2; i++) {
+            contributorsString.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.contributors.get(i)).reset());
+            contributorsString.append(", ");
+        }
+        contributorsString.append(" \n");
 
-                .reset().a(EasyCloudAgent.instance().i18nProvider().get("global.contributors") + ": ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
-                .reset().a(" " + EasyCloudAgent.instance().i18nProvider().get("global.and") + " ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
+        int length = 0;
+        var tmpString = new StringBuilder();
+        for (int i = 0; i < this.contributors.size() - 2; i++) {
+            var name = this.contributors.get(i + 2);
+            length = length + name.length();
+            tmpString.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(name).reset()).append(", ");
+
+            if ((i > 0 && i % 2 == 0) || this.contributors.size() == i + 3) {
+                var space = Math.max(28 - length, 7);
+                contributorsString.append(" ".repeat(space)).append(tmpString).append("\n");
+                tmpString = new StringBuilder();
+                length = 0;
+            }
+        }
+
+        var layout = ansi()
+                .fgRgb(LogType.PRIMARY.rgb()).a("       _           ").reset().a(" _              \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("      |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("      |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("                /  ").reset().a("\n").reset()
+
+                .reset().a("     " + EasyCloudAgent.instance().i18nProvider().get("global.contributors") + ": ")
+                .reset().a(contributorsString)
                 .reset().a("\n").toString();
 
         for (String s : layout.split("\n")) {
-            this.terminal.writer().println("        " + s);
+            this.terminal.writer().println("    " + s);
         }
         this.terminal.writer().println("");
 
         this.update();
-
-        /*var layout = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("  ______                 ").reset().a("  _____ _                 _  \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a(" |  ____|                ").reset().a(" / ____| |               | | \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a(" | |__   __ _ ___ _   _  ").reset().a("| |    | | ___  _   _  __| | \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a(" |  __| / _` / __| | | | ").reset().a("| |    | |/ _ \\| | | |/ _` | \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a(" | |___| (_| \\__ \\ |_| | ").reset().a("| |____| | (_) | |_| | (_| | \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a(" |______\\__,_|___/\\__, | ").reset().a(" \\_____|_|\\___/ \\__,_|\\__,_| \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("                  |___/                       [DEBUG]\n").reset()
-
-                .reset().a("    " + EasyCloudAgent.instance().i18nProvider().get("global.contributors") + ": ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("FlxwDNS")
-                .reset().a(", ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("1Chickxn")
-                .reset().a(" " + EasyCloudAgent.instance().i18nProvider().get("global.and") + " ")
-                .fgRgb(LogType.PRIMARY.rgb()).a("Swerion")
-                .reset().a("\n").toString();
-
-        for (String s : layout.split("\n")) {
-            this.terminal.writer().println(s);
-        }
-        this.terminal.writer().println("");
-
-        this.update();*/
     }
 }

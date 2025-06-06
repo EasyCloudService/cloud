@@ -1,5 +1,6 @@
 package dev.easycloud.service;
 
+import com.sun.net.httpserver.HttpServer;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.SimpleGroupProvider;
@@ -21,6 +22,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -107,7 +109,7 @@ public final class EasyCloudAgent {
         });
         log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
 
-        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
+        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
         log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
 
         this.terminal.start();
