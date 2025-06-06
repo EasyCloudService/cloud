@@ -11,6 +11,7 @@ import dev.easycloud.service.service.listener.ServiceReadyListener;
 import dev.easycloud.service.service.listener.ServiceShutdownListener;
 import dev.easycloud.service.service.resources.*;
 import dev.easycloud.service.terminal.logger.LogType;
+import io.activej.bytebuf.ByteBuf;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +42,7 @@ public final class SimpleServiceProvider implements ServiceProvider {
         new ServiceShutdownListener();
 
         EasyCloudAgent.instance().eventProvider().socket().read(ServiceRequestInformationEvent.class, (socket, event) -> {
-            log.info("RECEIVED SERVICE REQUEST INFORMATION EVENT: {}", event.serviceId());
-            //EasyCloudAgent.instance().eventProvider().socket().write("TEST");
-            EasyCloudAgent.instance().eventProvider().publishToSocket(socket, new ServiceInformationEvent(this.get(event.serviceId()), this.services));
+            socket.write(ByteBuf.wrapForReading(new ServiceInformationEvent(this.get(event.serviceId()), this.services).asBytes()));
         });
 
 

@@ -96,6 +96,8 @@ public final class EasyCloudAgent {
 
 
         this.eventProvider = new EventProvider(new ServerSocket());
+        this.eventProvider.socket().waitForConnection().get();
+
         Event.registerTypeAdapter(Service.class, SimpleService.class);
 
         this.terminal.clear();

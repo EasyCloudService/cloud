@@ -19,10 +19,6 @@ public final class EventProvider {
     }
 
     public void publish(Event event) {
-        this.socket.write(event.serialize());
-    }
-
-    public void publishToSocket(ITcpSocket socket, Event event) {
-        socket.write(ByteBuf.wrapForWriting(event.serialize().getBytes()));
+        this.socket.write(event.asBytes());
     }
 }

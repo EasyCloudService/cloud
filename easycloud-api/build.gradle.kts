@@ -10,6 +10,7 @@ plugins {
 dependencies {
     compileOnly("io.activej:activej:6.0-rc2")
     compileOnly("io.activej:activej-net:6.0-rc2")
+    compileOnly("io.activej:activej-csp:6.0-rc2")
 
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("io.activej:activej:6.0-rc2")

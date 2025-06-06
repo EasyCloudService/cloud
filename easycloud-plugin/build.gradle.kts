@@ -15,6 +15,7 @@ dependencies {
 
     implementation("io.activej:activej:6.0-rc2")
     implementation("io.activej:activej-net:6.0-rc2")
+    implementation("io.activej:activej-csp:6.0-rc2")
 
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")

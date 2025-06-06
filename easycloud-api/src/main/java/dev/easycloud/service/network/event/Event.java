@@ -1,6 +1,7 @@
 package dev.easycloud.service.network.event;
 
 import com.google.gson.*;
+import io.activej.bytebuf.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -32,5 +33,9 @@ public abstract class Event {
 
     public String serialize() {
         return gson().toJson(this);
+    }
+
+    public byte[] asBytes() {
+        return this.serialize().getBytes();
     }
 }

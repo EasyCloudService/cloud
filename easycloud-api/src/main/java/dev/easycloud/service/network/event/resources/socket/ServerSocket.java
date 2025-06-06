@@ -1,89 +1,84 @@
 package dev.easycloud.service.network.event.resources.socket;
 
 import dev.easycloud.service.network.event.Event;
-import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
+import io.activej.async.process.AsyncCloseable;
 import io.activej.bytebuf.ByteBuf;
+import io.activej.bytebuf.ByteBufPool;
+import io.activej.bytebuf.ByteBufStrings;
+import io.activej.csp.binary.BinaryChannelSupplier;
+import io.activej.csp.binary.decoder.ByteBufsDecoders;
+import io.activej.csp.consumer.ChannelConsumers;
+import io.activej.csp.supplier.ChannelSuppliers;
 import io.activej.eventloop.Eventloop;
 import io.activej.net.SimpleServer;
 import io.activej.net.socket.tcp.ITcpSocket;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetSocketAddress;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+
+import static io.activej.bytebuf.ByteBufStrings.CR;
+import static io.activej.bytebuf.ByteBufStrings.LF;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 @Slf4j
 public final class ServerSocket implements Socket {
-    private SimpleServer server;
+    private Eventloop eventloop;
 
-    private final Set<ITcpSocket> clients = ConcurrentHashMap.newKeySet();
+    private final byte[] CRLF = {CR, LF};
+    private final List<ITcpSocket> sockets = new ArrayList<>();
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
 
     @Override
     @SneakyThrows
     public void run() {
-        var eventLoop = Eventloop.builder().withCurrentThread().build();
-        this.server = SimpleServer.builder(eventLoop, socket -> {
-                    clients.add(socket);
-                    log.info("Client connected");
-                    this.read(socket);
-
-                    write("TEST");
+        this.eventloop = Eventloop.builder()
+                .withFatalErrorHandler((throwable, o) -> {
+                    throwable.printStackTrace();
                 })
-                .withListenPort(5200)
+                .withCurrentThread()
                 .build();
 
-        this.server.listen();
-        eventLoop.run();
+        var server = SimpleServer.builder(this.eventloop, socket -> {
+                    ChannelSuppliers.ofSocket(socket)
+                            .streamTo(ChannelConsumers.ofConsumer(byteBuf -> {
+                                byte[] data = new byte[byteBuf.readRemaining()];
+                                byteBuf.read(data);
+                                var dataString = new String(data, UTF_8);
 
+                                var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
+                                var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
+                                if (this.eventHandlers.containsKey(event.getClass())) {
+                                    this.eventHandlers.get(event.getClass()).forEach(it -> {
+                                        try {
+                                            it.accept(socket, event);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            log.error("Error processing event: {}", e.getMessage(), e);
+                                        }
+                                    });
+                                }
+                            }));
+
+
+                    this.sockets.add(socket);
+                })
+                .withListenAddress(new InetSocketAddress(5200))
+                .build();
+
+        server.listen();
         waitForConnection.complete(null);
-    }
 
-    private void read(ITcpSocket socket) {
-        socket.read().map(byteBuf -> {
-            byte[] byteData = new byte[byteBuf.readRemaining()];
-            byteBuf.read(byteData);
-            var data = new String(byteData);
+        this.eventloop.keepAlive(true);
+        this.eventloop.run();
 
-            if (data.equalsIgnoreCase("Ping")) {
-                socket.write(ByteBuf.wrapForReading("Pong".getBytes()));
-                return socket;
-            }
-
-
-            log.info(data.split("eventId")[1].split("\"")[2]);
-            var eventClass = Class.forName(data.split("eventId")[1].split("\"")[2]);
-            log.info("Found: " + eventClass.getSimpleName());
-
-
-            var event = Event.deserialize(data, (Class<? extends Event>) eventClass);
-            if (this.eventHandlers.containsKey(event.getClass())) {
-                this.eventHandlers.get(event.getClass()).forEach(it -> {
-                    try {
-                        it.accept(socket, event);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        log.error("Error processing event: {}", e.getMessage(), e);
-                    }
-                });
-            }
-            log.info(event.getClass().getSimpleName());
-            log.info("Received: {}", data);
-
-            return socket;
-        }).whenComplete(() -> {
-            this.read(socket);
-        }).whenException(() -> {
-            socket.close();
-            clients.remove(socket);
-            log.info("Client disconnected");
-        });
     }
 
     @Override
     public <T extends Event> void read(Class<T> event, BiConsumer<ITcpSocket, T> onEvent) {
-        log.info("Reading event: {}", event);
         if (!this.eventHandlers.containsKey(event)) {
             this.eventHandlers.put(event, new ArrayList<>());
         }
@@ -91,25 +86,18 @@ public final class ServerSocket implements Socket {
     }
 
     @Override
-    public void write(String message) {
-        if (this.server == null) {
-            log.warn("Server is not initialized. Cannot send message: {}", message);
-            return;
-        }
-
-        //var buffer = ByteBuf.wrapForReading(message.getBytes());
-        for (ITcpSocket client : clients) {
-            client.write(ByteBuf.wrapForReading(message.getBytes()));
-        }
-        //buffer.recycle();
+    public void write(byte[] bytes) {
+        this.sockets.forEach(socket -> {
+            socket.write(ByteBuf.wrapForReading(bytes));
+        });
     }
 
     @Override
     public void close() {
-        if (this.server == null) {
-            log.warn("Server is not initialized. Cannot close.");
-            return;
-        }
-        this.server.close();
+        this.sockets.forEach(AsyncCloseable::close);
+        this.sockets.clear();
+
+        this.eventloop.breakEventloop();
+        this.eventloop = null;
     }
 }

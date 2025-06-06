@@ -19,6 +19,7 @@ dependencies {
 
     runtimeDownload("io.activej:activej:6.0-rc2")
     runtimeDownload("io.activej:activej-net:6.0-rc2")
+    runtimeDownload("io.activej:activej-csp:6.0-rc2")
     //runtimeDownload("io.netty:netty5-all:5.0.0.Alpha5")
 
     runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")

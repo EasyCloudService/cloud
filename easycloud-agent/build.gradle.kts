@@ -13,6 +13,7 @@ dependencies {
     //compileOnly("io.netty:netty5-all:5.0.0.Alpha5")
     compileOnly("io.activej:activej:6.0-rc2")
     compileOnly("io.activej:activej-net:6.0-rc2")
+    compileOnly("io.activej:activej-csp:6.0-rc2")
 
     compileOnly("org.apache.logging.log4j:log4j-core:2.24.1")
     compileOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")

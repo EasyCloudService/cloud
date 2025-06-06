@@ -16,6 +16,6 @@ public interface Socket {
         return waitForConnection;
     }
 
-    void write(String message);
+    void write(byte[] bytes);
     void close();
 }
