@@ -61,6 +61,10 @@ public final class Log4jAppender extends AbstractAppender {
 
         TerminalCompleter.TEMP_VALUES().clear();
 
+        if(message.startsWith("Listening on [/")) {
+            return;
+        }
+
         if(!event.getLevel().name().equals("ERROR")) {
             if (event.getMessage().getFormattedMessage().startsWith("SETUP: ")) {
                 System.out.println(PATTERN.toString().replace("SETUP: ", ""));

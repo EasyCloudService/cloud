@@ -201,8 +201,6 @@ public final class TerminalImpl {
         for (String s : layout.split("\n")) {
             this.terminal.writer().println("    " + s);
         }
-        this.terminal.writer().println("");
-
         this.update();
     }
 }

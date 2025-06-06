@@ -49,16 +49,11 @@ public final class EasyCloudService {
 
             log.info("""
                      
-                      ______                 _____ _                 _
-                     |  ____|               / ____| |               | |
-                     | |__   __ _ ___ _   _| |    | | ___  _   _  __| |
-                     |  __| / _` / __| | | | |    | |/ _ \\| | | |/ _` |
-                     | |___| (_| \\__ \\ |_| | |____| | (_) | |_| | (_| |
-                     |______\\__,_|___/\\__, |\\_____|_|\\___/ \\__,_|\\__,_|
-                                       __/ |
-                                      |___/""");
-            log.info("Welcome back, @{}.", event.service().id());
-
+                            _            _
+                           |_  _.  _    /  |  _       _| 
+                           |_ (_| _> \\/ \\_ | (_) |_| (_|
+                                     / 
+                           Welcome back, @SERVICE_ID""".replace("SERVICE_ID", event.service().id()));
         });
 
         this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {

@@ -76,7 +76,7 @@ java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true
 ```
 
 ### 🌍 Language Settings
-Edit `local/config.json` to change the language:
+Edit `resources/config/local.json` to change the language:
 ```json
 {
   "language": "en"
