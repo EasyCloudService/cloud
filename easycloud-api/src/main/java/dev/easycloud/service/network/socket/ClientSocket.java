@@ -1,9 +1,7 @@
-package dev.easycloud.service.network.event.resources.socket;
+package dev.easycloud.service.network.socket;
 
 import dev.easycloud.service.network.event.Event;
 import io.activej.bytebuf.ByteBuf;
-import io.activej.csp.binary.BinaryChannelSupplier;
-import io.activej.csp.binary.decoder.ByteBufsDecoders;
 import io.activej.csp.consumer.ChannelConsumers;
 import io.activej.csp.supplier.ChannelSuppliers;
 import io.activej.eventloop.Eventloop;
@@ -12,7 +10,6 @@ import io.activej.net.socket.tcp.TcpSocket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +23,12 @@ public final class ClientSocket implements Socket {
     private Eventloop eventloop;
     private ITcpSocket socket;
 
+    private final String securityKey;
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
+
+    public ClientSocket(String securityKey) {
+        this.securityKey = securityKey;
+    }
 
     @Override
     public void run() {
@@ -45,6 +47,7 @@ public final class ClientSocket implements Socket {
             try {
                 this.socket = TcpSocket.wrapChannel(eventloop, channel, null);
                 log.info("Connected to server: {}", channel.getRemoteAddress());
+                this.write(("SECURITY:" + this.securityKey).getBytes());
             } catch (Exception exception2) {
                 exception2.printStackTrace();
             }
@@ -54,6 +57,12 @@ public final class ClientSocket implements Socket {
                         byte[] data = new byte[byteBuf.readRemaining()];
                         byteBuf.read(data);
                         var dataString = new String(data, UTF_8);
+
+                        if(dataString.equals("SECURITY:ACCEPTED")) {
+                            log.info("Security key accepted.");
+                            waitForConnection.complete(null);
+                            return;
+                        }
 
                         var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
                         var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
@@ -67,8 +76,6 @@ public final class ClientSocket implements Socket {
                             });
                         }
                     }));
-
-            waitForConnection.complete(null);
         });
 
         this.eventloop.keepAlive(true);

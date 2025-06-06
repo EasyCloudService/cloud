@@ -7,7 +7,7 @@ import dev.easycloud.service.command.CommandProvider;
 import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
-import dev.easycloud.service.network.event.resources.socket.ServerSocket;
+import dev.easycloud.service.network.socket.ServerSocket;
 import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.SimpleService;
@@ -76,26 +76,8 @@ public final class EasyCloudAgent {
         this.terminal = new SimpleTerminal();
         this.terminal.clear();
 
-        /*var eventLoop = Eventloop.builder().withCurrentThread().build();
-        this.server = SimpleServer.builder(eventLoop, socket -> {
-                    socket.read().map(byteBuf -> {
-                        byte[] data = new byte[byteBuf.readRemaining()];
-                        byteBuf.read(data);
 
-                        System.out.println("received data: " + new String(data));
-
-                        return socket;
-                    });
-                })
-                .withListenPort(5200)
-                .withAcceptOnce()
-                .build();
-
-        this.server.listen();
-        eventLoop.run();*/
-
-
-        this.eventProvider = new EventProvider(new ServerSocket());
+        this.eventProvider = new EventProvider(new ServerSocket(this.configuration().key()));
         this.eventProvider.socket().waitForConnection().get();
 
         Event.registerTypeAdapter(Service.class, SimpleService.class);
@@ -125,7 +107,7 @@ public final class EasyCloudAgent {
         });
         log.info(this.i18nProvider.get("agent.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
 
-        log.info(this.i18nProvider.get("netline.running", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
+        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("127.0.0.1").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
         log.info(this.i18nProvider.get("agent.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
 
         this.terminal.start();

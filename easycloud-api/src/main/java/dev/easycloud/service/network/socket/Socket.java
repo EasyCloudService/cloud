@@ -1,4 +1,4 @@
-package dev.easycloud.service.network.event.resources.socket;
+package dev.easycloud.service.network.socket;
 
 import dev.easycloud.service.network.event.Event;
 import io.activej.net.socket.tcp.ITcpSocket;

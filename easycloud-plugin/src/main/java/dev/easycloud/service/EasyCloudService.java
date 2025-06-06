@@ -6,7 +6,7 @@ import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
-import dev.easycloud.service.network.event.resources.socket.ClientSocket;
+import dev.easycloud.service.network.socket.ClientSocket;
 import dev.easycloud.service.service.AdvancedServiceProvider;
 import dev.easycloud.service.service.SimpleService;
 import dev.easycloud.service.service.SimpleServiceProvider;
@@ -32,10 +32,9 @@ public final class EasyCloudService {
         instance = this;
 
         // Initialize the EasyCloudService
-        this.eventProvider = new EventProvider(new ClientSocket());
+        this.eventProvider = new EventProvider(new ClientSocket(key));
         this.eventProvider.socket().waitForConnection().get();
 
-        log.info("NetLine has successfully connected to 127.0.0.1:5200.");
         log.info("Requesting service information...");
 
         // Register adapters

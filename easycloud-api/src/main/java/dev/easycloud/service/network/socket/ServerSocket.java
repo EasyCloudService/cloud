@@ -1,12 +1,8 @@
-package dev.easycloud.service.network.event.resources.socket;
+package dev.easycloud.service.network.socket;
 
 import dev.easycloud.service.network.event.Event;
 import io.activej.async.process.AsyncCloseable;
 import io.activej.bytebuf.ByteBuf;
-import io.activej.bytebuf.ByteBufPool;
-import io.activej.bytebuf.ByteBufStrings;
-import io.activej.csp.binary.BinaryChannelSupplier;
-import io.activej.csp.binary.decoder.ByteBufsDecoders;
 import io.activej.csp.consumer.ChannelConsumers;
 import io.activej.csp.supplier.ChannelSuppliers;
 import io.activej.eventloop.Eventloop;
@@ -19,8 +15,6 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import static io.activej.bytebuf.ByteBufStrings.CR;
-import static io.activej.bytebuf.ByteBufStrings.LF;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
@@ -28,9 +22,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public final class ServerSocket implements Socket {
     private Eventloop eventloop;
 
-    private final byte[] CRLF = {CR, LF};
+    private final String securityKey;
     private final List<ITcpSocket> sockets = new ArrayList<>();
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
+
+    public ServerSocket(String securityKey) {
+        this.securityKey = securityKey;
+    }
 
     @Override
     @SneakyThrows
@@ -49,6 +47,22 @@ public final class ServerSocket implements Socket {
                                 byteBuf.read(data);
                                 var dataString = new String(data, UTF_8);
 
+                                if(dataString.startsWith("SECURITY:") && !this.sockets.contains(socket)) {
+                                    if (!dataString.equals("SECURITY:" + this.securityKey)) {
+                                        log.error("Security key mismatch. Expected: {}, Received: {}", this.securityKey, dataString.replace("SECURITY:", ""));
+                                        socket.close();
+                                        return;
+                                    }
+                                    this.sockets.add(socket);
+                                    socket.write(ByteBuf.wrapForReading("SECURITY:ACCEPTED".getBytes()));
+                                    return;
+                                }
+
+                                if(!this.sockets.contains(socket)) {
+                                    log.error("Unauthorized socket connection attempt from");
+                                    return;
+                                }
+
                                 var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
                                 var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
                                 if (this.eventHandlers.containsKey(event.getClass())) {
@@ -62,9 +76,6 @@ public final class ServerSocket implements Socket {
                                     });
                                 }
                             }));
-
-
-                    this.sockets.add(socket);
                 })
                 .withListenAddress(new InetSocketAddress(5200))
                 .build();

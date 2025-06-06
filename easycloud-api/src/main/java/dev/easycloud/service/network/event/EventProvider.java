@@ -1,8 +1,6 @@
 package dev.easycloud.service.network.event;
 
-import dev.easycloud.service.network.event.resources.socket.Socket;
-import io.activej.bytebuf.ByteBuf;
-import io.activej.net.socket.tcp.ITcpSocket;
+import dev.easycloud.service.network.socket.Socket;
 import lombok.Getter;
 
 @Getter
