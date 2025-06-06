@@ -1,6 +1,8 @@
 package dev.easycloud.service.service.resources;
 
+import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
 import dev.easycloud.service.service.ExtendedService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +24,7 @@ public final class ServiceImpl implements ExtendedService {
 
     @Override
     public void publish() {
-
+        EasyCloudService.instance().eventProvider().publish(new ServiceUpdateEvent(this));
     }
 
    /*@Override

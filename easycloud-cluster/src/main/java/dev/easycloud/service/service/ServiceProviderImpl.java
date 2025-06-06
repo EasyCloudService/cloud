@@ -9,8 +9,7 @@ import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunc
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchBuilder;
-import dev.easycloud.service.service.listener.ServiceReadyListener;
-import dev.easycloud.service.service.listener.ServiceShutdownListener;
+import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
 import dev.easycloud.service.terminal.logger.LogType;
 import io.activej.bytebuf.ByteBuf;
@@ -42,14 +41,9 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         new ServiceReadyListener();
         new ServiceShutdownListener();
-
-        EasyCloudCluster.instance().eventProvider().socket().read(ServiceRequestInformationEvent.class, (socket, event) -> {
-            socket.write(ByteBuf.wrapForReading(new ServiceInformationEvent(this.get(event.serviceId()), this.services).asBytes()));
-        });
-
-        EasyCloudCluster.instance().eventProvider().socket().read(ServiceRequestLaunch.class, (socket, event) -> {
-            this.launch(EasyCloudCluster.instance().groupProvider().get(event.groupName()), event.count());
-        });
+        new ServiceRequestInformationListener();
+        new ServiceRequestLaunchListener();
+        new ServiceUpdateListener();
     }
 
     public void refresh() {

@@ -4,17 +4,22 @@ import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.service.ExtendedServiceProvider;
+import dev.easycloud.service.service.listener.ServiceUpdateListener;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
 public final class ServiceProviderImpl implements ExtendedServiceProvider {
     private final List<Service> services = new ArrayList<>();
-    private final Service thisService;
+    private final String thisServiceId;
+
+    public ServiceProviderImpl(final String thisServiceId) {
+        this.thisServiceId = thisServiceId;
+
+        new ServiceUpdateListener();
+    }
 
     @Override
     public Service get(String id) {
@@ -37,5 +42,10 @@ public final class ServiceProviderImpl implements ExtendedServiceProvider {
     @Override
     public void launch(Group group) {
         this.launch(group, 1);
+    }
+
+    @Override
+    public Service thisService() {
+        return this.services.stream().filter(it -> it.id().equals(thisServiceId)).findFirst().orElseThrow();
     }
 }

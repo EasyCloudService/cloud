@@ -25,8 +25,7 @@ public final class EasyCloudService {
     private static EasyCloudService instance;
 
     private final EventProvider eventProvider;
-
-    private ExtendedServiceProvider serviceProvider = null;
+    private final ExtendedServiceProvider serviceProvider;
 
     @SneakyThrows
     public EasyCloudService(String key, String serviceId) {
@@ -36,6 +35,8 @@ public final class EasyCloudService {
         this.eventProvider = new EventProvider(new ClientSocket(key));
         this.eventProvider.socket().waitForConnection().get();
 
+        this.serviceProvider = new ServiceProviderImpl(serviceId);
+
         log.info("Requesting service information...");
 
         // Register adapters
@@ -43,16 +44,15 @@ public final class EasyCloudService {
 
         // Register events
         this.eventProvider.socket().read(ServiceInformationEvent.class, (netChannel, event) -> {
-            this.serviceProvider = new ServiceProviderImpl(event.service());
             event.services().forEach(service -> this.serviceProvider.services().add(service));
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
             log.info("""
                      
                             _            _
-                           |_  _.  _    /  |  _       _| 
+                           |_  _.  _    /  |  _       _|
                            |_ (_| _> \\/ \\_ | (_) |_| (_|
-                                     / 
+                                     /
                            Welcome back, @SERVICE_ID""".replace("SERVICE_ID", event.service().id()));
         });
 
@@ -69,7 +69,6 @@ public final class EasyCloudService {
             this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
             log.info("Service '{}' has been shut down.", event.service().id());
         });
-
 
         // Request service information
         this.eventProvider.publish(new ServiceRequestInformationEvent(serviceId));
