@@ -1,7 +1,8 @@
 package dev.easycloud.service.service.builder;
 
 import dev.easycloud.service.platform.PlatformType;
-import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.Service;
+import dev.easycloud.service.service.resources.property.DefaultProperty;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public final class ServiceLaunchBuilder {
             arguments.add("--online-mode=false");
             arguments.add("nogui");
         }
-        arguments.add("--port=" + service.port());
+        arguments.add("--port=" + service.property(DefaultProperty.PORT()));
 
         var builder = new ProcessBuilder(arguments);
         builder.directory(service.directory().toFile());

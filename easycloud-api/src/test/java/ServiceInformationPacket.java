@@ -1,7 +1,7 @@
 import dev.easycloud.service.file.FileFactory;
 import packet.ServicePacket;
 import dev.easycloud.service.network.packet.SimpleService;
-import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.Service;
 import dev.httpmarco.netline.packet.PacketBuffer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

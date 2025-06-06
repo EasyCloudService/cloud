@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.service.ExtendedServiceProvider;
+import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.listener.ServiceUpdateListener;
 import lombok.Getter;
 

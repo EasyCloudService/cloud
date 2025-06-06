@@ -3,7 +3,6 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.service.resources.Service;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
@@ -16,7 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.jline.jansi.Ansi.ansi;
 
@@ -29,27 +30,25 @@ public final class ServiceImpl implements Service {
 
     private ServiceState state;
 
-    private final int port;
     private final String directoryRaw;
 
+    private final Map<String, Object> properties = new HashMap<>();
+
+    // transient
     private transient Process process;
     private transient boolean logStream;
+    private transient final List<String> logCache = new ArrayList<>();
 
-    private transient final List<String> logCache;
-
-    public ServiceImpl(String id, Group group, int port, Path directory) {
+    public ServiceImpl(String id, Group group, Path directory) {
         this.id = id;
         this.group = group;
 
         this.state = ServiceState.STARTING;
 
-        this.port = port;
         this.directoryRaw = directory.toString();
 
         this.process = null;
         this.logStream = false;
-
-        this.logCache = new ArrayList<>();
     }
 
     public void state(ServiceState serviceState) {
@@ -123,7 +122,6 @@ public final class ServiceImpl implements Service {
                 }
             } catch (IOException exception) {
                 this.print(exception.getMessage());
-                //throw new RuntimeException(exception);
             }
         }).start();
     }

@@ -1,7 +1,7 @@
 package packet;
 
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.httpmarco.netline.packet.Packet;
 import lombok.Getter;

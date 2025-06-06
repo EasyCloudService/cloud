@@ -1,12 +1,10 @@
 package dev.easycloud.service.network.event.resources;
 
 import dev.easycloud.service.network.event.Event;
-import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.Service;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @AllArgsConstructor

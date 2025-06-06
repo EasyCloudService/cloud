@@ -13,7 +13,7 @@ import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.service.ServiceProviderImpl;
-import dev.easycloud.service.service.resources.Service;
+import dev.easycloud.service.service.Service;
 import dev.easycloud.service.terminal.TerminalImpl;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;

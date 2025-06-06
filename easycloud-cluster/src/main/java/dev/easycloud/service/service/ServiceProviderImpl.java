@@ -3,16 +3,13 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
-import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
-import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
+import dev.easycloud.service.service.resources.property.DefaultProperty;
 import dev.easycloud.service.terminal.logger.LogType;
-import io.activej.bytebuf.ByteBuf;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +105,8 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
         var directory = Path.of("local").resolve(group.properties().saveFiles() ? "static" : "services").resolve(group.name() + "-" + id);
-        var service = new ServiceImpl(group.name() + "-" + id, group, port, directory);
+        var service = new ServiceImpl(group.name() + "-" + id, group, directory);
+        service.addProperty(DefaultProperty.PORT(), port);
 
         var result = this.prepare(service);
         if (!result) {
@@ -119,7 +117,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
 
-        log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.port()).reset()));
+        log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(DefaultProperty.PORT())).reset()));
 
         this.services.add(service);
     }
@@ -174,7 +172,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var port = 4000;
         while (port < 5000) {
             int finalPort = port;
-            if (this.services.stream().noneMatch(it -> it.port() == finalPort)) {
+            if (this.services.stream().noneMatch(it -> it.property(DefaultProperty.PORT()) == finalPort)) {
                 return port;
             }
             port++;
