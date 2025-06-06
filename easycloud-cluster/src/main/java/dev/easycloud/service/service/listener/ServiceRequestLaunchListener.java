@@ -12,7 +12,7 @@ public final class ServiceRequestLaunchListener {
 
     public ServiceRequestLaunchListener() {
         EasyCloudCluster.instance().eventProvider().socket().read(ServiceRequestLaunch.class, (socket, event) -> {
-            EasyCloudCluster.instance().serviceProvider().launch(EasyCloudCluster.instance().groupProvider().get(event.groupName()), event.count());
+            EasyCloudCluster.instance().serviceProvider().launch(event.builder(), event.count());
         });
     }
 }

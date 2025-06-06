@@ -6,7 +6,8 @@ import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
-import dev.easycloud.service.service.builder.ServiceLaunchBuilder;
+import dev.easycloud.service.service.builder.ServiceLaunchFactory;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
 import dev.easycloud.service.service.resources.ServiceProperties;
@@ -55,7 +56,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
             if(always > online) {
-                this.launch(group, (int) (always - online));
+                this.launch(new ServiceLaunchBuilder(group.name()), (int) (always - online));
             }
             if(max < online && max != -1) {
                 log.info("Shutting down {} services in group {} to maintain maximum of {}.", online - max, group.name(), max);
@@ -88,8 +89,18 @@ public final class ServiceProviderImpl implements ServiceProvider {
         ((ServiceImpl) service).shutdown();
     }
 
+
     @Override
-    public void launch(Group group) {
+    public void launch(ServiceLaunchBuilder builder) {
+        var defaultGroup = EasyCloudCluster.instance().groupProvider().get(builder.group());
+        var group = new Group(defaultGroup.enabled(), defaultGroup.name(), defaultGroup.platform());
+        builder.properties().forEach((key, value) -> group.properties().put(key, value));
+        defaultGroup.properties().forEach((key, value) -> {
+            if(!builder.properties().containsKey(key)) {
+                group.properties().put(key, value);
+            }
+        });
+
         if(!group.enabled()) {
             log.error("Group {} is currently disabled.", group.name());
             return;
@@ -104,8 +115,17 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return;
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
+        if(builder.id() > 0) {
+            id = builder.id();
 
-        var directory = Path.of("local").resolve(group.property(GroupProperties.SAVE_FILES()) ? "static" : "services").resolve(group.name() + "-" + id);
+            if(this.services.stream().anyMatch(it -> it.id().equals(group.name() + "-" + builder.id()))) {
+                log.error("Service with id {} already exists in group {}.", id, group.name());
+                log.error("Custom launch ids are only allowed if the service is not already running.");
+                return;
+            }
+        }
+
+        var directory = Path.of("local").resolve(builder.property(GroupProperties.SAVE_FILES(), group.property(GroupProperties.SAVE_FILES())) ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new ServiceImpl(group.name() + "-" + id, group, directory);
         service.addProperty(ServiceProperties.PORT(), port);
 
@@ -115,7 +135,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return;
         }
 
-        var process = ServiceLaunchBuilder.create(service);
+        var process = ServiceLaunchFactory.create(service);
         service.process(process);
 
         log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));

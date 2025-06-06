@@ -6,6 +6,7 @@ import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
 import dev.easycloud.service.property.Property;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.logger.LogType;
@@ -112,7 +113,7 @@ public final class GroupCommand extends Command {
 
                     var amount = it.result("amount", Integer.class);
                     log.info(this.i18nProvider().get("command.group.launch.success", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset(), amount));
-                    EasyCloudCluster.instance().serviceProvider().launch(group, amount);
+                    EasyCloudCluster.instance().serviceProvider().launch(new ServiceLaunchBuilder(group.name()), amount);
                 });
     }
 }

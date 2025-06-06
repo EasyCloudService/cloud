@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @UtilityClass
-public final class ServiceLaunchBuilder {
+public final class ServiceLaunchFactory {
     private final List<String> ARGUMENTS = List.of(
             "-Xms128M", "-XX:-UseAdaptiveSizePolicy",
             "-XX:MaxRAMPercentage=95.0", "-Dterminal.jline=false"

@@ -1,6 +1,6 @@
 package dev.easycloud.service.service;
 
-import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 
 import java.util.List;
 
@@ -18,11 +18,10 @@ public interface ServiceProvider {
         }
     }
     void shutdown(Service service);
-
-    void launch(Group group);
-    default void launch(Group group, int count) {
+    void launch(ServiceLaunchBuilder builder);
+    default void launch(ServiceLaunchBuilder builder, int count) {
         for (int i = 0; i < count; i++) {
-            this.launch(group);
+            this.launch(builder);
         }
     }
 

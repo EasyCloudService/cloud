@@ -5,6 +5,7 @@ import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.service.ExtendedServiceProvider;
 import dev.easycloud.service.service.Service;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.ServiceUpdateListener;
 import lombok.Getter;
 
@@ -36,13 +37,13 @@ public final class ServiceProviderImpl implements ExtendedServiceProvider {
     }
 
     @Override
-    public void launch(Group group, int count) {
-        EasyCloudService.instance().eventProvider().publish(new ServiceRequestLaunch(group.name(), count));
+    public void launch(ServiceLaunchBuilder builder, int count) {
+        EasyCloudService.instance().eventProvider().publish(new ServiceRequestLaunch(builder, count));
     }
 
     @Override
-    public void launch(Group group) {
-        this.launch(group, 1);
+    public void launch(ServiceLaunchBuilder builder) {
+        this.launch(builder, 1);
     }
 
     @Override
