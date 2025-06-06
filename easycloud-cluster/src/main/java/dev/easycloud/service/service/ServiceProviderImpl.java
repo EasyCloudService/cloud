@@ -3,12 +3,13 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
-import dev.easycloud.service.service.resources.property.DefaultProperty;
+import dev.easycloud.service.service.resources.ServiceProperties;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -49,8 +50,8 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
         for (Group group : EasyCloudCluster.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
-            var always = group.properties().always();
-            var max = group.properties().maximum();
+            var always = group.property(GroupProperties.ALWAYS_RUNNING());
+            var max = group.property(GroupProperties.MAXIMUM_RUNNING());
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
             if(always > online) {
@@ -104,9 +105,9 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
 
-        var directory = Path.of("local").resolve(group.properties().saveFiles() ? "static" : "services").resolve(group.name() + "-" + id);
+        var directory = Path.of("local").resolve(group.property(GroupProperties.SAVE_FILES()) ? "static" : "services").resolve(group.name() + "-" + id);
         var service = new ServiceImpl(group.name() + "-" + id, group, directory);
-        service.addProperty(DefaultProperty.PORT(), port);
+        service.addProperty(ServiceProperties.PORT(), port);
 
         var result = this.prepare(service);
         if (!result) {
@@ -117,7 +118,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var process = ServiceLaunchBuilder.create(service);
         service.process(process);
 
-        log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(DefaultProperty.PORT())).reset()));
+        log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
 
         this.services.add(service);
     }
@@ -172,7 +173,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var port = 4000;
         while (port < 5000) {
             int finalPort = port;
-            if (this.services.stream().noneMatch(it -> it.property(DefaultProperty.PORT()) == finalPort)) {
+            if (this.services.stream().noneMatch(it -> it.property(ServiceProperties.PORT()) == finalPort)) {
                 return port;
             }
             port++;

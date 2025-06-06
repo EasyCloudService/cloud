@@ -3,6 +3,7 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
@@ -83,13 +84,13 @@ public final class ServiceImpl implements Service {
         EasyCloudCluster.instance().terminal().exitScreen(this);
 
         new Thread(() -> {
-            if (!this.group.properties().saveFiles()) {
+            if (!this.group.property(GroupProperties.SAVE_FILES())) {
                 this.process.destroyForcibly();
             }
 
             try {
                 this.process.waitFor();
-                if (!this.group.properties().saveFiles()) {
+                if (!this.group.property(GroupProperties.SAVE_FILES())) {
                     FileFactory.remove(this.directory());
                 }
                 EasyCloudCluster.instance().serviceProvider().services().remove(this);

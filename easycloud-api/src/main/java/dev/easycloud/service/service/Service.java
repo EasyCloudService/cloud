@@ -1,7 +1,7 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.service.resources.property.Property;
+import dev.easycloud.service.property.Property;
 import dev.easycloud.service.service.resources.ServiceState;
 
 import java.nio.file.Path;
@@ -20,7 +20,6 @@ public interface Service {
                 value instanceof Class || value instanceof Enum || value instanceof Path || value instanceof UUID
         ) {
             properties().put(key, value);
-            return;
         } else {
             throw new IllegalArgumentException("Invalid property type: " + value.getClass().getSimpleName());
         }
@@ -35,7 +34,7 @@ public interface Service {
     }
 
     default <T> T property(Property<T> property) {
-        return (T) this.property(property.key(), property.type());
+        return this.property(property.key(), property.type());
     }
 
     ServiceState state();

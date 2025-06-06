@@ -13,7 +13,7 @@ import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import dev.easycloud.service.service.resources.ServiceState;
-import dev.easycloud.service.service.resources.property.DefaultProperty;
+import dev.easycloud.service.service.resources.ServiceProperties;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
@@ -44,12 +44,12 @@ public final class EasyCloudVelocity {
             event.services()
                     .stream()
                     .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id()))
-                    .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(DefaultProperty.PORT())))));
+                    .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(ServiceProperties.PORT())))));
         });
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceReadyEvent.class, (channel, event) -> {
             if (event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
-            this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().property(DefaultProperty.PORT()))));
+            this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().property(ServiceProperties.PORT()))));
         });
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceShutdownEvent.class, (channel, event) -> {

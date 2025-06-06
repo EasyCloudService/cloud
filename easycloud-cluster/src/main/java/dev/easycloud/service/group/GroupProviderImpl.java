@@ -3,6 +3,7 @@ package dev.easycloud.service.group;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.terminal.logger.LogType;
@@ -94,7 +95,7 @@ public final class GroupProviderImpl implements GroupProvider {
         var templatePath = localPath.resolve("templates").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
         templatePath.toFile().mkdirs();
 
-        if (!group.properties().saveFiles()) {
+        if (!group.property(GroupProperties.SAVE_FILES())) {
             new Thread(() -> {
                 if (group.platform().initializerId().equals("paper")) {
                     try {
