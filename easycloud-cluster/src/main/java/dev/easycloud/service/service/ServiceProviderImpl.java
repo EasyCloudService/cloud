@@ -30,7 +30,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
     private final List<Service> services = new ArrayList<>();
 
     public ServiceProviderImpl() {
-        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(1));
+        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(5));
 
         var templatePath = Path.of("local").resolve("templates");
         templatePath.resolve("global").resolve("all").toFile().mkdirs();

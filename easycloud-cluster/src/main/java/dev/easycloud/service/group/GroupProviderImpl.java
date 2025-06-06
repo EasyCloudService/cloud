@@ -78,7 +78,6 @@ public final class GroupProviderImpl implements GroupProvider {
 
                 FileFactory.download(downloadUrl, jarPath);
 
-                log.info("DEBUG 11");
                 log.info(EasyCloudCluster.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initializerId() + "-" + platform.version()).reset()));
             }
         });
