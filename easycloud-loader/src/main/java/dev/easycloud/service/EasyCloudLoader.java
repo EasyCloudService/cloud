@@ -42,11 +42,11 @@ public final class EasyCloudLoader {
         copyFile("easycloud-plugin.jar", resources.resolve("easycloud-plugin.jar"));
         copyFile("easycloud-api.jar", libaries.resolve("dev.easycloud.service-impl-stable.jar"));
 
-        copyFile("easycloud-agent.jar", Path.of("easycloud-agent.jar"));
+        copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
 
         var thread = new Thread(() -> {
             try {
-                var fileArg = "easycloud-agent.jar;resources/libaries/*;";
+                var fileArg = "easycloud-cluster.jar;resources/libaries/*;";
                 if(!isWindows()) {
                     fileArg = fileArg.replace(";", ":");
                 }

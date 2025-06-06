@@ -35,7 +35,7 @@ tasks.withType<Jar> {
     }
 
     from(project(":easycloud-api").tasks.jar)
-    from(project(":easycloud-agent").tasks.jar)
+    from(project(":easycloud-cluster").tasks.jar)
     from(project(":easycloud-plugin").tasks.getByPath(":easycloud-plugin:shadowJar"))
 
     manifest {

@@ -9,8 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/easycloud-agent" />
             <option value="$PROJECT_DIR$/easycloud-api" />
+            <option value="$PROJECT_DIR$/easycloud-cluster" />
             <option value="$PROJECT_DIR$/easycloud-loader" />
             <option value="$PROJECT_DIR$/easycloud-plugin" />
           </set>

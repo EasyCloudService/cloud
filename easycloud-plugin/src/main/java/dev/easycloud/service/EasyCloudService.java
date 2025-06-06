@@ -6,10 +6,11 @@ import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
+import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.network.socket.ClientSocket;
-import dev.easycloud.service.service.AdvancedServiceProvider;
-import dev.easycloud.service.service.SimpleService;
-import dev.easycloud.service.service.SimpleServiceProvider;
+import dev.easycloud.service.service.ExtendedServiceProvider;
+import dev.easycloud.service.service.resources.ServiceImpl;
+import dev.easycloud.service.service.resources.ServiceProviderImpl;
 import dev.easycloud.service.service.resources.Service;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -25,7 +26,7 @@ public final class EasyCloudService {
 
     private final EventProvider eventProvider;
 
-    private AdvancedServiceProvider serviceProvider = null;
+    private ExtendedServiceProvider serviceProvider = null;
 
     @SneakyThrows
     public EasyCloudService(String key, String serviceId) {
@@ -38,11 +39,11 @@ public final class EasyCloudService {
         log.info("Requesting service information...");
 
         // Register adapters
-        Event.registerTypeAdapter(Service.class, SimpleService.class);
+        Event.registerTypeAdapter(Service.class, ServiceImpl.class);
 
         // Register events
         this.eventProvider.socket().read(ServiceInformationEvent.class, (netChannel, event) -> {
-            this.serviceProvider = new SimpleServiceProvider(event.service());
+            this.serviceProvider = new ServiceProviderImpl(event.service());
             event.services().forEach(service -> this.serviceProvider.services().add(service));
             this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
@@ -57,6 +58,7 @@ public final class EasyCloudService {
                                        __/ |
                                       |___/""");
             log.info("Welcome back, @{}.", event.service().id());
+
         });
 
         this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
