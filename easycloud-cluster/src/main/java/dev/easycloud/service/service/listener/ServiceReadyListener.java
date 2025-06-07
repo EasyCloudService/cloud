@@ -15,8 +15,10 @@ public final class ServiceReadyListener {
 
     public ServiceReadyListener() {
         EasyCloudCluster.instance().eventProvider().socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
-            var service = (ServiceImpl) event.service();
+            var service = EasyCloudCluster.instance().serviceProvider().get(event.service().id());
             service.state(ServiceState.ONLINE);
+            service.publish();
+
             EasyCloudCluster.instance().eventProvider().publish(event);
             log.info(EasyCloudCluster.instance().i18nProvider().get("service.ready", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset()));
         });

@@ -3,7 +3,7 @@ package dev.easycloud.service.service.resources;
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
-import dev.easycloud.service.service.ExtendedService;
+import dev.easycloud.service.service.Service;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 @Slf4j
 @Getter
 @AllArgsConstructor
-public final class ServiceImpl implements ExtendedService {
+public final class ServiceImpl implements Service {
     private final String id;
     private final Group group;
 

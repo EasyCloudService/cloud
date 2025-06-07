@@ -82,4 +82,6 @@ public interface Service {
     default Path directory() {
         return Path.of(directoryRaw());
     }
+
+    void publish();
 }

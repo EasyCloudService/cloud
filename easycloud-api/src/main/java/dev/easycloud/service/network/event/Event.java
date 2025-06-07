@@ -1,11 +1,12 @@
 package dev.easycloud.service.network.event;
 
 import com.google.gson.*;
-import io.activej.bytebuf.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @ToString
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public abstract class Event {
 
 
     public static Event deserialize(String json, Class<? extends Event> eventClass) {
+        //log.info("Deserializing {}: {}", eventClass, json);
         return gson().fromJson(json, eventClass);
     }
 

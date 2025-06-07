@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
@@ -56,6 +57,11 @@ public final class ServiceImpl implements Service {
         this.state = serviceState;
     }
 
+    @Override
+    public void publish() {
+        EasyCloudCluster.instance().eventProvider().publish(new ServiceUpdateEvent(this));
+    }
+
     public void process(Process process) {
         this.process = process;
 
@@ -72,6 +78,9 @@ public final class ServiceImpl implements Service {
                 return;
             }
         } catch (Exception exception) {
+            if(!this.process.isAlive()) {
+                return;
+            }
             log.error(EasyCloudCluster.instance().i18nProvider().get("service.stream.failed", exception));
             return;
         }

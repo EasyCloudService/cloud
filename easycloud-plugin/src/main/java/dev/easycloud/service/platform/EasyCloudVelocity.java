@@ -43,7 +43,10 @@ public final class EasyCloudVelocity {
         EasyCloudService.instance().eventProvider().socket().read(ServiceInformationEvent.class, (channel, event) -> {
             event.services()
                     .stream()
-                    .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id()))
+                    .filter(it -> {
+                        logger.info(it.state() + " " + it.id() + " " + it.property(ServiceProperties.PORT()));
+                        return it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id());
+                    })
                     .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(ServiceProperties.PORT())))));
         });
 
