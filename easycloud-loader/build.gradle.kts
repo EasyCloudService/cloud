@@ -14,8 +14,8 @@ dependencies {
     runtimeDownload("org.yaml:snakeyaml:2.4")
     runtimeDownload("com.fasterxml.jackson.core:jackson-databind:2.0.1")
     runtimeDownload("com.google.code.gson:gson:2.11.0")
-    runtimeDownload("org.jline:jline:3.26.3")
-    runtimeDownload("org.fusesource.jansi:jansi:2.2.0")
+    runtimeDownload("org.jline:jline:3.30.4")
+    runtimeDownload("org.fusesource.jansi:jansi:2.4.2")
 
     runtimeDownload("io.activej:activej:6.0-rc2")
     runtimeDownload("io.activej:activej-net:6.0-rc2")

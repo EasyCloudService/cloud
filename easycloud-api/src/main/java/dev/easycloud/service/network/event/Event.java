@@ -29,8 +29,12 @@ public abstract class Event {
 
 
     public static Event deserialize(String json, Class<? extends Event> eventClass) {
-        //log.info("Deserializing {}: {}", eventClass, json);
-        return gson().fromJson(json, eventClass);
+       try {
+           return gson().fromJson(json, eventClass);
+       } catch (Exception e) {
+           log.info("Deserializing {}: {}", eventClass, json);
+           throw new RuntimeException(e);
+       }
     }
 
     public String serialize() {

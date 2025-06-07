@@ -51,7 +51,7 @@ public final class EasyCloudLoader {
                     fileArg = fileArg.replace(";", ":");
                 }
 
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "-cp", fileArg, "dev.easycloud.service.EasyCloudBootstrap")
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "--enable-native-access=ALL-UNNAMED", "-cp", fileArg, "dev.easycloud.service.EasyCloudBootstrap")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)

@@ -7,8 +7,8 @@ dependencies {
 
     compileOnly("org.yaml:snakeyaml:2.4")
 
-    compileOnly("org.jline:jline:3.26.3")
-    compileOnly("org.fusesource.jansi:jansi:2.2.0")
+    compileOnly("org.jline:jline:3.30.4")
+    compileOnly("org.fusesource.jansi:jansi:2.4.2")
 
     //compileOnly("io.netty:netty5-all:5.0.0.Alpha5")
     compileOnly("io.activej:activej:6.0-rc2")
