@@ -1,5 +1,6 @@
 package dev.easycloud.service.update.resources;
 
+import dev.easycloud.service.terminal.SimpleTerminal;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -64,7 +65,7 @@ public final class GithubUpdateService {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            System.out.println("Download finished: " + name);
+            SimpleTerminal.print("Download complete. File saved as: " + name);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
