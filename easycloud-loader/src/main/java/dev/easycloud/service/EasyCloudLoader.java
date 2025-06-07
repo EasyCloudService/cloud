@@ -17,36 +17,26 @@ public final class EasyCloudLoader {
     public static void main(String[] args) {
         var local = Path.of("local");
         var resources = Path.of("resources");
-        var libaries = resources.resolve("libaries");
+        var libraries = resources.resolve("libraries");
         local.toFile().mkdirs();
         resources.toFile().mkdirs();
-        libaries.toFile().mkdirs();
+        libraries.toFile().mkdirs();
 
-        copyFile("EasyCloudUpdater.class", libaries.resolve("EasyCloudUpdater.class"));
+        copyFile("EasyCloudUpdater.class", libraries.resolve("EasyCloudUpdater.class"));
 
         if(Arrays.stream(args).toList().stream().anyMatch(arg -> arg.equals("-Dauto.updates=true"))) {
             new LoaderUpdateProvider();
-        } else {
-            System.out.println("""
-                  ┌──────────────────────────────────┐
-                  │                                  │
-                  │  (Auto)Updates are not enabled!  │
-                  │                                  │
-                  └──────────────────────────────────┘
-                  To enable them, check the documentation on the GitHub page of EasyCloudService.
-                """);
         }
-
         new DependencyLoader();
 
         copyFile("easycloud-plugin.jar", resources.resolve("easycloud-plugin.jar"));
-        copyFile("easycloud-api.jar", libaries.resolve("dev.easycloud.service-impl-stable.jar"));
+        copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.service-impl-stable.jar"));
 
         copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
 
         var thread = new Thread(() -> {
             try {
-                var fileArg = "easycloud-cluster.jar;resources/libaries/*;";
+                var fileArg = "easycloud-cluster.jar;resources/libraries/*;";
                 if(!isWindows()) {
                     fileArg = fileArg.replace(";", ":");
                 }
