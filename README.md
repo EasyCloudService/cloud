@@ -100,7 +100,7 @@ repositories {
 
 dependencies {
     compileOnly("com.github.EasyCloudService.cloud:easycloud-api:[current_version]")
-    compileOnly("com.github.EasyCloudService.cloud:easycloud-plugin:[current_version]")
+    compileOnly("com.github.EasyCloudService.cloud:easycloud-service:[current_version]")
 }
 ```
 
@@ -122,7 +122,7 @@ dependencies {
     </dependency>
     <dependency>
         <groupId>com.github.EasyCloudService.cloud</groupId>
-        <artifactId>easycloud-plugin</artifactId>
+        <artifactId>easycloud-service</artifactId>
         <version>[current_version]</version>
         <scope>provided</scope>
     </dependency>

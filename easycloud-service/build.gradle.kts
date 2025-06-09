@@ -25,14 +25,14 @@ dependencies {
 }
 
 tasks.withType<ShadowJar> {
-    archiveFileName.set("easycloud-plugin.jar")
+    archiveFileName.set("easycloud-service.jar")
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "dev.easycloud.service"
-            artifactId = "easycloud-plugin"
+            artifactId = "easycloud-service"
             version = "1.0-SNAPSHOT"
 
             from(components["java"])

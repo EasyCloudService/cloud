@@ -36,7 +36,7 @@ tasks.withType<Jar> {
 
     from(project(":easycloud-api").tasks.jar)
     from(project(":easycloud-cluster").tasks.jar)
-    from(project(":easycloud-plugin").tasks.getByPath(":easycloud-plugin:shadowJar"))
+    from(project(":easycloud-service").tasks.getByPath(":easycloud-service:shadowJar"))
 
     manifest {
         attributes["Main-Class"] = "dev.easycloud.service.EasyCloudLoader"
