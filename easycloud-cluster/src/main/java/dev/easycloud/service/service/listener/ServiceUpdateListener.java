@@ -15,7 +15,7 @@ public final class ServiceUpdateListener {
 
             service.process(oldService.process());
             service.logStream(oldService.logStream());
-            service.logCache().addAll(oldService.logCache());
+            service.logCache(oldService.logCache());
 
             EasyCloudCluster.instance().serviceProvider().services().removeIf(it -> it.id().equals(event.service().id()));
             EasyCloudCluster.instance().serviceProvider().services().add(service);

@@ -39,7 +39,7 @@ public final class ServiceImpl implements Service {
     // transient
     private transient Process process;
     private transient boolean logStream;
-    private transient final List<String> logCache = new ArrayList<>();
+    private transient List<String> logCache = new ArrayList<>();
 
     public ServiceImpl(String id, Group group, Path directory) {
         this.id = id;
