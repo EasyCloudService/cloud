@@ -7,10 +7,12 @@ import lombok.experimental.Accessors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Accessors(chain = true)
 public final class ServiceLaunchBuilder {
+    private final UUID builderId = UUID.randomUUID();
     private final String group;
     @Setter
     private int id;

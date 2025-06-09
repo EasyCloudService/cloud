@@ -3,6 +3,7 @@ package dev.easycloud.service.service;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ServiceProvider {
     List<Service> services();
@@ -18,7 +19,7 @@ public interface ServiceProvider {
         }
     }
     void shutdown(Service service);
-    void launch(ServiceLaunchBuilder builder);
+    CompletableFuture<Service> launch(ServiceLaunchBuilder builder);
     default void launch(ServiceLaunchBuilder builder, int count) {
         for (int i = 0; i < count; i++) {
             this.launch(builder);

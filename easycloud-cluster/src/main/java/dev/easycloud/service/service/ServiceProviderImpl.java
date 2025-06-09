@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchFactory;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.jline.jansi.Ansi.ansi;
@@ -43,6 +45,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         new ServiceRequestInformationListener();
         new ServiceRequestLaunchListener();
         new ServiceUpdateListener();
+        new ServiceRequestShutdownListener();
     }
 
     public void refresh() {
@@ -55,10 +58,10 @@ public final class ServiceProviderImpl implements ServiceProvider {
             var max = group.property(GroupProperties.MAXIMUM_RUNNING());
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
-            if(always > online) {
+            if (always > online) {
                 this.launch(new ServiceLaunchBuilder(group.name()), (int) (always - online));
             }
-            if(max < online && max != -1) {
+            if (max < online && max != -1) {
                 log.info("Shutting down {} services in group {} to maintain maximum of {}.", online - max, group.name(), max);
                 this.services.stream()
                         .filter(it -> it.group().name().equals(group.name()))
@@ -91,37 +94,37 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
 
     @Override
-    public void launch(ServiceLaunchBuilder builder) {
+    public CompletableFuture<Service> launch(ServiceLaunchBuilder builder) {
         var defaultGroup = EasyCloudCluster.instance().groupProvider().get(builder.group());
         var group = new Group(defaultGroup.enabled(), defaultGroup.name(), defaultGroup.platform());
         builder.properties().forEach((key, value) -> group.properties().put(key, value));
         defaultGroup.properties().forEach((key, value) -> {
-            if(!builder.properties().containsKey(key)) {
+            if (!builder.properties().containsKey(key)) {
                 group.properties().put(key, value);
             }
         });
 
-        if(!group.enabled()) {
+        if (!group.enabled()) {
             log.error("Group {} is currently disabled.", group.name());
-            return;
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Group " + group.name() + " is currently disabled."));
         }
 
         var port = this.freePort();
-        if(group.platform().type().equals(PlatformType.PROXY)) {
-            port = 25565;
+        if (group.platform().type().equals(PlatformType.PROXY)) {
+            port = 25565 + (int) this.services.stream().filter(it -> it.group().platform().type().equals(PlatformType.PROXY)).count();
         }
         if (port == -1) {
             log.error("No free port available.");
-            return;
+            return CompletableFuture.failedFuture(new RuntimeException("No free port available."));
         }
         var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
-        if(builder.id() > 0) {
+        if (builder.id() > 0) {
             id = builder.id();
 
-            if(this.services.stream().anyMatch(it -> it.id().equals(group.name() + "-" + builder.id()))) {
+            if (this.services.stream().anyMatch(it -> it.id().equals(group.name() + "-" + builder.id()))) {
                 log.error("Service with id {} already exists in group {}.", id, group.name());
                 log.error("Custom launch ids are only allowed if the service is not already running.");
-                return;
+                return CompletableFuture.failedFuture(new IllegalArgumentException("Service with id " + id + " already exists in group " + group.name() + "."));
             }
         }
 
@@ -132,7 +135,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var result = this.prepare(service);
         if (!result) {
             log.error("Failed to prepare service.");
-            return;
+            return CompletableFuture.failedFuture(new RuntimeException("Failed to prepare service."));
         }
 
         var process = ServiceLaunchFactory.create(service);
@@ -141,6 +144,8 @@ public final class ServiceProviderImpl implements ServiceProvider {
         log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
 
         this.services.add(service);
+        EasyCloudCluster.instance().eventProvider().publish(new ServiceStartingEvent(builder.builderId(), service));
+        return CompletableFuture.completedFuture(service);
     }
 
     @SneakyThrows
@@ -154,12 +159,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         FileFactory.copy(templatePath.resolve("global").resolve("all"), service.directory());
 
-        if(group.platform().type().equals(PlatformType.PROXY)) {
+        if (group.platform().type().equals(PlatformType.PROXY)) {
             FileFactory.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
             FileFactory.copy(templatePath.resolve("proxy").resolve(service.group().name()), service.directory());
 
             var secretPath = service.directory().resolve("forwarding.secret");
-            if(Files.exists(secretPath)) {
+            if (Files.exists(secretPath)) {
                 Files.delete(secretPath);
             }
             Files.write(secretPath, EasyCloudCluster.instance().configuration().security().value().getBytes());
@@ -178,7 +183,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return false;
         }
 
-        if(!service.directory().resolve("platform.jar").toFile().exists()) {
+        if (!service.directory().resolve("platform.jar").toFile().exists()) {
             try {
                 Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {

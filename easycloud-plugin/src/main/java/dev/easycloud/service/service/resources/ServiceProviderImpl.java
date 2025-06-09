@@ -1,16 +1,17 @@
 package dev.easycloud.service.service.resources;
 
 import dev.easycloud.service.EasyCloudService;
-import dev.easycloud.service.group.resources.Group;
+import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
+import dev.easycloud.service.network.event.resources.request.ServiceRequestShutdown;
 import dev.easycloud.service.service.ExtendedServiceProvider;
 import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.ServiceUpdateListener;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 public final class ServiceProviderImpl implements ExtendedServiceProvider {
@@ -21,6 +22,11 @@ public final class ServiceProviderImpl implements ExtendedServiceProvider {
         this.thisServiceId = thisServiceId;
 
         new ServiceUpdateListener();
+
+        EasyCloudService.instance().eventProvider().socket().read(ServiceStartingEvent.class, (socket, event) -> {
+            this.serviceLaunchFutures.get(event.builderId()).complete(event.service());
+            this.serviceLaunchFutures.remove(event.builderId());
+        });
     }
 
     @Override
@@ -33,17 +39,18 @@ public final class ServiceProviderImpl implements ExtendedServiceProvider {
 
     @Override
     public void shutdown(Service service) {
-        //EasyCloudService.instance().netClient().send(new RequestServiceShutdownPacket(service.id()));
+        EasyCloudService.instance().eventProvider().publish(new ServiceRequestShutdown(service));
     }
 
-    @Override
-    public void launch(ServiceLaunchBuilder builder, int count) {
-        EasyCloudService.instance().eventProvider().publish(new ServiceRequestLaunch(builder, count));
-    }
+    private final Map<UUID, CompletableFuture<Service>> serviceLaunchFutures = new HashMap<>();
 
     @Override
-    public void launch(ServiceLaunchBuilder builder) {
-        this.launch(builder, 1);
+    public CompletableFuture<Service> launch(ServiceLaunchBuilder builder) {
+        var future = new CompletableFuture<Service>();
+
+        this.serviceLaunchFutures.put(builder.builderId(), future);
+        EasyCloudService.instance().eventProvider().publish(new ServiceRequestLaunch(builder));
+        return future;
     }
 
     @Override

@@ -7,6 +7,7 @@ import io.activej.csp.supplier.ChannelSuppliers;
 import io.activej.eventloop.Eventloop;
 import io.activej.net.socket.tcp.ITcpSocket;
 import io.activej.net.socket.tcp.TcpSocket;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -64,22 +65,37 @@ public final class ClientSocket implements Socket {
                             return;
                         }
 
-                        var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
-                        var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
-                        if (this.eventHandlers.containsKey(event.getClass())) {
-                            this.eventHandlers.get(event.getClass()).forEach(it -> {
-                                try {
-                                    it.accept(null, event);
-                                } catch (Exception exception3) {
-                                    exception3.printStackTrace();
+                        if (dataString.contains("{") && dataString.contains("}")) {
+                            // split if }{
+                            for (String s1 : dataString.split("(?<=})\\{")) {
+                                if(!s1.startsWith("{")) {
+                                    s1 = "{" + s1;
                                 }
-                            });
+                                this.trigger(s1);
+                            }
+                        } else {
+                            log.warn("Received malformed data: {}", dataString);
                         }
                     }));
         });
 
         this.eventloop.keepAlive(true);
         this.eventloop.run();
+    }
+    
+    @SneakyThrows
+    private void trigger(String data) {
+        var eventClass = Class.forName(data.split("eventId")[1].split("\"")[2]);
+        var event = Event.deserialize(data, (Class<? extends Event>) eventClass);
+        if (this.eventHandlers.containsKey(event.getClass())) {
+            this.eventHandlers.get(event.getClass()).forEach(it -> {
+                try {
+                    it.accept(null, event);
+                } catch (Exception exception3) {
+                    exception3.printStackTrace();
+                }
+            });
+        }
     }
 
     @Override
