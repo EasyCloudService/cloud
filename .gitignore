@@ -9,6 +9,8 @@ build/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/discord.xml
+.idea/material_theme_project_new.xml
 *.iws
 *.iml
 *.ipr
