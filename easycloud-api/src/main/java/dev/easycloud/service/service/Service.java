@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings({"unchecked", "rawtypes", "DuplicatedCode"})
 public interface Service {
     String id();
     Group group();
@@ -25,7 +26,7 @@ public interface Service {
         }
     }
 
-    default void addProperty(Property property, Object value) {
+    default void addProperty(Property<?> property, Object value) {
         this.addProperty(property.key(), value);
     }
 
@@ -55,7 +56,7 @@ public interface Service {
             result = Byte.parseByte(String.valueOf(value));
         }
         if(clazz.getSimpleName().equalsIgnoreCase("char")) {
-            result = Character.valueOf(String.valueOf(value).charAt(0));
+            result = String.valueOf(value).charAt(0);
         }
         if(clazz.getSimpleName().equalsIgnoreCase("class")) {
             result = Enum.valueOf((Class<Enum>) clazz, String.valueOf(value));

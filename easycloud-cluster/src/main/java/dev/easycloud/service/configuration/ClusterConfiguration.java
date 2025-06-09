@@ -10,6 +10,7 @@ public final class ClusterConfiguration {
     private final LocalConfiguration local;
     private final SecurityConfiguration security;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public ClusterConfiguration() {
         var path = Path.of("resources").resolve("config");
         path.toFile().mkdirs();

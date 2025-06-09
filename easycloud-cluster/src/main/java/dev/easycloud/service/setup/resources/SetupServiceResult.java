@@ -1,9 +1,12 @@
 package dev.easycloud.service.setup.resources;
 
 import java.util.Map;
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class SetupServiceResult {
 
 	private final Map<SetupData<?>, String> answers;
@@ -17,10 +20,10 @@ public final class SetupServiceResult {
 				.findFirst()
 				.orElse(null);
 
-		if (clazz.isEnum()) return (T) Enum.valueOf((Class<? extends Enum>) clazz, answer);
+		if (clazz.isEnum()) return (T) Enum.valueOf((Class<? extends Enum>) clazz, Objects.requireNonNull(answer));
 
 		if (clazz == String.class) return (T) answer;
-		if (clazz == Integer.class) return (T) Integer.valueOf(Integer.parseInt(answer));
+		if (clazz == Integer.class) return (T) Integer.valueOf(Integer.parseInt(Objects.requireNonNull(answer)));
 
 		throw new RuntimeException("Unknown class type: " + clazz);
 	}

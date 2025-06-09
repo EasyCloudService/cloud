@@ -7,8 +7,6 @@ import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.extern.log4j.Log4j2;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 @Log4j2
 public final class ServiceCommand extends Command {
     public ServiceCommand() {

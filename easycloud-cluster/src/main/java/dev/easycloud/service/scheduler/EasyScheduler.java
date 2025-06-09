@@ -21,6 +21,7 @@ public final class EasyScheduler {
         new Thread(() -> {
             while (true) {
                 try {
+                    //noinspection BusyWait
                     Thread.sleep(value);
                     runnable.run();
                 } catch (InterruptedException exception) {
@@ -29,18 +30,4 @@ public final class EasyScheduler {
             }
         }).start();
     }
-
-    public void repeat(long value, int times) {
-        new Thread(() -> {
-            for (int i = 0; i < times; i++) {
-                try {
-                    Thread.sleep(value);
-                    runnable.run();
-                } catch (InterruptedException exception) {
-                    throw new RuntimeException(exception);
-                }
-            }
-        }).start();
-    }
-
 }

@@ -1,12 +1,8 @@
 package dev.easycloud.service.network.event;
 
 import dev.easycloud.service.network.socket.Socket;
-import lombok.Getter;
 
-@Getter
-public final class EventProvider {
-    private final Socket socket;
-
+public record EventProvider(Socket socket) {
     public EventProvider(Socket socket) {
         this.socket = socket;
         new Thread(this.socket::run).start();

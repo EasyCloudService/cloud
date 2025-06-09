@@ -20,6 +20,7 @@ import java.util.function.BiConsumer;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
+@SuppressWarnings({"CallToPrintStackTrace", "unchecked"})
 public final class ClientSocket implements Socket {
     private Eventloop eventloop;
     private ITcpSocket socket;
@@ -34,9 +35,7 @@ public final class ClientSocket implements Socket {
     @Override
     public void run() {
         this.eventloop = Eventloop.builder()
-                .withFatalErrorHandler((throwable, o) -> {
-                    throwable.printStackTrace();
-                })
+                .withFatalErrorHandler((throwable, o) -> throwable.printStackTrace())
                 .withCurrentThread()
                 .build();
         this.eventloop.connect(new InetSocketAddress("127.0.0.1", 5200), (channel, exception) -> {
@@ -66,7 +65,6 @@ public final class ClientSocket implements Socket {
                         }
 
                         if (dataString.contains("{") && dataString.contains("}")) {
-                            // split if }{
                             for (String s1 : dataString.split("(?<=})\\{")) {
                                 if(!s1.startsWith("{")) {
                                     s1 = "{" + s1;

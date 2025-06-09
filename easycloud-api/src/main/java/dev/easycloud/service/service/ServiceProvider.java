@@ -19,6 +19,7 @@ public interface ServiceProvider {
         }
     }
     void shutdown(Service service);
+    @SuppressWarnings("UnusedReturnValue")
     CompletableFuture<Service> launch(ServiceLaunchBuilder builder);
     default void launch(ServiceLaunchBuilder builder, int count) {
         for (int i = 0; i < count; i++) {

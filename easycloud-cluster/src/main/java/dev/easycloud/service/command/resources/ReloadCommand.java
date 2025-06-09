@@ -22,6 +22,7 @@ public final class ReloadCommand extends Command {
         log.info(this.i18nProvider().get("command.reload.platforms", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().platformProvider().platforms().size() + " platforms").reset()));
         log.info(this.i18nProvider().get("command.reload.groups", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().groupProvider().groups().size() + " groups").reset()));
 
+        //noinspection CodeBlock2Expr
         EasyCloudCluster.instance().groupProvider().groups().forEach(group -> {
             log.info(this.i18nProvider().get("command.reload.groups.found", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset()));
         });

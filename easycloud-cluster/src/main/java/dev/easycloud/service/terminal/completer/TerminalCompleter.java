@@ -13,7 +13,7 @@ import java.util.List;
 
 public final class TerminalCompleter implements Completer {
     @Getter
-    private static List<String> TEMP_VALUES = new ArrayList<>();
+    private static final List<String> TEMP_VALUES = new ArrayList<>();
 
     @Getter
     @Setter

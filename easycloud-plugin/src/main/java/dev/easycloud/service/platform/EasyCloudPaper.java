@@ -9,12 +9,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.file.Path;
 
 public final class EasyCloudPaper extends JavaPlugin {
-    private ServiceDataConfiguration configuration;
 
     @Override
     public void onEnable() {
-        this.configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
-        new EasyCloudService(this.configuration.key(),this.configuration.id());
+        var configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
+        new EasyCloudService(configuration.key(), configuration.id());
     }
 
     @Override

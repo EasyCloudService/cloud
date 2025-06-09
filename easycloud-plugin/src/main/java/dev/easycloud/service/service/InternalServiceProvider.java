@@ -1,5 +1,5 @@
 package dev.easycloud.service.service;
 
-public interface ExtendedServiceProvider extends ServiceProvider {
+public interface InternalServiceProvider extends ServiceProvider {
     Service thisService();
 }

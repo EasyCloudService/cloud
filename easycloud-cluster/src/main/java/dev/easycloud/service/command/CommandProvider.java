@@ -58,8 +58,6 @@ public final class CommandProvider {
                                 .onExecute()
                                 .accept(Arrays.copyOfRange(args, 1, args.length));
                     }
-                }, () -> {
-                    log.error(EasyCloudCluster.instance().i18nProvider().get("command.unknown", command));
-                });
+                }, () -> log.error(EasyCloudCluster.instance().i18nProvider().get("command.unknown", command)));
     }
 }

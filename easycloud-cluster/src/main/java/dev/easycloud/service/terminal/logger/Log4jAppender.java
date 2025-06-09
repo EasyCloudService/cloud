@@ -20,9 +20,6 @@ import java.util.Calendar;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-/**
- * Log4j2Appender. Thanks to: https://github.com/HttpMarco
- */
 @Plugin(name = "Log4jAppender", category = Core.CATEGORY_NAME, elementType = "appender", printObject = true)
 public final class Log4jAppender extends AbstractAppender {
     private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("ExtractMethodRecommender")
 @Slf4j
 @Getter
 public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
@@ -25,6 +26,7 @@ public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
         super("paper" ,"https://api.papermc.io/v2/projects/paper");
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void initialize(Path path) {
         var yaml = FileFactory.YAML;
@@ -78,9 +80,7 @@ public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
             return new ArrayList<>();
         }
 
-        versions.forEach(version -> {
-            tmp.add(new Platform(this.id, version, this.type));
-        });
+        versions.forEach(version -> tmp.add(new Platform(this.id, version, this.type)));
         return tmp;
     }
 }

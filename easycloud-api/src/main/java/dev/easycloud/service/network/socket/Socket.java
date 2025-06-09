@@ -12,7 +12,8 @@ public interface Socket {
     <T extends Event> void read(Class<T> event, BiConsumer<ITcpSocket, T> onEvent);
 
     CompletableFuture<Void> waitForConnection = new CompletableFuture<>();
-    default CompletableFuture<Void> waitForConnection() {;
+    @SuppressWarnings("SameReturnValue")
+    default CompletableFuture<Void> waitForConnection() {
         return waitForConnection;
     }
 

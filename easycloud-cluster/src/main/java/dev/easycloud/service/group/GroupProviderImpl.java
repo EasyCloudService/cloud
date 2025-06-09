@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.jline.jansi.Ansi.ansi;
 
@@ -32,6 +33,7 @@ public final class GroupProviderImpl implements GroupProvider {
         this.scan();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void scan() {
         this.groups.clear();
 
@@ -40,11 +42,12 @@ public final class GroupProviderImpl implements GroupProvider {
             pathFile.mkdirs();
         }
 
-        for (File file : pathFile.listFiles()) {
+        for (File file : Objects.requireNonNull(pathFile.listFiles())) {
             this.groups.add(FileFactory.readRaw(file.toPath(), Group.class));
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void refresh() {
         List<Platform> platforms = new ArrayList<>();
@@ -69,20 +72,22 @@ public final class GroupProviderImpl implements GroupProvider {
             var jarPath = platformPath.resolve(platform.initializerId() + "-" + platform.version() + ".jar");
 
             if (!jarPath.toFile().exists()) {
-                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initializerId() + "-" + platform.version()).reset()));
+                var serviceId = platform.initializerId() + "-" + platform.version();
+                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(serviceId).reset()));
 
                 var downloadUrl = initializer.buildDownload(platform.version());
                 if (downloadUrl == null) {
-                    log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.download.failed", platform.initializerId() + "-" + platform.version()));
+                    log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.download.failed", serviceId));
                 }
 
                 FileFactory.download(downloadUrl, jarPath);
 
-                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform.initializerId() + "-" + platform.version()).reset()));
+                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(serviceId).reset()));
             }
         });
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     @SneakyThrows
     public void create(Group group) {

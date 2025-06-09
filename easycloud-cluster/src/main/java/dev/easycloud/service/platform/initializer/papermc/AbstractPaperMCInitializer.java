@@ -1,5 +1,6 @@
 package dev.easycloud.service.platform.initializer.papermc;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.easycloud.service.file.FileFactory;
@@ -8,6 +9,7 @@ import dev.easycloud.service.request.RequestFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,15 @@ public abstract class AbstractPaperMCInitializer implements PlatformInitializer 
         }
 
         var builds = json.getAsJsonArray("builds");
+        var latestBuild = latestBuild(builds);
 
+        return this.url
+                + "/versions/" + version
+                + "/builds/" + latestBuild
+                + "/downloads/" + this.id + "-" + version + "-" + latestBuild + ".jar";
+    }
+
+    private static @Nullable Integer latestBuild(JsonArray builds) {
         Integer latestBuild = null;
         for (JsonElement element : builds) {
             var build = element.getAsJsonObject();
@@ -58,10 +68,6 @@ public abstract class AbstractPaperMCInitializer implements PlatformInitializer 
                 }
             }
         }
-
-        return this.url
-                + "/versions/" + version
-                + "/builds/" + latestBuild
-                + "/downloads/" + this.id + "-" + version + "-" + latestBuild + ".jar";
+        return latestBuild;
     }
 }

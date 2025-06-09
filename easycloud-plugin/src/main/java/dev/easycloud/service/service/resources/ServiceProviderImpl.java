@@ -4,7 +4,7 @@ import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestShutdown;
-import dev.easycloud.service.service.ExtendedServiceProvider;
+import dev.easycloud.service.service.InternalServiceProvider;
 import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.ServiceUpdateListener;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
-public final class ServiceProviderImpl implements ExtendedServiceProvider {
+public final class ServiceProviderImpl implements InternalServiceProvider {
     private final List<Service> services = new ArrayList<>();
     private final String thisServiceId;
 
@@ -55,6 +55,9 @@ public final class ServiceProviderImpl implements ExtendedServiceProvider {
 
     @Override
     public Service thisService() {
-        return this.services.stream().filter(it -> it.id().equals(thisServiceId)).findFirst().orElseThrow();
+        return this.services.stream()
+                .filter(it -> it.id().equals(thisServiceId))
+                .findFirst()
+                .orElse(null);
     }
 }

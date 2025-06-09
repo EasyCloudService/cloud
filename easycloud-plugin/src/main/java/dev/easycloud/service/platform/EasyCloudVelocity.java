@@ -23,22 +23,18 @@ import java.nio.file.Path;
 @Plugin(id = "easycloud-velocity", name = "EasyCloud-Velocity", version = "1.0", description = "EasyCloud Velocity Plugin", authors = "EasyCloud")
 public final class EasyCloudVelocity {
     private final ProxyServer server;
-    private final Logger logger;
 
-    private final ServiceDataConfiguration configuration;
-
+    @SuppressWarnings("CodeBlock2Expr")
     @Inject
     public EasyCloudVelocity(ProxyServer server, Logger logger) {
         this.server = server;
-        this.logger = logger;
 
         this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
 
-        this.configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
+        var configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
+        logger.info("EasyCloudService is starting...");
 
-        this.logger.info("EasyCloudService is starting...");
-
-        new EasyCloudService(this.configuration.key(), this.configuration.id());
+        new EasyCloudService(configuration.key(), configuration.id());
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceInformationEvent.class, (channel, event) -> {
             event.services()

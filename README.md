@@ -134,8 +134,6 @@ dependencies {
 // Get current service instance
 ServiceProvider provider = EasyCloudService.instance().serviceProvider();
 var service = provider.thisService();
-
-service.shutdown();
 ```
 
 ---
@@ -174,12 +172,12 @@ service.shutdown();
 
 ## 📊 System Requirements
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| **Java** | 17+ | 21+ |
-| **RAM** | 4GB | 16GB+ |
-| **Storage** | 5GB | 25GB+ |
-| **CPU** | 2 Cores | 4+ Cores |
+| Component   | Minimum | Recommended |
+|-------------|---------|-------------|
+| **Java**    | 17+     | 21+         |
+| **RAM**     | 4GB     | 16GB+       |
+| **Storage** | 5GB     | 25GB+       |
+| **CPU**     | 2 Cores | 4+ Cores    |
 
 ---
 

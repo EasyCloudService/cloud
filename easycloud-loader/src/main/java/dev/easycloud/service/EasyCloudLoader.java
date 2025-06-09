@@ -3,6 +3,7 @@ package dev.easycloud.service;
 import dev.easycloud.service.update.LoaderUpdateProvider;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 @Slf4j
 public final class EasyCloudLoader {
 
@@ -34,6 +36,23 @@ public final class EasyCloudLoader {
 
         copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
 
+        var thread = processThread();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if(thread.isAlive()) {
+                thread.interrupt();
+            }
+        }));
+
+        while (true) {
+            if(!thread.isAlive()) {
+                System.exit(0);
+                break;
+            }
+        }
+    }
+
+    private static @NotNull Thread processThread() {
         var thread = new Thread(() -> {
             try {
                 var fileArg = "easycloud-cluster.jar;resources/libraries/*;";
@@ -60,19 +79,7 @@ public final class EasyCloudLoader {
         });
         thread.setDaemon(false);
         thread.start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if(thread.isAlive()) {
-                thread.interrupt();
-            }
-        }));
-
-        while (true) {
-            if(!thread.isAlive()) {
-                System.exit(0);
-                break;
-            }
-        }
+        return thread;
     }
 
     private static boolean isWindows() {

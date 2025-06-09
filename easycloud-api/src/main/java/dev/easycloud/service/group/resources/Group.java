@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings({"unchecked", "rawtypes", "DuplicatedCode"})
 @Slf4j
 @Getter
 @Setter
@@ -24,7 +25,7 @@ public final class Group {
 
     private final Map<String, Object> properties = new HashMap<>();
 
-    public void addProperty(Property property, Object value) {
+    public void addProperty(Property<?> property, Object value) {
         if(value instanceof String || value instanceof Integer || value instanceof Boolean ||
                 value instanceof Double || value instanceof Float || value instanceof Long ||
                 value instanceof Short || value instanceof Byte || value instanceof Character ||
@@ -61,7 +62,7 @@ public final class Group {
             result = Byte.parseByte(String.valueOf(value));
         }
         if(property.className().equalsIgnoreCase("char")) {
-            result = Character.valueOf(String.valueOf(value).charAt(0));
+            result = String.valueOf(value).charAt(0);
         }
         if(property.className().equalsIgnoreCase("class")) {
             result = Enum.valueOf((Class<Enum>) property.type(), String.valueOf(value));

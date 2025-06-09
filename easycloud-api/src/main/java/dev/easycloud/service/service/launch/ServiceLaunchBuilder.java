@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Accessors(chain = true)
+@SuppressWarnings("unchecked")
 public final class ServiceLaunchBuilder {
     private final UUID builderId = UUID.randomUUID();
     private final String group;

@@ -15,6 +15,7 @@ public final class RequestFactory {
     @SneakyThrows
     public String getRequest(String url) {
         try {
+            @SuppressWarnings("deprecation")
             var connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
 

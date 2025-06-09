@@ -11,7 +11,6 @@ import dev.easycloud.service.service.builder.ServiceLaunchFactory;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
-import dev.easycloud.service.service.resources.ServiceProperties;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -36,8 +35,11 @@ public final class ServiceProviderImpl implements ServiceProvider {
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(5));
 
         var templatePath = Path.of("local").resolve("templates");
+        //noinspection ResultOfMethodCallIgnored
         templatePath.resolve("global").resolve("all").toFile().mkdirs();
+        //noinspection ResultOfMethodCallIgnored
         templatePath.resolve("global").resolve("server").toFile().mkdirs();
+        //noinspection ResultOfMethodCallIgnored
         templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
         new ServiceReadyListener();
@@ -154,7 +156,9 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var templatePath = Path.of("local").resolve("templates");
         var group = service.group();
 
+        //noinspection ResultOfMethodCallIgnored
         service.directory().toFile().mkdirs();
+        //noinspection ResultOfMethodCallIgnored
         service.directory().resolve("plugins").toFile().mkdirs();
 
         FileFactory.copy(templatePath.resolve("global").resolve("all"), service.directory());

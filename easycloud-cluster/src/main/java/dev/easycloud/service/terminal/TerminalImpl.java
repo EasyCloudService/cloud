@@ -33,6 +33,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 @Getter
 @Accessors(fluent = true)
+@SuppressWarnings("CallToPrintStackTrace")
 public final class TerminalImpl {
     private final String prompt;
 
@@ -95,6 +96,7 @@ public final class TerminalImpl {
         System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
 
 
+        @SuppressWarnings("deprecation")
         var url = new URL("https://api.github.com/repos/EasyCloudService/cloud/contributors");
         try {
             var mapper = new ObjectMapper().readTree(url);

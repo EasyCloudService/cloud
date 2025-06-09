@@ -1,6 +1,7 @@
-package dev.easycloud.service.update.resources;
+package dev.easycloud.service.update.service;
 
 import dev.easycloud.service.terminal.SimpleTerminal;
+import dev.easycloud.service.update.ReleaseInformation;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -10,13 +11,13 @@ import java.net.URL;
 import java.util.regex.Pattern;
 
 public final class GithubUpdateService {
-    private final String URL = "https://api.github.com/repos/EasyCloudService/cloud/releases/latest";
     @Getter
     private final ReleaseInformation information;
 
     @SneakyThrows
     public GithubUpdateService() {
-        var url = new URL(this.URL);
+        @SuppressWarnings("deprecation")
+        var url = new URL("https://api.github.com/repos/EasyCloudService/cloud/releases/latest");
         var conn = (HttpURLConnection) url.openConnection();
 
         conn.setRequestMethod("GET");
@@ -57,10 +58,11 @@ public final class GithubUpdateService {
     }
 
     public void download() {
-        var name = "tmp-loader.jar";
-        try (var in = new BufferedInputStream(new URL(this.information.getDownloadUrl()).openStream());
+        var name = "loader-patcher.jar";
+        //noinspection deprecation
+        try (var in = new BufferedInputStream(new URL(this.information.url()).openStream());
              var fileOutputStream = new FileOutputStream(name)) {
-            byte dataBuffer[] = new byte[1024];
+            var dataBuffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);

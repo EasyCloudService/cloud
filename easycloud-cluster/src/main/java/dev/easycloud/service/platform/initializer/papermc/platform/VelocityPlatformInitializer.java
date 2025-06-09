@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Getter
@@ -26,7 +27,7 @@ public final class VelocityPlatformInitializer extends AbstractPaperMCInitialize
     @SneakyThrows
     public void initialize(Path path) {
         if(!Files.exists(path.resolve("velocity.toml"))) {
-            Files.copy(EasyCloudCluster.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml"), path.resolve("velocity.toml"));
+            Files.copy(Objects.requireNonNull(EasyCloudCluster.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml")), path.resolve("velocity.toml"));
         }
     }
 
@@ -39,9 +40,7 @@ public final class VelocityPlatformInitializer extends AbstractPaperMCInitialize
             return new ArrayList<>();
         }
 
-        versions.forEach(version -> {
-            tmp.add(new Platform(this.id, version, this.type));
-        });
+        versions.forEach(version -> tmp.add(new Platform(this.id, version, this.type)));
         return tmp;
     }
 }

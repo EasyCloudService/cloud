@@ -2,7 +2,6 @@ package dev.easycloud.service.service.listener;
 
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
-import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.slf4j.Slf4j;

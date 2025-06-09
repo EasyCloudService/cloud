@@ -9,7 +9,7 @@ allprojects {
     }
 
     dependencies {
-        "compileOnly"("com.fasterxml.jackson.core:jackson-databind:2.0.1")
+        "compileOnly"("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
         "compileOnly"("com.google.code.gson:gson:2.12.1")
 
         "compileOnly"("org.projectlombok:lombok:1.18.36")

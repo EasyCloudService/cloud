@@ -17,8 +17,8 @@ import java.util.function.BiConsumer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-
 @Slf4j
+@SuppressWarnings({"CallToPrintStackTrace", "unchecked"})
 public final class ServerSocket implements Socket {
     private Eventloop eventloop;
 
@@ -34,49 +34,45 @@ public final class ServerSocket implements Socket {
     @SneakyThrows
     public void run() {
         this.eventloop = Eventloop.builder()
-                .withFatalErrorHandler((throwable, o) -> {
-                    throwable.printStackTrace();
-                })
+                .withFatalErrorHandler((throwable, o) -> throwable.printStackTrace())
                 .withCurrentThread()
                 .build();
 
-        var server = SimpleServer.builder(this.eventloop, socket -> {
-                    ChannelSuppliers.ofSocket(socket)
-                            .streamTo(ChannelConsumers.ofConsumer(byteBuf -> {
-                                byte[] data = new byte[byteBuf.readRemaining()];
-                                byteBuf.read(data);
-                                var dataString = new String(data, UTF_8);
+        var server = SimpleServer.builder(this.eventloop, socket -> ChannelSuppliers.ofSocket(socket)
+                .streamTo(ChannelConsumers.ofConsumer(byteBuf -> {
+                    byte[] data = new byte[byteBuf.readRemaining()];
+                    byteBuf.read(data);
+                    var dataString = new String(data, UTF_8);
 
-                                if(dataString.startsWith("SECURITY:") && !this.sockets.contains(socket)) {
-                                    if (!dataString.equals("SECURITY:" + this.securityKey)) {
-                                        log.error("Security key mismatch. Expected: {}, Received: {}", this.securityKey, dataString.replace("SECURITY:", ""));
-                                        socket.close();
-                                        return;
-                                    }
-                                    this.sockets.add(socket);
-                                    socket.write(ByteBuf.wrapForReading("SECURITY:ACCEPTED".getBytes()));
-                                    return;
-                                }
+                    if(dataString.startsWith("SECURITY:") && !this.sockets.contains(socket)) {
+                        if (!dataString.equals("SECURITY:" + this.securityKey)) {
+                            log.error("Security key mismatch. Expected: {}, Received: {}", this.securityKey, dataString.replace("SECURITY:", ""));
+                            socket.close();
+                            return;
+                        }
+                        this.sockets.add(socket);
+                        socket.write(ByteBuf.wrapForReading("SECURITY:ACCEPTED".getBytes()));
+                        return;
+                    }
 
-                                if(!this.sockets.contains(socket)) {
-                                    log.error("Unauthorized socket connection attempt from");
-                                    return;
-                                }
+                    if(!this.sockets.contains(socket)) {
+                        log.error("Unauthorized socket connection attempt from");
+                        return;
+                    }
 
-                                var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
-                                var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
-                                if (this.eventHandlers.containsKey(event.getClass())) {
-                                    this.eventHandlers.get(event.getClass()).forEach(it -> {
-                                        try {
-                                            it.accept(socket, event);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            log.error("Error processing event: {}", e.getMessage(), e);
-                                        }
-                                    });
-                                }
-                            }));
-                })
+                    var eventClass = Class.forName(dataString.split("eventId")[1].split("\"")[2]);
+                    var event = Event.deserialize(dataString, (Class<? extends Event>) eventClass);
+                    if (this.eventHandlers.containsKey(event.getClass())) {
+                        this.eventHandlers.get(event.getClass()).forEach(it -> {
+                            try {
+                                it.accept(socket, event);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                log.error("Error processing event: {}", e.getMessage(), e);
+                            }
+                        });
+                    }
+                })))
                 .withListenAddress(new InetSocketAddress(5200))
                 .build();
 
@@ -98,9 +94,7 @@ public final class ServerSocket implements Socket {
 
     @Override
     public void write(byte[] bytes) {
-        this.sockets.forEach(socket -> {
-            socket.write(ByteBuf.wrapForReading(bytes));
-        });
+        this.sockets.forEach(socket -> socket.write(ByteBuf.wrapForReading(bytes)));
     }
 
     @Override

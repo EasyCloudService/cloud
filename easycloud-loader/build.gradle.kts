@@ -12,7 +12,7 @@ dependencies {
 
     // define all dependencies that should be downloaded at runtime
     runtimeDownload("org.yaml:snakeyaml:2.4")
-    runtimeDownload("com.fasterxml.jackson.core:jackson-databind:2.0.1")
+    runtimeDownload("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
     runtimeDownload("com.google.code.gson:gson:2.11.0")
     runtimeDownload("org.jline:jline:3.30.4")
     runtimeDownload("org.fusesource.jansi:jansi:2.4.2")
