@@ -43,6 +43,7 @@ public final class GroupProviderImpl implements GroupProvider {
         }
 
         for (File file : Objects.requireNonNull(pathFile.listFiles())) {
+            if(file.isDirectory()) continue;
             this.groups.add(FileFactory.readRaw(file.toPath(), Group.class));
         }
     }
@@ -58,7 +59,7 @@ public final class GroupProviderImpl implements GroupProvider {
             platforms.add(group.platform());
         }
 
-        var platformPath = Path.of("resources").resolve("platforms");
+        var platformPath = Path.of("resources").resolve("groups").resolve("platforms");
         if (!platformPath.toFile().exists()) {
             platformPath.toFile().mkdirs();
         }
@@ -103,7 +104,7 @@ public final class GroupProviderImpl implements GroupProvider {
             new Thread(() -> {
                 if (group.platform().initializerId().equals("paper")) {
                     try {
-                        Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
+                        Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
                         var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
                                 .directory(templatePath.toFile())
                                 .start();

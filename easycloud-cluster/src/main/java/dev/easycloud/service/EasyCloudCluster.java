@@ -56,7 +56,7 @@ public final class EasyCloudCluster {
 
         var localPath = Path.of("local");
         var resourcesPath = Path.of("resources");
-        FileFactory.remove(localPath.resolve("services"));
+        FileFactory.remove(localPath.resolve("dynamic"));
 
         this.configuration = new ClusterConfiguration();
         List.of("de", "en").forEach(s -> {
@@ -73,7 +73,7 @@ public final class EasyCloudCluster {
         this.terminal = new TerminalImpl();
         this.terminal.clear();
 
-        this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value()));
+        this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value(), this.configuration.local().clusterPort()));
         this.eventProvider.socket().waitForConnection().get();
 
         Event.registerTypeAdapter(Service.class, ServiceImpl.class);
@@ -103,7 +103,7 @@ public final class EasyCloudCluster {
         });
         log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
 
-        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a("5200").reset()));
+        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(this.configuration.local().clusterPort()).reset()));
         log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
 
         this.terminal.start();

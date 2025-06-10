@@ -119,7 +119,17 @@ public final class ServiceProviderImpl implements ServiceProvider {
             log.error("No free port available.");
             return CompletableFuture.failedFuture(new RuntimeException("No free port available."));
         }
-        var id = this.services.stream().filter(it -> it.group().name().equals(group.name())).count() + 1;
+
+
+        var id = 0;
+        for (int i = 0; i < 999; i++) {
+            int finalId = id;
+            if (this.services.stream().noneMatch(it -> it.id().equals(group.name() + "-" + finalId))) {
+                break;
+            }
+            id++;
+        }
+
         if (builder.id() > 0) {
             id = builder.id();
 
@@ -130,7 +140,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             }
         }
 
-        var directory = Path.of("local").resolve(builder.property(GroupProperties.SAVE_FILES(), group.property(GroupProperties.SAVE_FILES())) ? "static" : "services").resolve(group.name() + "-" + id);
+        var directory = Path.of("local").resolve(builder.property(GroupProperties.SAVE_FILES(), group.property(GroupProperties.SAVE_FILES())) ? "constant" : "dynamic").resolve(group.name() + "-" + id);
         var service = new ServiceImpl(group.name() + "-" + id, group, directory);
         service.addProperty(ServiceProperties.PORT(), port);
 
@@ -178,7 +188,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
         EasyCloudCluster.instance().platformProvider().initializer(group.platform().initializerId()).initialize(service.directory());
-        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value()));
+        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
 
         try {
             Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("plugins").resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
@@ -189,7 +199,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         if (!service.directory().resolve("platform.jar").toFile().exists()) {
             try {
-                Files.copy(resourcesPath.resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
+                Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), service.directory().resolve("platform.jar"));
             } catch (Exception exception) {
                 log.error("Failed to copy platform jar.", exception);
                 return false;

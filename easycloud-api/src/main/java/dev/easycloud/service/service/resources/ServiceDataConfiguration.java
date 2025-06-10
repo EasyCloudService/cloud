@@ -11,5 +11,6 @@ import lombok.Getter;
 public final class ServiceDataConfiguration {
     private final String id;
     private final String key;
+    private final int clusterPort;
 
 }

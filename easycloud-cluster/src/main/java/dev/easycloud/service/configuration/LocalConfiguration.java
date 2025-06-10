@@ -9,4 +9,5 @@ import java.util.Locale;
 @FileEntity(name = "local")
 public final class LocalConfiguration {
     private final Locale language = Locale.ENGLISH;
+    private final int clusterPort = 5200;
 }

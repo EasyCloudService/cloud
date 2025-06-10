@@ -34,21 +34,25 @@ public final class EasyCloudVelocity {
         var configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
         logger.info("EasyCloudService is starting...");
 
-        new EasyCloudService(configuration.key(), configuration.id());
+        new EasyCloudService(configuration.key(), configuration.clusterPort(), configuration.id());
 
-        EasyCloudService.instance().eventProvider().socket().read(ServiceInformationEvent.class, (channel, event) -> {
-            event.services()
-                    .stream()
-                    .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id()))
-                    .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(ServiceProperties.PORT())))));
-        });
+        EasyCloudService.instance()
+                .serviceProvider()
+                .services()
+                .stream()
+                .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(EasyCloudService.instance().serviceProvider().thisService().id()))
+                .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(ServiceProperties.PORT())))));
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceReadyEvent.class, (channel, event) -> {
+            logger.info("[DEBUG] Service {} is ready", event.service().id());
+
             if (event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
             this.server.registerServer(new ServerInfo(event.service().id(), new InetSocketAddress(event.service().property(ServiceProperties.PORT()))));
         });
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceShutdownEvent.class, (channel, event) -> {
+            logger.info("[DEBUG] Service {} is shutting down", event.service().id());
+
             if (event.service().id().equals(EasyCloudService.instance().serviceProvider().thisService().id())) return;
             this.server.unregisterServer(this.server.getServer(event.service().id()).orElseThrow().getServerInfo());
         });

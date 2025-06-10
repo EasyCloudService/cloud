@@ -15,7 +15,7 @@ public final class EasyCloudPaper extends JavaPlugin {
     @Override
     public void onEnable() {
         var configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
-        new EasyCloudService(configuration.key(), configuration.id());
+        new EasyCloudService(configuration.key(), configuration.clusterPort(), configuration.id());
 
         log.info(EasyCloudService.instance().serviceProvider().thisService().id());
     }

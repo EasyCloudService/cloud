@@ -26,10 +26,12 @@ public final class ClientSocket implements Socket {
     private ITcpSocket socket;
 
     private final String securityKey;
+    private final int port;
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
 
-    public ClientSocket(String securityKey) {
+    public ClientSocket(String securityKey, int port) {
         this.securityKey = securityKey;
+        this.port = port;
     }
 
     @Override
@@ -38,7 +40,7 @@ public final class ClientSocket implements Socket {
                 .withFatalErrorHandler((throwable, o) -> throwable.printStackTrace())
                 .withCurrentThread()
                 .build();
-        this.eventloop.connect(new InetSocketAddress("127.0.0.1", 5200), (channel, exception) -> {
+        this.eventloop.connect(new InetSocketAddress("127.0.0.1", this.port), (channel, exception) -> {
             if (exception != null) {
                 exception.printStackTrace();
                 return;
@@ -46,7 +48,6 @@ public final class ClientSocket implements Socket {
 
             try {
                 this.socket = TcpSocket.wrapChannel(eventloop, channel, null);
-                log.info("Connected to server: {}", channel.getRemoteAddress());
                 this.write(("SECURITY:" + this.securityKey).getBytes());
             } catch (Exception exception2) {
                 exception2.printStackTrace();

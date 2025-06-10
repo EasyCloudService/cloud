@@ -24,8 +24,10 @@ public final class ServiceProviderImpl implements InternalServiceProvider {
         new ServiceUpdateListener();
 
         EasyCloudService.instance().eventProvider().socket().read(ServiceStartingEvent.class, (socket, event) -> {
-            this.serviceLaunchFutures.get(event.builderId()).complete(event.service());
-            this.serviceLaunchFutures.remove(event.builderId());
+            if(this.serviceLaunchFutures.containsKey(event.builderId())) {
+                this.serviceLaunchFutures.get(event.builderId()).complete(event.service());
+                this.serviceLaunchFutures.remove(event.builderId());
+            }
         });
     }
 

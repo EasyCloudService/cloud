@@ -23,11 +23,13 @@ public final class ServerSocket implements Socket {
     private Eventloop eventloop;
 
     private final String securityKey;
+    private final int port;
     private final List<ITcpSocket> sockets = new ArrayList<>();
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
 
-    public ServerSocket(String securityKey) {
+    public ServerSocket(String securityKey, int port) {
         this.securityKey = securityKey;
+        this.port = port;
     }
 
     @Override

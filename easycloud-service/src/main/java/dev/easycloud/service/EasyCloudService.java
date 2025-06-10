@@ -27,11 +27,11 @@ public final class EasyCloudService {
     private final InternalServiceProvider serviceProvider;
 
     @SneakyThrows
-    public EasyCloudService(String key, String serviceId) {
+    public EasyCloudService(String key, int port, String serviceId) {
         instance = this;
 
         // Initialize the EasyCloudService
-        this.eventProvider = new EventProvider(new ClientSocket(key));
+        this.eventProvider = new EventProvider(new ClientSocket(key, port));
         this.eventProvider.socket().waitForConnection().get();
 
         this.serviceProvider = new ServiceProviderImpl(serviceId);
