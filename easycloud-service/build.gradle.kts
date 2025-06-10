@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import groovy.util.Node
+import org.gradle.internal.impldep.org.apache.maven.model.Exclusion
 
 repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/")

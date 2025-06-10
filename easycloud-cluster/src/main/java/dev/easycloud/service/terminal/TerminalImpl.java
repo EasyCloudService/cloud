@@ -20,13 +20,10 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
-import org.jline.widget.TailTipWidgets;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -44,7 +41,7 @@ public final class TerminalImpl {
     private TerminalReadingThread readingThread;
 
     @Setter
-    private boolean screenPrinting = false;
+    private boolean logging = false;
 
     @SneakyThrows
     public TerminalImpl() {
@@ -88,9 +85,6 @@ public final class TerminalImpl {
 
         var autoSuggestion = new AutosuggestionWidgets(this.lineReader);
         autoSuggestion.enable();
-
-        var tailtipWidgets = new TailTipWidgets(this.lineReader, new HashMap<>(), 5, TailTipWidgets.TipType.COMPLETER);
-        tailtipWidgets.enable();
 
         System.setOut(new SimpleLoggingStream(this::print).printStream());
         System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
@@ -155,14 +149,14 @@ public final class TerminalImpl {
         }
     }
 
-    public void exitScreen(ServiceImpl service) {
-        EasyCloudCluster.instance().terminal().screenPrinting(false);
+    public void exit(ServiceImpl service) {
+        EasyCloudCluster.instance().terminal().logging(false);
 
         if (service != null) {
             service.logStream(false);
         }
 
-        TerminalCompleter.enabled(true);
+        ((TerminalCompleter) this.lineReader.getCompleter()).enabled(true);
         EasyCloudCluster.instance().terminal().revert();
     }
 

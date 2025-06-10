@@ -10,6 +10,7 @@ import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.log4j.Log4j2;
+import org.jline.reader.impl.completer.NullCompleter;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Log4j2
 public final class GroupCommand extends Command {
     public GroupCommand() {
-        super("group", "command.group.info", "g");
+        super("group", "command.group.info");
 
         addSubCommand(new CommandNode("list", "command.group.list.info", this::list));
         addSubCommand(new CommandNode("setup", "command.group.setup.info", this::setup));

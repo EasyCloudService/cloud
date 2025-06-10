@@ -7,6 +7,7 @@ import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.jline.reader.Candidate;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +43,9 @@ public final class SetupServiceImpl implements SetupService {
     private Boolean error = false;
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
+            var completer = (TerminalCompleter) EasyCloudCluster.instance().terminal().lineReader().getCompleter();
+            completer.possibleResults().add(new Candidate(""));
+
             if (tempSetupList.isEmpty()) {
                 SetupService.running.remove(this);
                 EasyCloudCluster.instance().terminal().revert();
@@ -54,14 +58,16 @@ public final class SetupServiceImpl implements SetupService {
 
                 if (current.possible() != null) {
                     this.print(ansi().a("* For possible answers use 'tab'").toString());
-                    current.possible().forEach(it -> TerminalCompleter.TEMP_VALUES().add(String.valueOf(it)));
+                    current.possible().forEach(it -> {
+                        completer.possibleResults().add(new Candidate(String.valueOf(it), String.valueOf(it), null, null, null, null, true));
+                    });
                 }
             }
 
             EasyCloudCluster.instance().terminal().readingThread().priority(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
                     SetupService.running.remove(this);
-                    TerminalCompleter.TEMP_VALUES().clear();
+                    completer.possibleResults().clear();
                     EasyCloudCluster.instance().terminal().revert();
                     this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(EasyCloudCluster.instance().i18nProvider().get("global.setup.cancel")).toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
@@ -74,7 +80,7 @@ public final class SetupServiceImpl implements SetupService {
                     return;
                 }
                 this.error = false;
-                TerminalCompleter.TEMP_VALUES().clear();
+                completer.possibleResults().clear();
 
                 this.print(ansi().fgRgb(LogType.GRAY.rgb()).a("> ").a(line).reset().toString());
 

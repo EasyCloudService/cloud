@@ -3,6 +3,7 @@ package dev.easycloud.service.service.command;
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
+import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import lombok.extern.log4j.Log4j2;
@@ -10,10 +11,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class ServiceCommand extends Command {
     public ServiceCommand() {
-        super("service", "command.service.info", "ser");
+        super("service", "command.service.info");
 
-        addSubCommand(new CommandNode("shutdown", "command.service.shutdown.info", this::shutdown));
-        addSubCommand(new CommandNode("screen", "command.service.screen.info", this::screen));
+        addSubCommand(new CommandNode("shutdown", "command.service.shutdown.info", unused -> {
+            return EasyCloudCluster.instance().serviceProvider().services().stream().map(Service::id).toList();
+        }, this::shutdown));
+        addSubCommand(new CommandNode("screen", "command.service.screen.info", unused -> {
+            return EasyCloudCluster.instance().serviceProvider().services().stream().map(Service::id).toList();
+        }, this::screen));
 
     }
 
@@ -49,10 +54,9 @@ public final class ServiceCommand extends Command {
             return;
         }
 
-        TerminalCompleter.enabled(false);
-        TerminalCompleter.TEMP_VALUES().clear();
+        ((TerminalCompleter) EasyCloudCluster.instance().terminal().lineReader().getCompleter()).enabled(false);
 
-        EasyCloudCluster.instance().terminal().screenPrinting(true);
+        EasyCloudCluster.instance().terminal().logging(true);
         EasyCloudCluster.instance().terminal().clear();
 
         service.logCache().forEach(service::print);

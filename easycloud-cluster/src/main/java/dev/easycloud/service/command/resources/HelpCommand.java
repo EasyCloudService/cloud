@@ -10,7 +10,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 public final class HelpCommand extends Command {
     public HelpCommand() {
-        super("help", "command.help.info", "h");
+        super("help", "command.help.info");
     }
 
     @Override

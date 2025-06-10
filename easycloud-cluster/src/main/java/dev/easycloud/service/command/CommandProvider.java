@@ -25,7 +25,7 @@ public final class CommandProvider {
     }
 
     public void execute(String command, String[] args) {
-        if (EasyCloudCluster.instance().terminal().screenPrinting()) {
+        if (EasyCloudCluster.instance().terminal().logging()) {
             var service = EasyCloudCluster.instance().serviceProvider().services().stream().filter(it -> it instanceof ServiceImpl)
                     .map(it -> (ServiceImpl) it)
                     .filter(ServiceImpl::logStream)
@@ -37,7 +37,7 @@ public final class CommandProvider {
             }
 
             if (command.equalsIgnoreCase("exit") || service == null) {
-                EasyCloudCluster.instance().terminal().exitScreen(service);
+                EasyCloudCluster.instance().terminal().exit(service);
                 return;
             }
 
@@ -46,7 +46,7 @@ public final class CommandProvider {
         }
 
         this.commands.stream()
-                .filter(it -> it.name().equals(command) || it.aliases().stream().anyMatch(it2 -> it2.equalsIgnoreCase(command)))
+                .filter(it -> it.name().equalsIgnoreCase(command))
                 .findFirst()
                 .ifPresentOrElse(it -> {
                     if (args.length == 0 || it.commandNodes().stream().noneMatch(it2 -> it2.name().equalsIgnoreCase(args[1]))) {

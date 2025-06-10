@@ -3,62 +3,75 @@ package dev.easycloud.service.terminal.completer;
 import dev.easycloud.service.EasyCloudCluster;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+@Slf4j
+@Getter
 public final class TerminalCompleter implements Completer {
-    @Getter
-    private static final List<String> TEMP_VALUES = new ArrayList<>();
-
-    @Getter
     @Setter
-    private static boolean enabled = true;
+    private boolean enabled = true;
+    private final List<Candidate> possibleResults = new ArrayList<>();
 
     @Override
-    public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> list) {
-        if (parsedLine.line().startsWith(" ") || !enabled) return;
-
-        if(!TEMP_VALUES.isEmpty()) {
-            TEMP_VALUES.forEach(it -> list.add(new Candidate(it)));
+    public void complete(LineReader reader, ParsedLine parsedLine, List<Candidate> candidates) {
+        if (!this.enabled) {
             return;
         }
 
-        if(EasyCloudCluster.instance().terminal().readingThread().priority() != null) return;
+        var line = parsedLine.line();
+        List<Candidate> possibleResults = new ArrayList<>();
+        if (!this.possibleResults.isEmpty()) {
+            possibleResults.addAll(this.possibleResults);
+        }
 
-        var args = parsedLine.line().split(" ", -1);
-        if (args.length >= 2) {
-            var command = EasyCloudCluster.instance().commandProvider()
-                    .commands()
-                    .stream().filter(it -> it.name().equals(args[0]) || it.aliases().stream().anyMatch(it2 -> it2.equalsIgnoreCase(args[0])))
-                    .findFirst()
-                    .orElse(null);
-            if (command == null) return;
+        var splitLine = line.split(" ", -1);
+        var lineCount = splitLine.length;
+        if (lineCount >= 4) {
+            return;
+        }
 
-            if(args.length >= 3) {
-                var subCommand = command.commandNodes()
-                        .stream().filter(it -> it.name().equalsIgnoreCase(args[args.length - 2]))
+        if (possibleResults.isEmpty()) {
+            if (lineCount > 1) {
+                var command = EasyCloudCluster.instance().commandProvider().commands().stream().filter(it -> it.name().equalsIgnoreCase(splitLine[0])).findFirst().orElse(null);
+                if (command == null) {
+                    return;
+                }
+                var node = command.commandNodes().stream()
+                        .filter(it -> it.name().equalsIgnoreCase(splitLine[1]))
                         .findFirst()
                         .orElse(null);
-                if (subCommand == null) return;
 
-                subCommand.commandNodes().forEach(it -> list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true)));
-                return;
+                if (node == null) {
+                    command.commandNodes().forEach(it -> {
+                        possibleResults.add(new Candidate(it.name(), it.name(), null, null, null, null, true));
+                    });
+                } else {
+                    node.completer().forEach(completer -> {
+                        possibleResults.add(new Candidate(completer, completer, null, null, null, null, true));
+                    });
+                }
+            } else {
+                EasyCloudCluster.instance().commandProvider().commands().forEach(command -> {
+                    possibleResults.add(new Candidate(command.name(), command.name(), null, null, null, null, true));
+                });
             }
+        }
 
-            command.commandNodes().forEach(it -> list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true)));
+        if (line.trim().isEmpty()) {
+            candidates.addAll(possibleResults);
             return;
         }
 
-        EasyCloudCluster.instance().commandProvider()
-                .commands()
-                .forEach(it -> {
-                    list.add(new Candidate(it.name(), it.name(), null, it.description(), null, null, true));
-                    it.aliases().forEach(it2 -> list.add(new Candidate(it2, it2, null, it.description(), null, null, true)));
-                });
+        for (Candidate candidate : possibleResults) {
+            if (candidate.value().startsWith(splitLine[lineCount - 1])) {
+                candidates.add(candidate);
+            }
+        }
     }
 }

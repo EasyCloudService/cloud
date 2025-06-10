@@ -18,14 +18,12 @@ public abstract class Command {
 
     private final String name;
     private final String description;
-    private final List<String> aliases;
 
     private final List<CommandNode> commandNodes = new ArrayList<>();
 
-    public Command(String name, String description, String... aliases) {
+    public Command(String name, String description) {
         this.name = name;
         this.description = this.i18nProvider.get(description);
-        this.aliases = Arrays.stream(aliases).toList();
     }
 
     public void executeBase() {

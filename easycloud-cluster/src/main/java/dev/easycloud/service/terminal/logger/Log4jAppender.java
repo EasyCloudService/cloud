@@ -2,7 +2,6 @@ package dev.easycloud.service.terminal.logger;
 
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.setup.SetupService;
-import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
@@ -56,7 +55,7 @@ public final class Log4jAppender extends AbstractAppender {
                 .fgRgb(LogType.PRIMARY.rgb()).a(" " + event.getLevel().name() + ": ")
                 .reset().a(format(message) + "\r");
 
-        TerminalCompleter.TEMP_VALUES().clear();
+        //CommandCompleter.TEMP_VALUES().clear();
 
         if(message.startsWith("Listening on [/")) {
             return;
@@ -72,7 +71,7 @@ public final class Log4jAppender extends AbstractAppender {
                 System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
                 return;
             }
-            if (!EasyCloudCluster.instance().terminal().screenPrinting() && SetupService.running.isEmpty()) {
+            if (!EasyCloudCluster.instance().terminal().logging() && SetupService.running.isEmpty()) {
                 System.out.println(PATTERN.toString());
             }
         } else {

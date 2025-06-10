@@ -31,7 +31,7 @@ public final class TerminalReadingThread extends Thread {
     public void run() {
         while (!this.isInterrupted()) {
             var prompt = this.terminal.prompt();
-            if(this.terminal.screenPrinting()) {
+            if(this.terminal.logging()) {
                 prompt = ansi()
                         .fgRgb(LogType.WHITE.rgb()).a("service")
                         .fgRgb(LogType.GRAY.rgb()).a("@")
@@ -43,6 +43,10 @@ public final class TerminalReadingThread extends Thread {
                 if(priority != null) {
                     priority.accept(line);
                     priority = null;
+                    continue;
+                }
+
+                if(line.replace(" ", "").isEmpty()) {
                     continue;
                 }
 

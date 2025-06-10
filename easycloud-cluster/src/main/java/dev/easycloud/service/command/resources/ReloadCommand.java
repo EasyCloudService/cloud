@@ -11,7 +11,7 @@ import static org.jline.jansi.Ansi.ansi;
 @Slf4j
 public final class ReloadCommand extends Command {
     public ReloadCommand() {
-        super("reload", "command.reload.info", "refresh");
+        super("reload", "command.reload.info");
     }
 
     @Override

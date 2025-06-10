@@ -90,7 +90,7 @@ public final class ServiceImpl implements Service {
     public void shutdown() {
         this.execute("stop");
         log.info(EasyCloudCluster.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
-        EasyCloudCluster.instance().terminal().exitScreen(this);
+        EasyCloudCluster.instance().terminal().exit(this);
 
         new Thread(() -> {
             if (!this.group.property(GroupProperties.SAVE_FILES())) {

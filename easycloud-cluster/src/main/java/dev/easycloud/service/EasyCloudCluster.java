@@ -73,7 +73,6 @@ public final class EasyCloudCluster {
         this.terminal = new TerminalImpl();
         this.terminal.clear();
 
-
         this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value()));
         this.eventProvider.socket().waitForConnection().get();
 
@@ -81,9 +80,9 @@ public final class EasyCloudCluster {
 
         this.terminal.clear();
 
+        this.serviceProvider = new ServiceProviderImpl();
         this.commandProvider = new CommandProvider();
 
-        this.serviceProvider = new ServiceProviderImpl();
         this.groupProvider = new GroupProviderImpl();
         this.platformProvider = new PlatformProvider();
 

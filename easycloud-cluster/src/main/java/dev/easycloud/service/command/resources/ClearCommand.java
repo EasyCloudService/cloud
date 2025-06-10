@@ -6,7 +6,7 @@ import dev.easycloud.service.command.Command;
 public final class ClearCommand extends Command {
 
     public ClearCommand() {
-        super("clear", "command.clear.info","clr");
+        super("clear", "command.clear.info");
     }
 
     @Override

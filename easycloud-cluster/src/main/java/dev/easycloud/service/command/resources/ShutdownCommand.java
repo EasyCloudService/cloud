@@ -5,7 +5,7 @@ import dev.easycloud.service.command.Command;
 
 public final class ShutdownCommand extends Command {
     public ShutdownCommand() {
-        super("shutdown", "command.shutdown.info", "stop");
+        super("shutdown", "command.shutdown.info");
     }
 
     @Override
