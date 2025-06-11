@@ -24,7 +24,7 @@ public final class OnboardingProvider {
         this.write("If you have need help, please join our Discord: " + ansi().fgRgb(LogType.PRIMARY.rgb()).a("https://discord.gg/D5EKk9Cr2P").reset());
         this.write("");
         this.write("Please read our rules and guidelines before using EasyCloudService:");
-        this.write(ansi().fgRgb(LogType.PRIMARY.rgb()).a("https://github.com/EasyCloudService/cloud/guidelines.md").reset().toString());
+        this.write(ansi().fgRgb(LogType.PRIMARY.rgb()).a("https://github.com/EasyCloudService/cloud/GUIDELINES.md").reset().toString());
         this.write("");
         this.write("If you are using EasyCloud you agree to the guidelines and rules of @" + ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud").reset() + ".");
         this.write("Do you want to continue? (yes/no)");
