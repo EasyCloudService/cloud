@@ -50,6 +50,7 @@ public final class SetupServiceImpl implements SetupService {
                 SetupService.running.remove(this);
                 EasyCloudCluster.instance().terminal().revert();
                 future.complete(new SetupServiceResult(this.answers));
+                completer.possibleResults().clear();
                 return;
             }
             var current = this.tempSetupList.getFirst();

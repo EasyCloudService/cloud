@@ -118,12 +118,10 @@ public final class GroupProviderImpl implements GroupProvider {
 
                 group.enabled(true);
                 FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
-                log.info(EasyCloudCluster.instance().i18nProvider().get("group.created", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset()));
             }).start();
         } else {
             group.enabled(true);
             FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
-            log.info(EasyCloudCluster.instance().i18nProvider().get("group.created", Ansi.ansi().a(group.name()).fgRgb(LogType.WHITE.rgb()).reset()));
         }
     }
 
