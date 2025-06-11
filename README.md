@@ -14,6 +14,9 @@
 
 ---
 
+Guidelines for using EasyCloudService can be found in the [GUIDELINES.md](GUIDELINES.md) file.\
+If you are using EasyCloudService, you must follow these guidelines.
+
 ## ✨ Features
 
 <table>
