@@ -7,8 +7,10 @@ import java.nio.file.Path;
 
 @Getter
 public final class ClusterConfiguration {
-    private final LocalConfiguration local;
-    private final SecurityConfiguration security;
+    private final Path path = Path.of("resources").resolve("config");
+
+    private LocalConfiguration local;
+    private SecurityConfiguration security;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public ClusterConfiguration() {
@@ -16,9 +18,13 @@ public final class ClusterConfiguration {
         path.toFile().mkdirs();
 
         FileFactory.writeIfNotExists(path, new LocalConfiguration());
-        this.local = FileFactory.read(path, LocalConfiguration.class);
-
         FileFactory.writeIfNotExists(path, new SecurityConfiguration());
+
+        this.reload();
+    }
+
+    public void reload() {
+        this.local = FileFactory.read(path, LocalConfiguration.class);
         this.security = FileFactory.read(path, SecurityConfiguration.class);
     }
 }
