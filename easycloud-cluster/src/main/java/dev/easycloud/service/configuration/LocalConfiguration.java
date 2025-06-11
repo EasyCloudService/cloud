@@ -10,4 +10,5 @@ import java.util.Locale;
 public final class LocalConfiguration {
     private final Locale language = Locale.ENGLISH;
     private final int clusterPort = 5200;
+    private final int proxyPort = 25565;
 }

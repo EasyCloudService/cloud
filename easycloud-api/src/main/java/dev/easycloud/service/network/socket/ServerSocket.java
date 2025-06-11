@@ -75,7 +75,7 @@ public final class ServerSocket implements Socket {
                         });
                     }
                 })))
-                .withListenAddress(new InetSocketAddress(5200))
+                .withListenAddress(new InetSocketAddress(this.port))
                 .build();
 
         server.listen();

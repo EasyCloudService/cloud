@@ -116,7 +116,7 @@ accepts-transfers = false
 enabled = false
 
 # If query is enabled, on what port should the query protocol listen on?
-port = 25565
+port = 0
 
 # This is the map name that is reported to the query services.
 map = "Velocity"
