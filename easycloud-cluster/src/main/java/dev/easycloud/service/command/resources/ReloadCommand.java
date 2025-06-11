@@ -16,10 +16,13 @@ public final class ReloadCommand extends Command {
 
     @Override
     public void executeBase() {
-        EasyCloudCluster.instance().platformProvider().refresh();
-        ((GroupProviderImpl) EasyCloudCluster.instance().groupProvider()).scan();
+        EasyCloudCluster.instance().configuration().reload();
+        log.info(this.i18nProvider().get("command.reload.configurations", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().configuration().path()).reset()));
 
+        EasyCloudCluster.instance().platformProvider().refresh();
         log.info(this.i18nProvider().get("command.reload.platforms", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().platformProvider().platforms().size() + " platforms").reset()));
+
+        ((GroupProviderImpl) EasyCloudCluster.instance().groupProvider()).scan();
         log.info(this.i18nProvider().get("command.reload.groups", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().groupProvider().groups().size() + " groups").reset()));
 
         //noinspection CodeBlock2Expr
