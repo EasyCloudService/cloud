@@ -70,22 +70,6 @@ If you are using EasyCloudService, you must follow these guidelines.
 
 ## ⚙️ Configuration
 
-### 🔄 Enable Auto-Updates
-Add the auto-update flag to your start script:
-
-**(`start.bat`) or (`start.sh`):**
-```batch
-java -Xms512M -Xmx512M -jar easycloud-loader.jar -Dauto.updates=true
-```
-
-### 🌍 Language Settings
-Edit `resources/config/local.json` to change the language:
-```json
-{
-  "language": "en"
-}
-```
-
 **Supported Languages:**
 - 🇺🇸 `en` - English
 - 🇩🇪 `de` - German
@@ -117,18 +101,24 @@ dependencies {
 </repositories>
 
 <dependencies>
-    <dependency>
-        <groupId>com.github.EasyCloudService.cloud</groupId>
-        <artifactId>easycloud-api</artifactId>
-        <version>[current_version]</version>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.github.EasyCloudService.cloud</groupId>
-        <artifactId>easycloud-service</artifactId>
-        <version>[current_version]</version>
-        <scope>provided</scope>
-    </dependency>
+<dependency>
+    <groupId>com.github.EasyCloudService.cloud</groupId>
+    <artifactId>easycloud-api</artifactId>
+    <version>[current_version]</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>com.github.EasyCloudService.cloud</groupId>
+    <artifactId>easycloud-service</artifactId>
+    <version>[current_version]</version>
+    <scope>provided</scope>
+    <exclusions>
+        <exclusion>
+            <groupId>io.activej</groupId>
+            <artifactId>activej</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
 </dependencies>
 ```
 

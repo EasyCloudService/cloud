@@ -44,7 +44,6 @@ public final class SetupServiceImpl implements SetupService {
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
             var completer = (TerminalCompleter) EasyCloudCluster.instance().terminal().lineReader().getCompleter();
-            completer.possibleResults().add(new Candidate(""));
 
             if (tempSetupList.isEmpty()) {
                 SetupService.running.remove(this);
@@ -55,13 +54,15 @@ public final class SetupServiceImpl implements SetupService {
             }
             var current = this.tempSetupList.getFirst();
             if (!this.error) {
-                this.print(ansi().bgRgb(LogType.WHITE.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
+                this.print(ansi().bgRgb(LogType.PRIMARY.rgb()).fgRgb(LogType.WHITE.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
                     this.print(ansi().a("* For possible answers use 'tab'").toString());
                     current.possible().forEach(it -> {
                         completer.possibleResults().add(new Candidate(String.valueOf(it), String.valueOf(it), null, null, null, null, true));
                     });
+                } else {
+                    completer.possibleResults().add(new Candidate(""));
                 }
             }
 

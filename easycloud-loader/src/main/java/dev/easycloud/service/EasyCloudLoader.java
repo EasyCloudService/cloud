@@ -1,6 +1,6 @@
 package dev.easycloud.service;
 
-import dev.easycloud.service.update.LoaderUpdateProvider;
+import dev.easycloud.service.terminal.SimpleTerminal;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @Slf4j
@@ -24,11 +23,14 @@ public final class EasyCloudLoader {
         resources.toFile().mkdirs();
         libraries.toFile().mkdirs();
 
+        if(Files.exists(Path.of("loader-patcher.jar"))) {
+            SimpleTerminal.print("An update is in progress, please wait...");
+            SimpleTerminal.print("If its been more than 1 minute, contact the EasyCloud support team.");
+            System.exit(0);
+        }
+
         copyFile("easycloud-patcher.jar", libraries.resolve("dev.easycloud.patcher.jar"));
 
-        if(Arrays.stream(args).toList().stream().anyMatch(arg -> arg.equals("-Dauto.updates=true"))) {
-            new LoaderUpdateProvider();
-        }
         new DependencyLoader();
 
         copyFile("easycloud-service.jar", resources.resolve("easycloud-service.jar"));

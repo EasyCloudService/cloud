@@ -1,5 +1,6 @@
 package dev.easycloud.service.configuration;
 
+import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import lombok.Getter;
 
@@ -21,6 +22,18 @@ public final class ClusterConfiguration {
         FileFactory.writeIfNotExists(path, new SecurityConfiguration());
 
         this.reload();
+    }
+
+    public void publish(Object object) {
+        if (object instanceof LocalConfiguration localConfig) {
+            this.local = localConfig;
+            FileFactory.write(path, localConfig);
+        } else if (object instanceof SecurityConfiguration securityConfig) {
+            this.security = securityConfig;
+            FileFactory.write(path, securityConfig);
+        } else {
+            throw new IllegalArgumentException("Unsupported configuration type: " + object.getClass().getName());
+        }
     }
 
     public void reload() {

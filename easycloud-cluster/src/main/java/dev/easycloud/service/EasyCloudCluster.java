@@ -11,6 +11,7 @@ import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.socket.ServerSocket;
 import dev.easycloud.service.onboarding.OnboardingProvider;
 import dev.easycloud.service.platform.PlatformProvider;
+import dev.easycloud.service.release.ReleasesService;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.service.ServiceProviderImpl;
@@ -48,6 +49,7 @@ public final class EasyCloudCluster {
     private final PlatformProvider platformProvider;
     private final ClusterConfiguration configuration;
     private final EventProvider eventProvider;
+    private final ReleasesService releasesService;
 
     @SneakyThrows
     public EasyCloudCluster() {
@@ -59,6 +61,7 @@ public final class EasyCloudCluster {
         var resourcesPath = Path.of("resources");
         FileFactory.remove(localPath.resolve("dynamic"));
 
+        var firstLaunch = !Files.exists(resourcesPath.resolve("config")) || !Files.exists(resourcesPath.resolve("groups"));
         this.configuration = new ClusterConfiguration();
         List.of("de", "en").forEach(s -> {
             try {
@@ -69,41 +72,32 @@ public final class EasyCloudCluster {
             }
         });
 
-        this.i18nProvider = new I18nProvider(this.configuration.local().language());
+        this.i18nProvider = new I18nProvider();
 
         this.terminal = new TerminalImpl();
-        this.terminal.clear();
         this.terminal.start();
 
         this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value(), this.configuration.local().clusterPort()));
         this.eventProvider.socket().waitForConnection().get();
 
-        Event.registerTypeAdapter(Service.class, ServiceImpl.class);
+        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(this.configuration.local().clusterPort()).reset()));
 
-        this.terminal.clear();
+        Event.registerTypeAdapter(Service.class, ServiceImpl.class);
 
         this.serviceProvider = new ServiceProviderImpl();
         this.commandProvider = new CommandProvider();
 
         // onboarding if its the first start
-        if(!Files.exists(resourcesPath.resolve("groups"))) {
+        if(firstLaunch) {
             var onboarding = new OnboardingProvider();
             onboarding.run();
+            timeSinceStart = System.currentTimeMillis();
         }
 
         this.groupProvider = new GroupProviderImpl();
         this.platformProvider = new PlatformProvider();
 
         this.platformProvider.refresh();
-        this.groupProvider.refresh();
-
-        var groups = new StringBuilder();
-        this.groupProvider.groups().forEach(group -> {
-            if (!groups.isEmpty()) groups.append(", ");
-            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.name().toLowerCase()).reset());
-        });
-        log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
-
         var platformTypes = new StringBuilder();
         this.platformProvider.initializers().forEach(platform -> {
             if (!platformTypes.isEmpty()) platformTypes.append(", ");
@@ -111,7 +105,15 @@ public final class EasyCloudCluster {
         });
         log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
 
-        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(this.configuration.local().clusterPort()).reset()));
+        this.groupProvider.refresh();
+        var groups = new StringBuilder();
+        this.groupProvider.groups().forEach(group -> {
+            if (!groups.isEmpty()) groups.append(", ");
+            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.name().toLowerCase()).reset());
+        });
+        log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
+
+        this.releasesService = new ReleasesService();
         log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
     }
 
@@ -125,9 +127,16 @@ public final class EasyCloudCluster {
 
         log.info(this.i18nProvider.get("cluster.shutdown"));
 
+        if(Files.exists(Path.of("loader-patcher.jar"))) {
+            log.info("Applying updates from loader-patcher.jar...");
+        }
+
         this.terminal.readingThread().interrupt();
         this.terminal.terminal().close();
 
+        if(Files.exists(Path.of("loader-patcher.jar"))) {
+            new ProcessBuilder("java", "-jar", "dev.easycloud.patcher.jar").directory(Path.of("resources").resolve("libraries").toFile()).start();
+        }
         System.exit(0);
     }
 }

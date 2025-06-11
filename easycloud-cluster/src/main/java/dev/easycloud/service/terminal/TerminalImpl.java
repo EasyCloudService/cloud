@@ -21,6 +21,7 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -88,27 +89,6 @@ public final class TerminalImpl {
 
         System.setOut(new SimpleLoggingStream(this::print).printStream());
         System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
-
-
-        @SuppressWarnings("deprecation")
-        var url = new URL("https://api.github.com/repos/EasyCloudService/cloud/contributors");
-        try {
-            var mapper = new ObjectMapper().readTree(url);
-            mapper.forEach(node -> {
-                if(node.get("login") == null || node.get("type").asText().equalsIgnoreCase("bot")) {
-                    return;
-                }
-                if(node.get("contributions").asInt() < 15) {
-                    return;
-                }
-
-                this.contributors.add(node.get("login").asText());
-            });
-            if(this.contributors.size() == 1) this.contributors.add("EasyCloud");
-        } catch (Exception exception) {
-            this.contributors.add("FlxwDNS");
-            this.contributors.add("EasyCloud\n\n       Unable to load contributors,\n   please check your internet connection.");
-        }
     }
 
     public void revert() {
@@ -134,6 +114,7 @@ public final class TerminalImpl {
             EasyCloudCluster.instance().shutdown();
         });
         this.readingThread.start();
+        this.clear();
     }
 
     public void clear() {
@@ -166,42 +147,16 @@ public final class TerminalImpl {
         EasyCloudCluster.instance().terminal().revert();
     }
 
-    private final List<String> contributors = new ArrayList<>();
     public void redraw() {
-        var contributorsString = new StringBuilder();
-        for (int i = 0; i < 2; i++) {
-            contributorsString.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.contributors.get(i)).reset());
-            contributorsString.append(", ");
-        }
-        contributorsString.append(" \n");
-
-        int length = 0;
-        var tmpString = new StringBuilder();
-        for (int i = 0; i < this.contributors.size() - 2; i++) {
-            var name = this.contributors.get(i + 2);
-            length = length + name.length();
-            tmpString.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(name).reset()).append(", ");
-
-            if ((i > 0 && i % 2 == 0) || this.contributors.size() == i + 3) {
-                var space = Math.max(28 - length, 7);
-                contributorsString.append(" ".repeat(space)).append(tmpString).append("\n");
-                tmpString = new StringBuilder();
-                length = 0;
-            }
-        }
-
         var layout = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("       _           ").reset().a(" _              \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("      |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("      |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("                /  ").reset().a("\n").reset()
-
-                .reset().a("     " + EasyCloudCluster.instance().i18nProvider().get("global.contributors") + ": ")
-                .reset().a(contributorsString)
+                .fgRgb(LogType.PRIMARY.rgb()).a("           _           ").reset().a(" _              \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("          |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("          |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
+                .fgRgb(LogType.PRIMARY.rgb()).a("                    /  ").reset().a("\n").reset()
                 .reset().a("\n").toString();
 
         for (String s : layout.split("\n")) {
-            this.terminal.writer().println("    " + s);
+            this.terminal.writer().println(s);
         }
         this.update();
     }
