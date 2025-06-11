@@ -9,7 +9,7 @@ public final class EasyCloudUpdater {
         Thread.sleep(500);
 
         var mainPath = Path.of("").toAbsolutePath().getParent().getParent();
-        Files.copy(mainPath.resolve("tmp-loader.jar"), mainPath.resolve("easycloud-loader.jar"), StandardCopyOption.REPLACE_EXISTING);
-        Files.deleteIfExists(mainPath.resolve("tmp-loader.jar"));
+        Files.copy(mainPath.resolve("loader-patcher.jar"), mainPath.resolve("easycloud-loader.jar"), StandardCopyOption.REPLACE_EXISTING);
+        Files.deleteIfExists(mainPath.resolve("loader-patcher.jar"));
     }
 }
