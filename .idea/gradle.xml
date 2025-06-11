@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/easycloud-api" />
             <option value="$PROJECT_DIR$/easycloud-cluster" />
             <option value="$PROJECT_DIR$/easycloud-loader" />
+            <option value="$PROJECT_DIR$/easycloud-patcher" />
             <option value="$PROJECT_DIR$/easycloud-service" />
           </set>
         </option>

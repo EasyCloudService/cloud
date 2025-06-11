@@ -24,7 +24,7 @@ public final class EasyCloudLoader {
         resources.toFile().mkdirs();
         libraries.toFile().mkdirs();
 
-        copyFile("EasyCloudUpdater.class", libraries.resolve("EasyCloudUpdater.class"));
+        copyFile("easycloud-patcher.jar", libraries.resolve("dev.easycloud.patcher.jar"));
 
         if(Arrays.stream(args).toList().stream().anyMatch(arg -> arg.equals("-Dauto.updates=true"))) {
             new LoaderUpdateProvider();
