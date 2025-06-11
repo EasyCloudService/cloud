@@ -26,7 +26,7 @@ public final class LoaderUpdateProvider {
 
         SimpleTerminal.print("Unpacking update and replacing loader files...");
         SimpleTerminal.print("Please restart in 2 seconds.");
-        new ProcessBuilder("java", "EasyCloudUpdater").directory(Path.of("resources").resolve("libraries").toFile()).start();
+        new ProcessBuilder("java", "-jar", "dev.easycloud.patcher.jar").directory(Path.of("resources").resolve("libraries").toFile()).start();
         System.exit(0);
     }
 }
