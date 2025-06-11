@@ -4,11 +4,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class SetupServiceResult {
 
+	@Getter
 	private final Map<SetupData<?>, String> answers;
 
 	public <T> T result(String id, Class<T> clazz) {

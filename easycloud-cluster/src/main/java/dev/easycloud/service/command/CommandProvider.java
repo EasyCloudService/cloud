@@ -21,7 +21,7 @@ public final class CommandProvider {
 
     public CommandProvider() {
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand(), new ReloadCommand()));
+        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand(), new ReloadCommand(), new LocalCommand()));
     }
 
     public void execute(String command, String[] args) {
