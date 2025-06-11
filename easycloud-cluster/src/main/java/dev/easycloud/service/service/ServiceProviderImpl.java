@@ -55,6 +55,10 @@ public final class ServiceProviderImpl implements ServiceProvider {
             this.shutdown(service);
         }
 
+        if(EasyCloudCluster.instance().groupProvider() == null) {
+            return;
+        }
+
         for (Group group : EasyCloudCluster.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
             var always = group.property(GroupProperties.ALWAYS_RUNNING());
             var max = group.property(GroupProperties.MAXIMUM_RUNNING());

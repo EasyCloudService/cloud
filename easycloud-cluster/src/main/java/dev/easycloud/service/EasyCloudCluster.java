@@ -9,6 +9,7 @@ import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.socket.ServerSocket;
+import dev.easycloud.service.onboarding.OnboardingProvider;
 import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.ServiceImpl;
@@ -72,6 +73,7 @@ public final class EasyCloudCluster {
 
         this.terminal = new TerminalImpl();
         this.terminal.clear();
+        this.terminal.start();
 
         this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value(), this.configuration.local().clusterPort()));
         this.eventProvider.socket().waitForConnection().get();
@@ -82,6 +84,12 @@ public final class EasyCloudCluster {
 
         this.serviceProvider = new ServiceProviderImpl();
         this.commandProvider = new CommandProvider();
+
+        // onboarding if its the first start
+        if(!Files.exists(resourcesPath.resolve("groups"))) {
+            var onboarding = new OnboardingProvider();
+            onboarding.run();
+        }
 
         this.groupProvider = new GroupProviderImpl();
         this.platformProvider = new PlatformProvider();
@@ -105,8 +113,6 @@ public final class EasyCloudCluster {
 
         log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(this.configuration.local().clusterPort()).reset()));
         log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
-
-        this.terminal.start();
     }
 
     @SneakyThrows

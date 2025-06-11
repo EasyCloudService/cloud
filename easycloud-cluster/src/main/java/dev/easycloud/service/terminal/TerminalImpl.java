@@ -137,9 +137,15 @@ public final class TerminalImpl {
     }
 
     public void clear() {
+        this.clear(true);
+    }
+
+    public void clear(boolean redraw) {
         this.terminal.puts(InfoCmp.Capability.clear_screen);
         this.terminal.flush();
-        this.redraw();
+        if (redraw) {
+            this.redraw();
+        }
     }
 
     public void update() {
