@@ -113,7 +113,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         var port = this.freePort();
         if (group.platform().type().equals(PlatformType.PROXY)) {
-            port = 25565 + (int) this.services.stream().filter(it -> it.group().platform().type().equals(PlatformType.PROXY)).count();
+            port = EasyCloudCluster.instance().configuration().local().proxyPort() + (int) this.services.stream().filter(it -> it.group().platform().type().equals(PlatformType.PROXY)).count();
         }
         if (port == -1) {
             log.error("No free port available.");
