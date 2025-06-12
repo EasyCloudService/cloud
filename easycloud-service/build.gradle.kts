@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/")
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
@@ -7,7 +5,6 @@ repositories {
 
 plugins {
     id("maven-publish")
-    id("com.gradleup.shadow") version ("9.0.0-beta8")
 }
 
 dependencies {
@@ -16,14 +13,9 @@ dependencies {
     compileOnly("io.activej:activej:6.0-rc2")
     compileOnly("io.activej:activej-net:6.0-rc2")
     compileOnly("io.activej:activej-csp:6.0-rc2")
-
-
-
-    implementation("org.apache.logging.log4j:log4j-core:2.24.1")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 }
 
-tasks.withType<ShadowJar> {
+tasks.withType<Jar> {
     archiveFileName.set("easycloud-service.jar")
     manifest {
         attributes["Main-Class"] = "dev.easycloud.service.EasyCloudServiceBoot"

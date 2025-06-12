@@ -37,6 +37,9 @@ public final class EasyCloudBoot {
         copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.api.jar"));
 
         copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
+        var modules = Path.of("modules");
+        modules.toFile().mkdirs();
+        copyFile("bridge-module.jar", modules.resolve("bridge-module.jar"));
 
         var thread = processThread();
 

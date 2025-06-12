@@ -2,5 +2,6 @@ repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/")
 }
 
-dependencies {
+tasks.withType<Jar> {
+    archiveFileName.set("bridge-module.jar")
 }

@@ -38,7 +38,7 @@ public final class ServiceLaunchFactory {
         var mainClass = new JarInputStream(Files.newInputStream(serviceFile)).getManifest().getMainAttributes().getValue("Main-Class");
 
         List<String> dependencies = new ArrayList<>();
-        var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api");
+        var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api", "org.slf4j", "org.apache.logging");
         for (File file : Objects.requireNonNull(Path.of("resources").resolve("libraries").toFile().listFiles())) {
             if(allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
                 dependencies.add(file.getAbsolutePath());

@@ -35,9 +35,10 @@ tasks.withType<Jar> {
 
     from(project(":easycloud-api").tasks.jar)
     from(project(":easycloud-cluster").tasks.jar)
-    from(project(":easycloud-service").tasks.getByPath(":easycloud-service:shadowJar"))
-    //from(project(":easycloud-service").tasks.jar)
+    //from(project(":easycloud-service").tasks.getByPath(":easycloud-service:shadowJar"))
+    from(project(":easycloud-service").tasks.jar)
     from(project(":easycloud-patcher").tasks.jar)
+    from(project(":easycloud-modules:bridge-module").tasks.jar)
 
     manifest {
         attributes["Main-Class"] = "dev.easycloud.service.EasyCloudBoot"
