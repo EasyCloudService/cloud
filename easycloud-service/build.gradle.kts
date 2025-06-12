@@ -17,8 +17,7 @@ dependencies {
     compileOnly("io.activej:activej-net:6.0-rc2")
     compileOnly("io.activej:activej-csp:6.0-rc2")
 
-    //implementation("ch.qos.logback:logback-classic:1.5.18")
-    //implementation("ch.qos.logback:logback-core:1.5.18")
+
 
     implementation("org.apache.logging.log4j:log4j-core:2.24.1")
     implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")

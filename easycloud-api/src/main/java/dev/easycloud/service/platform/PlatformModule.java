@@ -9,9 +9,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface PlatformModule {
     String platformId();
-
     String name();
-    String version() default "1.0";
-    String description() default "An easycloud platform module.";
-    String[] authors() default {};
 }

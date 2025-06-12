@@ -3,11 +3,13 @@ package dev.easycloud.service;
 import dev.easycloud.service.classloader.PlatformClassLoader;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
+import lombok.Getter;
 
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 
 public final class EasyCloudServiceBoot {
+    @Getter
     private static Instrumentation instrumentation;
     private static Thread classLoaderThread;
 

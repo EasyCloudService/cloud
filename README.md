@@ -51,6 +51,7 @@ If you are using EasyCloudService, you must follow these guidelines.
 - ☕ Java 21 or higher
 - 💾 At least 4GB RAM
 - 🌐 Internet connection
+- 🔮 All versions from 1.17 up to 1.21 are supported
 
 ### Installation
 

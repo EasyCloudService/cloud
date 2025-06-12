@@ -5,6 +5,7 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
+import dev.easycloud.service.platform.PlatformModule;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchFactory;
@@ -16,11 +17,13 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +58,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             this.shutdown(service);
         }
 
-        if(EasyCloudCluster.instance().groupProvider() == null) {
+        if (EasyCloudCluster.instance().groupProvider() == null) {
             return;
         }
 
@@ -195,13 +198,24 @@ public final class ServiceProviderImpl implements ServiceProvider {
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
 
         try {
-            //Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("plugins").resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
-
             Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin. ({})", service.id(), exception);
             return false;
         }
+
+        EasyCloudCluster.instance().moduleService().modules()
+                .entrySet()
+                .stream()
+                .filter(it -> it.getKey().platformId().equals(service.group().platform().initializerId()))
+                .map(Map.Entry::getValue)
+                .forEach(path -> {
+                    try {
+                        Files.copy(path, service.directory().resolve("plugins").resolve(path.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
         if (!service.directory().resolve("platform.jar").toFile().exists()) {
             try {

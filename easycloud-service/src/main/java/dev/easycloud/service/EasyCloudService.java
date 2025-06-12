@@ -1,5 +1,6 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.module.ModuleLoaderImpl;
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
@@ -24,6 +25,7 @@ public final class EasyCloudService {
     private static EasyCloudService instance;
 
     private final EventProvider eventProvider;
+    private final ModuleLoaderImpl moduleLoader;
     private final InternalServiceProvider serviceProvider;
 
     @SneakyThrows
@@ -62,6 +64,8 @@ public final class EasyCloudService {
             //noinspection BusyWait
             Thread.sleep(1000);
         }
+
+        this.moduleLoader = new ModuleLoaderImpl();
 
         this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;

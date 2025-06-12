@@ -116,7 +116,7 @@ public final class EasyCloudCluster {
         });
         log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
 
-        this.moduleService.scan();
+        this.moduleService.refresh();
 
         this.releasesService = new ReleasesService();
         log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));

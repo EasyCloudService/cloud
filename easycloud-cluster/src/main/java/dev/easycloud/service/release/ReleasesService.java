@@ -15,7 +15,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 public final class ReleasesService {
     @Getter
-    private final String CURRENT = "0.9.2-preview1";
+    private final String CURRENT = "0.9.3-preview1";
 
     public ReleasesService() {
         new Thread(() -> {
