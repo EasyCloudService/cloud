@@ -1,8 +1,6 @@
 package dev.easycloud.service.onboarding;
 
 import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
@@ -53,6 +51,7 @@ public final class OnboardingProvider {
                         .publish()
                         .thenAccept(it -> {
                             if(it.answers().isEmpty()) {
+                                EasyCloudCluster.instance().terminal().clear();
                                 finished.set(true);
                                 return;
                             }
@@ -78,6 +77,7 @@ public final class OnboardingProvider {
                         });
                 return;
             }
+            EasyCloudCluster.instance().terminal().clear();
             finished.set(true);
         });
 

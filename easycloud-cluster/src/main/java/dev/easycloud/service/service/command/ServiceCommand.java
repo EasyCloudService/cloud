@@ -57,7 +57,7 @@ public final class ServiceCommand extends Command {
         ((TerminalCompleter) EasyCloudCluster.instance().terminal().lineReader().getCompleter()).enabled(false);
 
         EasyCloudCluster.instance().terminal().logging(true);
-        EasyCloudCluster.instance().terminal().clear();
+        EasyCloudCluster.instance().terminal().clear(false);
 
         service.logCache().forEach(service::print);
 

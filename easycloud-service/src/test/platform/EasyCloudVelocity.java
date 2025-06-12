@@ -8,7 +8,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import dev.easycloud.service.EasyCloudService;
 import dev.easycloud.service.file.FileFactory;
-import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;

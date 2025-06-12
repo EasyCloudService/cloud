@@ -34,7 +34,7 @@ public final class EasyCloudLoader {
         new DependencyLoader();
 
         copyFile("easycloud-service.jar", resources.resolve("easycloud-service.jar"));
-        copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.service-impl-stable.jar"));
+        copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.api.jar"));
 
         copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
 

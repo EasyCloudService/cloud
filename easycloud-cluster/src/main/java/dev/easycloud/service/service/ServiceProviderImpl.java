@@ -195,7 +195,9 @@ public final class ServiceProviderImpl implements ServiceProvider {
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
 
         try {
-            Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("plugins").resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
+            //Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("plugins").resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin. ({})", service.id(), exception);
             return false;

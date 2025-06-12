@@ -1,6 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import groovy.util.Node
-import org.gradle.internal.impldep.org.apache.maven.model.Exclusion
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 repositories {
     maven(url = "https://repo.papermc.io/repository/maven-public/")
@@ -9,25 +7,23 @@ repositories {
 
 plugins {
     id("maven-publish")
-    id("com.gradleup.shadow") version ("9.0.0-beta8")
+    //id("com.gradleup.shadow") version ("9.0.0-beta8")
 }
 
 dependencies {
     implementation(project(":easycloud-api"))
 
-    implementation("io.activej:activej:6.0-rc2")
-    implementation("io.activej:activej-net:6.0-rc2")
-    implementation("io.activej:activej-csp:6.0-rc2")
-
-    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
-
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:15.0")
+    compileOnly("io.activej:activej:6.0-rc2")
+    compileOnly("io.activej:activej-net:6.0-rc2")
+    compileOnly("io.activej:activej-csp:6.0-rc2")
 }
 
-tasks.withType<ShadowJar> {
+tasks.withType<Jar> {
     archiveFileName.set("easycloud-service.jar")
+    manifest {
+        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudServiceBootstrap"
+        attributes["Premain-Class"] = "dev.easycloud.service.EasyCloudServiceBootstrap"
+    }
 }
 
 publishing {
