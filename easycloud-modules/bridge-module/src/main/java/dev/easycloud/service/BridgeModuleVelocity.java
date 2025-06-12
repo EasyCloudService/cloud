@@ -26,6 +26,8 @@ public class BridgeModuleVelocity  {
         this.server = server;
         this.logger = logger;
 
+        this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
+
         EasyCloudService.instance()
                 .serviceProvider()
                 .services()
@@ -52,6 +54,7 @@ public class BridgeModuleVelocity  {
 
     @Subscribe
     public void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
+        logger.info("Player {} is choosing an initial server", event.getPlayer().getUsername());
         this.server.getAllServers().stream()
                 .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
                 .findFirst()

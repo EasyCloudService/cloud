@@ -61,7 +61,7 @@ public final class ModuleService {
                 platforms.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform).reset());
             });
 
-            log.info(" - {} ({})", ansi().fgRgb(LogType.PRIMARY.rgb()).a(module.name()).reset(), platforms);
+            log.info("* {} ({})", ansi().fgRgb(LogType.PRIMARY.rgb()).a(module.name()).reset(), platforms);
         });
     }
 }
