@@ -5,7 +5,6 @@ import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
-import dev.easycloud.service.platform.PlatformModule;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchFactory;
@@ -22,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -207,7 +207,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         EasyCloudCluster.instance().moduleService().modules()
                 .entrySet()
                 .stream()
-                .filter(it -> it.getKey().platformId().equals(service.group().platform().initializerId()))
+                .filter(it -> Arrays.stream(it.getKey().platforms()).toList().stream().anyMatch(it2 -> it2.equals(service.group().platform().initializerId())))
                 .map(Map.Entry::getValue)
                 .forEach(path -> {
                     try {

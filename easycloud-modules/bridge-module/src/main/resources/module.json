@@ -1,0 +1,6 @@
+{
+  "platforms": [
+    "paper", "velocity"
+  ],
+  "name": "BridgeModule"
+}

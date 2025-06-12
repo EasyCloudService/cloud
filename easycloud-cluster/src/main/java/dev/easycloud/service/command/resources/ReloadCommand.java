@@ -19,6 +19,9 @@ public final class ReloadCommand extends Command {
         EasyCloudCluster.instance().configuration().reload();
         log.info(this.i18nProvider().get("command.reload.configurations", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().configuration().path()).reset()));
 
+        EasyCloudCluster.instance().moduleService().refresh();
+        log.info(this.i18nProvider().get("command.reload.modules", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().moduleService().modules().size() + " modules").reset()));
+
         EasyCloudCluster.instance().platformProvider().refresh();
         log.info(this.i18nProvider().get("command.reload.platforms", ansi().fgRgb(LogType.WHITE.rgb()).a(EasyCloudCluster.instance().platformProvider().platforms().size() + " platforms").reset()));
 
