@@ -1,3 +1,8 @@
+> ⚠️ **Disclaimer:** This is **not a final version** of EasyCloudService. Bugs **may occur**, and some features are **still missing**. Everything is subject to change.  
+> If you encounter a **bug**, please open an [issue](https://github.com/EasyCloudService/cloud/issues) or contact us directly via Discord: [discord.gg/D5EKk9Cr2P](https://discord.gg/D5EKk9Cr2P)  
+> If you need a feature or have suggestions, **reach out to us!** 💬
+
+
 # 🚀 EasyCloudService
 > **The next-generation cloud management platform that makes scaling effortless**
 
@@ -5,7 +10,7 @@
 
 [![Download](https://img.shields.io/github/downloads/EasyCloudService/cloud/total?style=for-the-badge&logo=github&color=2ea043)](https://github.com/EasyCloudService/cloud/releases)
 [![Version](https://img.shields.io/github/v/release/EasyCloudService/cloud?style=for-the-badge&logo=semver&color=blue)](https://github.com/EasyCloudService/cloud/releases)
-[![Discord](https://img.shields.io/discord/1235237612931776512?label=Community&style=for-the-badge&logo=discord&color=7289da)](https://discord.gg/bzW4gJCNdN)
+[![Discord](https://img.shields.io/discord/1235237612931776512?label=Community&style=for-the-badge&logo=discord&color=7289da)](https://discord.gg/D5EKk9Cr2P)
 [![Wiki](https://img.shields.io/badge/Docs-Wiki-4d7a97?style=for-the-badge&logo=gitbook)](https://github.com/EasyCloudService/cloud/wiki)
 
 **[📥 Download](https://github.com/EasyCloudService/cloud/releases)** • **[📚 Documentation](https://github.com/EasyCloudService/cloud/wiki)** • **[💬 Discord](https://discord.gg/bzW4gJCNdN)** • **[🐛 Issues](https://github.com/EasyCloudService/cloud/issues)**
