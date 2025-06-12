@@ -14,5 +14,5 @@ public final class LocalConfiguration {
     private boolean announceUpdates = true;
     private int clusterPort = 5200;
     private int proxyPort = 25565;
-    private int startingSameTime = 2;
+    private int startingSameTime = 3;
 }

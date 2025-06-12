@@ -62,13 +62,25 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return;
         }
 
+        var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
+        if(currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+            return;
+        }
+
         for (Group group : EasyCloudCluster.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
             var always = group.property(GroupProperties.ALWAYS_RUNNING());
             var max = group.property(GroupProperties.MAXIMUM_RUNNING());
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
             if (always > online) {
-                this.launch(new ServiceLaunchBuilder(group.name()), (int) (always - online));
+                for (int i = 0; i < always - online; i++) {
+                    if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+                        return;
+                    }
+                    this.launch(new ServiceLaunchBuilder(group.name()));
+                    currentStarting++;
+                }
+
             }
             if (max < online && max != -1) {
                 log.info("Shutting down {} services in group {} to maintain maximum of {}.", online - max, group.name(), max);
