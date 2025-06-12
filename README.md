@@ -1,4 +1,6 @@
-> ⚠️ **Disclaimer:** This is **not a final version** of EasyCloudService. Bugs **may occur**, and some features are **still missing**. Everything is subject to change.  
+> ⚠️ **Disclaimer:**\
+> This is **not a final version** of EasyCloudService. Bugs **may occur**, and some features are **still missing**.
+> Everything is subject to change.
 > If you encounter a **bug**, please open an [issue](https://github.com/EasyCloudService/cloud/issues) or contact us directly via Discord: [discord.gg/D5EKk9Cr2P](https://discord.gg/D5EKk9Cr2P)  
 > If you need a feature or have suggestions, **reach out to us!** 💬
 
