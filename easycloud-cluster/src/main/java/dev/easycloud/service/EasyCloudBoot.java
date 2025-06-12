@@ -1,6 +1,6 @@
 package dev.easycloud.service;
 
-public final class EasyCloudBootstrap {
+public final class EasyCloudBoot {
 
     public static void main(String[] args) {
         new EasyCloudCluster();

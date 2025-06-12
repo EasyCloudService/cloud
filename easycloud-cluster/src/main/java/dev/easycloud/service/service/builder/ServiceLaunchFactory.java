@@ -41,6 +41,7 @@ public final class ServiceLaunchFactory {
         arguments.add("java");
         arguments.add("-Xmx" + service.group().property(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);
+        arguments.add("-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener");
         arguments.add("-Dcom.mojang.eula.agree=true");
         arguments.add("-cp");
 

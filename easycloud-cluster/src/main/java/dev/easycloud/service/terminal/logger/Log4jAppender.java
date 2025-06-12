@@ -55,8 +55,6 @@ public final class Log4jAppender extends AbstractAppender {
                 .fgRgb(LogType.PRIMARY.rgb()).a(" " + event.getLevel().name() + ": ")
                 .reset().a(format(message) + "\r");
 
-        //CommandCompleter.TEMP_VALUES().clear();
-
         if(message.startsWith("Listening on [/")) {
             return;
         }
@@ -68,7 +66,17 @@ public final class Log4jAppender extends AbstractAppender {
             }
 
             if (event.getMessage().getFormattedMessage().startsWith("SERVICE_LOG: ")) {
-                System.out.println(PATTERN.toString().replace("SERVICE_LOG: ", ""));
+                var rawMessage = event.getMessage().getFormattedMessage();
+                var logType = "INFO";
+                if(rawMessage.contains("WARN")) logType = "WARN";
+                if(rawMessage.contains("ERROR")) logType = "ERROR";
+
+                System.out.println(ansi()
+                        .fgRgb(LogType.GRAY.rgb()).a("[")
+                        .fgRgb(LogType.WHITE.rgb()).a(DATE_FORMAT.format(Calendar.getInstance().getTime()))
+                        .fgRgb(LogType.GRAY.rgb()).a("]")
+                        .fgRgb(LogType.PRIMARY.rgb()).a(" " + logType + ": ")
+                        .reset().a(format(message) + "\r").toString().replace("SERVICE_LOG: ", "").replace(":" + logType + " : ", ""));
                 return;
             }
             if (!EasyCloudCluster.instance().terminal().logging() && SetupService.running.isEmpty()) {

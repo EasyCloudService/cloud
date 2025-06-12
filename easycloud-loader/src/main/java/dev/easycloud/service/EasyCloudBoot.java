@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @Slf4j
-public final class EasyCloudLoader {
+public final class EasyCloudBoot {
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -62,7 +62,7 @@ public final class EasyCloudLoader {
                     fileArg = fileArg.replace(";", ":");
                 }
 
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "--enable-native-access=ALL-UNNAMED", "-cp", fileArg, "dev.easycloud.service.EasyCloudBootstrap")
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "--enable-native-access=ALL-UNNAMED", "-cp", fileArg, "dev.easycloud.service.EasyCloudBoot")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)

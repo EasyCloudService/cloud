@@ -7,7 +7,9 @@ public interface ModuleLoader {
     void add(Class<? extends Module> moduleClass);
     void load(Module module);
 
+
+    ModuleLoaderImpl simple = new ModuleLoaderImpl();
     static ModuleLoader simple() {
-        return new ModuleLoaderImpl();
+        return simple;
     }
 }

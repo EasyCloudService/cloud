@@ -14,7 +14,9 @@ import dev.easycloud.service.service.Service;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Accessors(fluent = true)
 public final class EasyCloudService {
@@ -43,27 +45,13 @@ public final class EasyCloudService {
                 event.services().forEach(service -> this.serviceProvider.services().add(service));
                 this.eventProvider.publish(new ServiceReadyEvent(event.service()));
 
-                System.out.println("""
+                log.info("""
                      
                             _            _
                            |_  _.  _    /  |  _       _|
                            |_ (_| _> \\/ \\_ | (_) |_| (_|
                                      /
                            Welcome back, @SERVICE_ID""".replace("SERVICE_ID", event.service().id()));
-            });
-
-            this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
-                if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
-
-                this.serviceProvider.services().add(event.service());
-                System.out.println("Service '" + event.service().id() + "' has connected.");
-            });
-
-            this.eventProvider.socket().read(ServiceShutdownEvent.class, (netChannel, event) -> {
-                if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
-
-                this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
-                System.out.println("Service '{" + event.service().id() + "}' has been shut down.");
             });
         }).start();
 
@@ -74,5 +62,19 @@ public final class EasyCloudService {
             //noinspection BusyWait
             Thread.sleep(1000);
         }
+
+        this.eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
+            if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
+
+            this.serviceProvider.services().add(event.service());
+            log.info("Service '{}' has connected.", event.service().id());
+        });
+
+        this.eventProvider.socket().read(ServiceShutdownEvent.class, (netChannel, event) -> {
+            if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
+
+            this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
+            log.info("Service '{{}}' has been shut down.", event.service().id());
+        });
     }
 }

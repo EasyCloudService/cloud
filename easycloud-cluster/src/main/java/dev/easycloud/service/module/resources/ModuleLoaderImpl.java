@@ -31,8 +31,6 @@ public class ModuleLoaderImpl implements ModuleLoader {
 
         var platform = EasyCloudCluster.instance().platformProvider().initializer(platformModule.platformId());
         this.modules.get(platform.id()).add(moduleClass);
-
-        log.info("Added module: {} for platform: {}", moduleClass.getName(), platform.id());
     }
 
     @Override

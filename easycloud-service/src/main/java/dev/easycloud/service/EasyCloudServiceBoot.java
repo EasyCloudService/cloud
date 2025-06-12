@@ -7,7 +7,7 @@ import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 
-public final class EasyCloudServiceBootstrap {
+public final class EasyCloudServiceBoot {
     private static Instrumentation instrumentation;
     private static Thread classLoaderThread;
 
