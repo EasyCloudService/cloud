@@ -8,7 +8,6 @@ import io.activej.eventloop.Eventloop;
 import io.activej.net.socket.tcp.ITcpSocket;
 import io.activej.net.socket.tcp.TcpSocket;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.function.BiConsumer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-@Slf4j
 @SuppressWarnings({"CallToPrintStackTrace", "unchecked"})
 public final class ClientSocket implements Socket {
     private Eventloop eventloop;
@@ -60,7 +58,7 @@ public final class ClientSocket implements Socket {
                         var dataString = new String(data, UTF_8);
 
                         if(dataString.equals("SECURITY:ACCEPTED")) {
-                            log.info("Security key accepted.");
+                            System.out.println("Connection established successfully.");
                             waitForConnection.complete(null);
                             return;
                         }
@@ -73,7 +71,7 @@ public final class ClientSocket implements Socket {
                                 this.trigger(s1);
                             }
                         } else {
-                            log.warn("Received malformed data: {}", dataString);
+                            System.err.println("Received malformed data: " + dataString);
                         }
                     }));
         });

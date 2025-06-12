@@ -6,6 +6,7 @@ import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.GroupProviderImpl;
 import dev.easycloud.service.command.CommandProvider;
 import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.module.ModuleService;
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.socket.ServerSocket;
@@ -50,6 +51,7 @@ public final class EasyCloudCluster {
     private final ClusterConfiguration configuration;
     private final EventProvider eventProvider;
     private final ReleasesService releasesService;
+    private final ModuleService moduleService;
 
     @SneakyThrows
     public EasyCloudCluster() {
@@ -96,6 +98,7 @@ public final class EasyCloudCluster {
 
         this.groupProvider = new GroupProviderImpl();
         this.platformProvider = new PlatformProvider();
+        this.moduleService = new ModuleService();
 
         this.platformProvider.refresh();
         var platformTypes = new StringBuilder();
@@ -112,6 +115,8 @@ public final class EasyCloudCluster {
             groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.name().toLowerCase()).reset());
         });
         log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
+
+        this.moduleService.refresh();
 
         this.releasesService = new ReleasesService();
         log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));

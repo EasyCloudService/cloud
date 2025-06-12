@@ -15,30 +15,32 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 public final class ReleasesService {
     @Getter
-    private final String CURRENT = "0.9.2-preview1";
-    private JsonNode node;
+    private final String CURRENT = "0.9.3-preview1";
 
     public ReleasesService() {
         new Thread(() -> {
-            try {
-                this.node = new ObjectMapper().readTree(new URL("https://api.github.com/repos/EasyCloudService/cloud/releases/latest"));
-                if(!this.CURRENT.equals(this.name()) && EasyCloudCluster.instance().configuration().local().announceUpdates()) {
-                   log.info("A new release available: {} | Current: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(LogType.ERROR.rgb()).a(this.CURRENT).reset());
-                   log.info("Use '{}' to update the cloud.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("local update").reset());
-                }
-            } catch (IOException exception) {
-                throw new RuntimeException(exception);
+            if(!this.CURRENT.equals(this.name()) && EasyCloudCluster.instance().configuration().local().announceUpdates()) {
+               log.info("A new release available: {} | Current: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(LogType.ERROR.rgb()).a(this.CURRENT).reset());
+               log.info("Use '{}' to update the cloud.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("local update").reset());
             }
         }).start();
     }
 
+    private JsonNode node() {
+        try {
+            return new ObjectMapper().readTree(new URL("https://api.github.com/repos/EasyCloudService/cloud/releases/latest"));
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     public String name() {
-        return this.node.get("name").asText();
+        return this.node().get("name").asText();
     }
 
     public void download() {
         @SuppressWarnings("deprecation")
-        var assets = this.node.get("assets");
+        var assets = this.node().get("assets");
         if (assets == null) {
             log.error("No assets found in the latest release.");
             return;

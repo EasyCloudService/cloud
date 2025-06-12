@@ -1,0 +1,6 @@
+name: BridgeModule
+version: 1.0.0
+description: A module for bridging different systems and services.
+author: EasyCloud
+main: dev.easycloud.service.BridgeModulePaper
+api-version: "1.17"

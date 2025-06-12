@@ -16,11 +16,14 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +58,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
             this.shutdown(service);
         }
 
-        if(EasyCloudCluster.instance().groupProvider() == null) {
+        if (EasyCloudCluster.instance().groupProvider() == null) {
+            return;
+        }
+
+        var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
+        if(currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
             return;
         }
 
@@ -65,7 +73,14 @@ public final class ServiceProviderImpl implements ServiceProvider {
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
 
             if (always > online) {
-                this.launch(new ServiceLaunchBuilder(group.name()), (int) (always - online));
+                for (int i = 0; i < always - online; i++) {
+                    if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+                        return;
+                    }
+                    this.launch(new ServiceLaunchBuilder(group.name()));
+                    currentStarting++;
+                }
+
             }
             if (max < online && max != -1) {
                 log.info("Shutting down {} services in group {} to maintain maximum of {}.", online - max, group.name(), max);
@@ -195,11 +210,24 @@ public final class ServiceProviderImpl implements ServiceProvider {
         FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
 
         try {
-            Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("plugins").resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy server plugin. ({})", service.id(), exception);
             return false;
         }
+
+        EasyCloudCluster.instance().moduleService().modules()
+                .entrySet()
+                .stream()
+                .filter(it -> Arrays.stream(it.getKey().platforms()).toList().stream().anyMatch(it2 -> it2.equals(service.group().platform().initializerId())))
+                .map(Map.Entry::getValue)
+                .forEach(path -> {
+                    try {
+                        Files.copy(path, service.directory().resolve("plugins").resolve(path.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
         if (!service.directory().resolve("platform.jar").toFile().exists()) {
             try {

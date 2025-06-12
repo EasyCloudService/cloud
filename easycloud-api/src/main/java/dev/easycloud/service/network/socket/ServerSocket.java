@@ -1,6 +1,8 @@
 package dev.easycloud.service.network.socket;
 
 import dev.easycloud.service.network.event.Event;
+import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
+import dev.easycloud.service.service.Service;
 import io.activej.async.process.AsyncCloseable;
 import io.activej.bytebuf.ByteBuf;
 import io.activej.csp.consumer.ChannelConsumers;
@@ -8,6 +10,7 @@ import io.activej.csp.supplier.ChannelSuppliers;
 import io.activej.eventloop.Eventloop;
 import io.activej.net.SimpleServer;
 import io.activej.net.socket.tcp.ITcpSocket;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +27,7 @@ public final class ServerSocket implements Socket {
 
     private final String securityKey;
     private final int port;
+
     private final List<ITcpSocket> sockets = new ArrayList<>();
     private final Map<Class<? extends Event>, List<BiConsumer<ITcpSocket, Event>>> eventHandlers = new HashMap<>();
 
@@ -81,9 +85,20 @@ public final class ServerSocket implements Socket {
         server.listen();
         waitForConnection.complete(null);
 
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+                this.sockets.removeIf(ITcpSocket::isClosed);
+            }
+        }).start();
+
         this.eventloop.keepAlive(true);
         this.eventloop.run();
-
     }
 
     @Override
@@ -96,6 +111,7 @@ public final class ServerSocket implements Socket {
 
     @Override
     public void write(byte[] bytes) {
+        this.sockets.removeIf(ITcpSocket::isClosed);
         this.sockets.forEach(socket -> socket.write(ByteBuf.wrapForReading(bytes)));
     }
 

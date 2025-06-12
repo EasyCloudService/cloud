@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @Slf4j
-public final class EasyCloudLoader {
+public final class EasyCloudBoot {
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -34,9 +34,12 @@ public final class EasyCloudLoader {
         new DependencyLoader();
 
         copyFile("easycloud-service.jar", resources.resolve("easycloud-service.jar"));
-        copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.service-impl-stable.jar"));
+        copyFile("easycloud-api.jar", libraries.resolve("dev.easycloud.api.jar"));
 
         copyFile("easycloud-cluster.jar", Path.of("easycloud-cluster.jar"));
+        var modules = Path.of("modules");
+        modules.toFile().mkdirs();
+        copyFile("bridge-module.jar", modules.resolve("bridge-module.jar"));
 
         var thread = processThread();
 
@@ -62,7 +65,7 @@ public final class EasyCloudLoader {
                     fileArg = fileArg.replace(";", ":");
                 }
 
-                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "--enable-native-access=ALL-UNNAMED", "-cp", fileArg, "dev.easycloud.service.EasyCloudBootstrap")
+                var process = new ProcessBuilder("java", "-Xms512M", "-Xmx512M", "--enable-native-access=ALL-UNNAMED", "-cp", fileArg, "dev.easycloud.service.EasyCloudBoot")
                         .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
                         .redirectInput(ProcessBuilder.Redirect.INHERIT)

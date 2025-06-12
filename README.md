@@ -48,9 +48,10 @@ If you are using EasyCloudService, you must follow these guidelines.
 ## 🚀 Quick Start
 
 ### Prerequisites
-- ☕ Java 17 or higher
+- ☕ Java 21 or higher
 - 💾 At least 4GB RAM
 - 🌐 Internet connection
+- 🔮 All versions from 1.17 up to 1.21 are supported
 
 ### Installation
 
@@ -167,7 +168,7 @@ var service = provider.thisService();
 
 | Component   | Minimum | Recommended |
 |-------------|---------|-------------|
-| **Java**    | 17+     | 21+         |
+| **Java**    | 21+     | 21+         |
 | **RAM**     | 4GB     | 16GB+       |
 | **Storage** | 5GB     | 25GB+       |
 | **CPU**     | 2 Cores | 4+ Cores    |

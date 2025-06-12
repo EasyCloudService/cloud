@@ -17,10 +17,19 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
 public final class FileFactory {
-    public static final Yaml YAML = new Yaml();
+    public static Yaml YAML;
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final Gson GSON_NO_PRETTY = new GsonBuilder().create();
+
+    static {
+        try {
+            Class.forName("org.yaml.snakeyaml.Yaml");
+            YAML = new Yaml();
+        } catch (Exception exception) {
+            YAML = null;
+        }
+    }
 
     private static String name(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(FileEntity.class)) {

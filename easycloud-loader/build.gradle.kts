@@ -20,7 +20,6 @@ dependencies {
     runtimeDownload("io.activej:activej:6.0-rc2")
     runtimeDownload("io.activej:activej-net:6.0-rc2")
     runtimeDownload("io.activej:activej-csp:6.0-rc2")
-    //runtimeDownload("io.netty:netty5-all:5.0.0.Alpha5")
 
     runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")
     runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
@@ -36,11 +35,13 @@ tasks.withType<Jar> {
 
     from(project(":easycloud-api").tasks.jar)
     from(project(":easycloud-cluster").tasks.jar)
-    from(project(":easycloud-service").tasks.getByPath(":easycloud-service:shadowJar"))
+    //from(project(":easycloud-service").tasks.getByPath(":easycloud-service:shadowJar"))
+    from(project(":easycloud-service").tasks.jar)
     from(project(":easycloud-patcher").tasks.jar)
+    from(project(":easycloud-modules:bridge-module").tasks.jar)
 
     manifest {
-        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudLoader"
+        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudBoot"
     }
 
     archiveFileName.set("easycloud-loader.jar")
