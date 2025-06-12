@@ -15,7 +15,7 @@
 [![Discord](https://img.shields.io/discord/1235237612931776512?label=Community&style=for-the-badge&logo=discord&color=7289da)](https://discord.gg/D5EKk9Cr2P)
 [![Wiki](https://img.shields.io/badge/Docs-Wiki-4d7a97?style=for-the-badge&logo=gitbook)](https://github.com/EasyCloudService/cloud/wiki)
 
-**[📥 Download](https://github.com/EasyCloudService/cloud/releases)** • **[📚 Documentation](https://github.com/EasyCloudService/cloud/wiki)** • **[💬 Discord](https://discord.gg/bzW4gJCNdN)** • **[🐛 Issues](https://github.com/EasyCloudService/cloud/issues)**
+**[📥 Download](https://github.com/EasyCloudService/cloud/releases)** • **[📚 Documentation](https://github.com/EasyCloudService/cloud/wiki)** • **[💬 Discord](https://discord.gg/D5EKk9Cr2P)** • **[🐛 Issues](https://github.com/EasyCloudService/cloud/issues)**
 
 </div>
 
@@ -211,7 +211,7 @@ Found a bug? Have a great idea? We want to hear from you!
 
 - 🐛 **Bug Reports**: [Create an Issue](https://github.com/EasyCloudService/cloud/issues/new?template=bug_report.md)
 - 💡 **Feature Requests**: [Request a Feature](https://github.com/EasyCloudService/cloud/issues/new?template=feature_request.md)
-- 💬 **Questions**: Join our [Discord Community](https://discord.gg/bzW4gJCNdN)
+- 💬 **Questions**: Join our [Discord Community](https://discord.gg/D5EKk9Cr2P)
 
 ---
 
