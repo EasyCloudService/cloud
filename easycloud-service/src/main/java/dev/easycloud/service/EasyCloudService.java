@@ -73,7 +73,7 @@ public final class EasyCloudService {
             if(event.service().id().equals(this.serviceProvider.thisService().id())) return;
 
             this.serviceProvider.services().removeIf(it -> it.id().equals(event.service().id()));
-            log.info("Service '{{}}' has been shut down.", event.service().id());
+            log.info("Service '{}' has been shut down.", event.service().id());
         });
     }
 }

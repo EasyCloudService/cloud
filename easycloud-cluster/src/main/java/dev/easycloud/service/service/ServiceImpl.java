@@ -4,6 +4,7 @@ import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.file.FileFactory;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
 import dev.easycloud.service.service.resources.ServiceState;
 import dev.easycloud.service.terminal.logger.LogType;
@@ -88,6 +89,8 @@ public final class ServiceImpl implements Service {
     }
 
     public void shutdown() {
+        EasyCloudCluster.instance().eventProvider().publish(new ServiceShutdownEvent(this));
+
         this.execute("stop");
         log.info(EasyCloudCluster.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
         EasyCloudCluster.instance().terminal().exit(this);

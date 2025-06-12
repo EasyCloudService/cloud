@@ -13,9 +13,6 @@ public final class ServiceShutdownListener {
                 return;
             }
 
-            if(service.group().platform().type().equals(PlatformType.SERVER)) {
-                EasyCloudCluster.instance().eventProvider().publish(event);
-            }
             EasyCloudCluster.instance().serviceProvider().shutdown(service);
         });
     }
