@@ -111,8 +111,10 @@ public final class ServerSocket implements Socket {
 
     @Override
     public void write(byte[] bytes) {
-        this.sockets.removeIf(ITcpSocket::isClosed);
-        this.sockets.forEach(socket -> socket.write(ByteBuf.wrapForReading(bytes)));
+        this.eventloop.execute(() -> {
+            this.sockets.removeIf(ITcpSocket::isClosed);
+            this.sockets.forEach(socket -> socket.write(ByteBuf.wrapForReading(bytes)));
+        });
     }
 
     @Override
