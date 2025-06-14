@@ -24,32 +24,6 @@
 Guidelines for using EasyCloudService can be found in the [GUIDELINES.md](GUIDELINES.md) file.\
 If you are using EasyCloudService, you must follow these guidelines.
 
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🎯 **Core Features**
-- **🔄 Auto-Updates** - Keep your services always up-to-date
-- **🌍 Multi-Language** - English & German support
-- **⚡ High Performance** - Optimized for speed and reliability
-- **🔧 Easy Setup** - Get started in minutes, not hours
-- **📊 Real-time Monitoring** - Track your services live
-
-</td>
-<td width="50%">
-
-### 🛠️ **Developer Tools**
-- **🔌 Plugin API** - Extend functionality easily
-- **🖥️ CLI Interface** - Powerful command-line tools
-- **📈 Analytics** - Built-in performance metrics
-- **🔒 Security First** - Enterprise-grade security
-
-</td>
-</tr>
-</table>
-
 ---
 
 ## 🚀 Quick Start
@@ -61,74 +35,10 @@ If you are using EasyCloudService, you must follow these guidelines.
 - 🔮 All versions from 1.17 up to 1.21 are supported
 
 ### Installation
-
-1. **Download the latest release**
-   ```bash
-   wget https://github.com/EasyCloudService/cloud/releases/latest/download/easycloud-loader.jar
-   ```
-
-2. **Run EasyCloudService**
-   ```bash
-   java -Xms512M -Xmx512M -jar easycloud-loader.jar
-   ```
-
-3. **🎉 That's it!** Your cloud service is now running!
-
----
-
-## ⚙️ Configuration
-
-**Supported Languages:**
-- 🇺🇸 `en` - English
-- 🇩🇪 `de` - German
-
+[Github Wiki](https://github.com/EasyCloudService/cloud/wiki/Setup)
 ---
 
 ## 🔌 API Integration
-
-### Gradle Setup (Kotlin DSL)
-```kotlin
-repositories {
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
-}
-
-dependencies {
-    compileOnly("com.github.EasyCloudService.cloud:easycloud-api:[current_version]")
-    compileOnly("com.github.EasyCloudService.cloud:easycloud-service:[current_version]")
-}
-```
-
-### Maven Setup
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-
-<dependencies>
-<dependency>
-    <groupId>com.github.EasyCloudService.cloud</groupId>
-    <artifactId>easycloud-api</artifactId>
-    <version>[current_version]</version>
-    <scope>provided</scope>
-</dependency>
-<dependency>
-    <groupId>com.github.EasyCloudService.cloud</groupId>
-    <artifactId>easycloud-service</artifactId>
-    <version>[current_version]</version>
-    <scope>provided</scope>
-    <exclusions>
-        <exclusion>
-            <groupId>io.activej</groupId>
-            <artifactId>activej</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
-</dependencies>
-```
 
 ### Usage Example
 ```java
@@ -137,47 +47,13 @@ ServiceProvider provider = EasyCloudService.instance().serviceProvider();
 var service = provider.thisService();
 ```
 
----
-
-## 🛠️ Commands
-
-<table>
-<tr>
-<th>Command</th>
-<th>Description</th>
-<th>Example</th>
-</tr>
-<tr>
-<td><code>group setup</code></td>
-<td>Initialize a new service group</td>
-<td><code>group setup</code></td>
-</tr>
-<tr>
-<td><code>service screen [name]</code></td>
-<td>Attach to service console</td>
-<td><code>service screen Lobby-1</code></td>
-</tr>
-<tr>
-<td><code>service start</code></td>
-<td>Start a specific group</td>
-<td><code>service start</code></td>
-</tr>
-<tr>
-<td><code>service stop</code></td>
-<td>Stop a specific service</td>
-<td><code>service stop</code></td>
-</tr>
-</table>
-
----
-
 ## 📊 System Requirements
 
 | Component   | Minimum | Recommended |
 |-------------|---------|-------------|
 | **Java**    | 21+     | 21+         |
-| **RAM**     | 4GB     | 16GB+       |
-| **Storage** | 5GB     | 25GB+       |
+| **RAM**     | 3GB     | 16GB+       |
+| **Storage** | 2GB     | 25GB+       |
 | **CPU**     | 2 Cores | 4+ Cores    |
 
 ---
