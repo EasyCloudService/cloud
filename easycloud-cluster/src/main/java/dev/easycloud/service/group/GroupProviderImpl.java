@@ -126,6 +126,17 @@ public final class GroupProviderImpl implements GroupProvider {
     }
 
     @Override
+    public void delete(Group group) {
+        this.groups.remove(group);
+
+        try {
+            Files.deleteIfExists(this.GROUPS_PATH.resolve(group.name() + ".json"));
+        } catch (IOException e) {
+            log.error("Failed to delete group file: {}", group.name(), e);
+        }
+    }
+
+    @Override
     public Group get(String name) {
         return this.groups.stream()
                 .filter(it -> it.name().equals(name))

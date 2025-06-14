@@ -30,7 +30,7 @@ public final class LocalCommand extends Command {
     }
 
     private void contributors(String[] args) {
-        log.info("Contributors: ");
+        log.info(this.i18nProvider().get("global.contributors"));
         new Thread(() -> {
             URL url;
             try {
