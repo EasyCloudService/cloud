@@ -9,7 +9,6 @@ import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fusesource.jansi.Ansi;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,6 +121,17 @@ public final class GroupProviderImpl implements GroupProvider {
         } else {
             group.enabled(true);
             FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+        }
+    }
+
+    @Override
+    public void delete(Group group) {
+        this.groups.remove(group);
+
+        try {
+            Files.deleteIfExists(this.GROUPS_PATH.resolve(group.name() + ".json"));
+        } catch (IOException e) {
+            log.error("Failed to delete group file: {}", group.name(), e);
         }
     }
 

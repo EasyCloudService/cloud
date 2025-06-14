@@ -8,4 +8,6 @@ import lombok.experimental.UtilityClass;
 public final class ServiceProperties {
     @Getter
     private final Property<Integer> PORT = new Property<>("PORT", Integer.class);
+    @Getter
+    private final Property<Integer> ONLINE_PLAYERS = new Property<>("NAME", Integer.class);
 }

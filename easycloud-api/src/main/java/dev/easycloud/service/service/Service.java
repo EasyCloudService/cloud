@@ -32,6 +32,10 @@ public interface Service {
 
 
     default <T> T property(String key, Class<T> clazz) {
+        if(!properties().containsKey(key)) {
+            return null;
+        }
+
         var value = String.valueOf(this.properties().get(key));
         Object result = value;
         if(clazz.getSimpleName().equalsIgnoreCase("integer")) {

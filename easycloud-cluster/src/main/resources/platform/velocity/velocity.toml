@@ -8,7 +8,7 @@ forwarding-secret-file = "forwarding.secret"
 # End of the section that you should not modify.y
 
 show-max-players = 500
-motd = "<color:#333333>▶▷</color> <aqua>EasyCloud</aqua> <color:#333333>»</color> <gray>simplicity meets</gray> <aqua><b>performance</b></aqua>\n<color:#333333>➥</color> <gray>download on</gray> <color:#333333>(</color><aqua>easycloudservice.de</aqua><color:#333333>)</color> <color:#333333>(</color><aqua>velocity</aqua><color:#333333>)"
+motd = "<color:#7CBDFFFF>EasyCloud</color> <color:#333333>»</color> <gray>simplicity meets</gray> <color:#7CBDFFFF><b>performance</b></color>.\n         <color:#3094FF>github.com/easycloudservice</color>"
 
 # Should the proxy enforce the new public key security standard? By default, this is on.
 force-key-authentication = true

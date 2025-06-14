@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -63,26 +60,57 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
         var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
-        if(currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+        if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
             return;
         }
 
-        for (Group group : EasyCloudCluster.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
+        for (Group group : EasyCloudCluster.instance().groupProvider().groups()
+                .stream()
+                .sorted((o1, o2) -> {
+                    return Integer.compare(o2.property(GroupProperties.PRIORITY()), o1.property(GroupProperties.PRIORITY()));
+                })
+                .filter(Group::enabled)
+                .toList()) {
             var always = group.property(GroupProperties.ALWAYS_RUNNING());
             var max = group.property(GroupProperties.MAXIMUM_RUNNING());
+            if(max == -1) {
+                max = Integer.MAX_VALUE;
+            }
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
-
-            if (always > online) {
+            if (always > online && online < max) {
                 for (int i = 0; i < always - online; i++) {
+                    if(this.services.stream().filter(it -> it.group().name().equals(group.name())).count() >= max) {
+                        break;
+                    }
                     if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
                         return;
                     }
                     this.launch(new ServiceLaunchBuilder(group.name()));
                     currentStarting++;
                 }
-
             }
-            if (max < online && max != -1) {
+
+            online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
+            var percentage = EasyCloudCluster.instance().configuration().local().dynamicPercentage() / 100.0;
+
+            if(online < max) {
+                for (Service service : this.services().stream().filter(it -> it.group().name().equals(group.name())).toList()) {
+                    if(service.property("ALREADY_LAUNCHED", Boolean.class) != null && service.property("ALREADY_LAUNCHED", Boolean.class)) {
+                        continue;
+                    }
+
+                    if (service.state().equals(ServiceState.ONLINE)) {
+                        if(((double) service.property(ServiceProperties.ONLINE_PLAYERS()) / group.property(GroupProperties.MAX_PLAYERS())) >= percentage) {
+                            service.addProperty("ALREADY_LAUNCHED", true);
+                            service.publish();
+
+                            this.launch(new ServiceLaunchBuilder(group.name()));
+                        }
+                    }
+                };
+            }
+
+            if (max < online) {
                 log.info("Shutting down {} services in group {} to maintain maximum of {}.", online - max, group.name(), max);
                 this.services.stream()
                         .filter(it -> it.group().name().equals(group.name()))
@@ -91,6 +119,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
                         .forEach(ServiceImpl::shutdown);
             }
         }
+
     }
 
     @Override
@@ -162,6 +191,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var directory = Path.of("local").resolve(builder.property(GroupProperties.SAVE_FILES(), group.property(GroupProperties.SAVE_FILES())) ? "constant" : "dynamic").resolve(group.name() + "-" + id);
         var service = new ServiceImpl(group.name() + "-" + id, group, directory);
         service.addProperty(ServiceProperties.PORT(), port);
+        service.addProperty(ServiceProperties.ONLINE_PLAYERS(), 0);
 
         var result = this.prepare(service);
         if (!result) {
