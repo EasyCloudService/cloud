@@ -15,4 +15,5 @@ public final class LocalConfiguration {
     private int clusterPort = 5200;
     private int proxyPort = 25565;
     private int startingSameTime = 3;
+    private int dynamicPercentage = 80;
 }

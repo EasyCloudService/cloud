@@ -36,6 +36,7 @@ public final class ModuleService {
 
     @SneakyThrows
     public void refresh() {
+        this.modules.clear();
         for (File file : Objects.requireNonNull(this.modulePath.toFile().listFiles())) {
             if (!file.getName().endsWith(".jar")) continue;
 

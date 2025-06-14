@@ -5,6 +5,7 @@ import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
+import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.setup.SetupService;
@@ -65,7 +66,6 @@ public final class GroupCommand extends Command {
                 .add(new SetupData<>("always", this.i18nProvider().get("command.group.setup.always"), null))
                 .add(new SetupData<>("maximum", this.i18nProvider().get("command.group.setup.maximum"), null))
                 .add(new SetupData<>("static", this.i18nProvider().get("command.group.setup.static"), List.of("yes", "no")))
-                .add(new SetupData<>("priority", this.i18nProvider().get("command.group.setup.priority"), null))
                 .add(new SetupData<>("continue", this.i18nProvider().get("global.setup.continue"), List.of("yes", "no")))
                 .publish()
                 .thenAccept(it -> {
@@ -95,17 +95,19 @@ public final class GroupCommand extends Command {
                         return;
                     }
 
-                    var priority = it.result("priority", Integer.class);
-                    if (priority < 0) {
-                        log.error(this.i18nProvider().get("command.group.setup.priority.invalid"));
+                    var platform = EasyCloudCluster.instance().platformProvider().platforms().stream()
+                            .filter(it2 -> (it2.initializerId() + "-" + it2.version()).equals(it.result("platform", String.class)))
+                            .findFirst()
+                            .orElse(null);
+                    if(platform == null) {
+                        log.error(this.i18nProvider().get("command.group.setup.platform.invalid"));
                         return;
                     }
-
 
                     var group = new Group(
                             false,
                             it.result("name", String.class),
-                            EasyCloudCluster.instance().platformProvider().platforms().stream().filter(platform -> (platform.initializerId() + "-" + platform.version()).equals(it.result("platform", String.class))).findFirst().orElseThrow()
+                            platform
                     );
 
                     group.addProperty(GroupProperties.MEMORY(), memory);
@@ -113,7 +115,8 @@ public final class GroupCommand extends Command {
                     group.addProperty(GroupProperties.ALWAYS_RUNNING(), always);
                     group.addProperty(GroupProperties.MAXIMUM_RUNNING(), maximum);
                     group.addProperty(GroupProperties.SAVE_FILES(), it.result("static", String.class).equalsIgnoreCase("yes"));
-                    group.addProperty(GroupProperties.PRIORITY(), priority);
+                    group.addProperty(GroupProperties.PRIORITY(), platform.type().equals(PlatformType.PROXY) ? 1 : 0);
+                    group.addProperty(GroupProperties.DYNAMIC_SIZE(), true);
 
                     EasyCloudCluster.instance().groupProvider().create(group);
                 });
