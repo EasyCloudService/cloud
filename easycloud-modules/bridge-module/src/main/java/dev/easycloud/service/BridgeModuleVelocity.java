@@ -2,6 +2,7 @@ package dev.easycloud.service;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -17,7 +18,7 @@ import org.slf4j.Logger;
 import java.net.InetSocketAddress;
 
 @Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity")
-public class BridgeModuleVelocity  {
+public class BridgeModuleVelocity {
     private final ProxyServer server;
     private final Logger logger;
 
@@ -54,11 +55,19 @@ public class BridgeModuleVelocity  {
 
     @Subscribe
     public void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
-        logger.info("Player {} is choosing an initial server", event.getPlayer().getUsername());
         this.server.getAllServers().stream()
                 .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
                 .findFirst()
                 .ifPresentOrElse(event::setInitialServer, () -> event.getPlayer().disconnect(Component.text("§cNo fallback server found!")));
     }
 
+    @Subscribe
+    public void onKickedFromServer(KickedFromServerEvent event) {
+        server.getAllServers().stream()
+                .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
+                .findFirst()
+                .ifPresentOrElse(it -> event.setResult(KickedFromServerEvent.RedirectPlayer.create(it)),
+                        () -> event.getPlayer().disconnect(Component.text("§cNo fallback server found!"))
+                );
+    }
 }

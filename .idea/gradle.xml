@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/easycloud-loader" />
             <option value="$PROJECT_DIR$/easycloud-modules" />
             <option value="$PROJECT_DIR$/easycloud-modules/bridge-module" />
+            <option value="$PROJECT_DIR$/easycloud-modules/hub-module" />
             <option value="$PROJECT_DIR$/easycloud-patcher" />
             <option value="$PROJECT_DIR$/easycloud-service" />
           </set>

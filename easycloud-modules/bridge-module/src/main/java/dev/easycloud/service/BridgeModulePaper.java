@@ -2,7 +2,6 @@ package dev.easycloud.service;
 
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
-import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.resources.ServiceProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
