@@ -11,7 +11,6 @@ import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.extern.log4j.Log4j2;
-import org.jline.reader.impl.completer.NullCompleter;
 
 import java.util.List;
 
@@ -66,6 +65,7 @@ public final class GroupCommand extends Command {
                 .add(new SetupData<>("always", this.i18nProvider().get("command.group.setup.always"), null))
                 .add(new SetupData<>("maximum", this.i18nProvider().get("command.group.setup.maximum"), null))
                 .add(new SetupData<>("static", this.i18nProvider().get("command.group.setup.static"), List.of("yes", "no")))
+                .add(new SetupData<>("priority", this.i18nProvider().get("command.group.setup.priority"), null))
                 .add(new SetupData<>("continue", this.i18nProvider().get("global.setup.continue"), List.of("yes", "no")))
                 .publish()
                 .thenAccept(it -> {
@@ -89,6 +89,19 @@ public final class GroupCommand extends Command {
                         return;
                     }
 
+                    var maximum = it.result("maximum", Integer.class);
+                    if (maximum < 1 && maximum != -1) {
+                        log.error(this.i18nProvider().get("command.group.setup.maximum.invalid"));
+                        return;
+                    }
+
+                    var priority = it.result("priority", Integer.class);
+                    if (priority < 0) {
+                        log.error(this.i18nProvider().get("command.group.setup.priority.invalid"));
+                        return;
+                    }
+
+
                     var group = new Group(
                             false,
                             it.result("name", String.class),
@@ -98,8 +111,9 @@ public final class GroupCommand extends Command {
                     group.addProperty(GroupProperties.MEMORY(), memory);
                     group.addProperty(GroupProperties.MAX_PLAYERS(), maxPlayers);
                     group.addProperty(GroupProperties.ALWAYS_RUNNING(), always);
-                    group.addProperty(GroupProperties.MAXIMUM_RUNNING(), it.result("maximum", Integer.class));
+                    group.addProperty(GroupProperties.MAXIMUM_RUNNING(), maximum);
                     group.addProperty(GroupProperties.SAVE_FILES(), it.result("static", String.class).equalsIgnoreCase("yes"));
+                    group.addProperty(GroupProperties.PRIORITY(), priority);
 
                     EasyCloudCluster.instance().groupProvider().create(group);
                 });

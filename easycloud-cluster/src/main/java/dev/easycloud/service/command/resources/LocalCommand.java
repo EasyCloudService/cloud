@@ -29,6 +29,7 @@ public final class LocalCommand extends Command {
         log.info("local [update]");
     }
 
+    @SuppressWarnings("deprecation")
     private void contributors(String[] args) {
         log.info(this.i18nProvider().get("global.contributors"));
         new Thread(() -> {

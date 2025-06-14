@@ -16,4 +16,6 @@ public final class GroupProperties {
     private final Property<Integer> MAXIMUM_RUNNING = new Property<>("MAXIMUM_RUNNING", Integer.class);
     @Getter
     private final Property<Boolean> SAVE_FILES = new Property<>("SAVE_FILES", Boolean.class);
+    @Getter
+    private final Property<Integer> PRIORITY = new Property<>("PRIORITY", Integer.class);
 }

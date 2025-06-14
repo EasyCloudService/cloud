@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -63,11 +60,17 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
         var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
-        if(currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+        if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
             return;
         }
 
-        for (Group group : EasyCloudCluster.instance().groupProvider().groups().stream().filter(Group::enabled).toList()) {
+        for (Group group : EasyCloudCluster.instance().groupProvider().groups()
+                .stream()
+                .sorted((o1, o2) -> {
+                    return Integer.compare(o2.property(GroupProperties.PRIORITY()), o1.property(GroupProperties.PRIORITY()));
+                })
+                .filter(Group::enabled)
+                .toList()) {
             var always = group.property(GroupProperties.ALWAYS_RUNNING());
             var max = group.property(GroupProperties.MAXIMUM_RUNNING());
             var online = this.services.stream().filter(it -> it.group().name().equals(group.name())).count();
