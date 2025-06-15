@@ -67,6 +67,14 @@ public final class ServiceProviderImpl implements ServiceProvider {
         for (Group group : EasyCloudCluster.instance().groupProvider().groups()
                 .stream()
                 .sorted((o1, o2) -> {
+                    if(o1.property(GroupProperties.PRIORITY()) == null) {
+                        log.error("Group {} has no priority set, defaulting to 0.", o1.name());
+                        return 0;
+                    }
+                    if(o2.property(GroupProperties.PRIORITY()) == null) {
+                        log.error("Group {} has no priority set, defaulting to 0.", o2.name());
+                        return 0;
+                    }
                     return Integer.compare(o2.property(GroupProperties.PRIORITY()), o1.property(GroupProperties.PRIORITY()));
                 })
                 .filter(Group::enabled)
