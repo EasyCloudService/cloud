@@ -70,6 +70,7 @@ public final class GroupCommand extends Command {
                 .publish()
                 .thenAccept(it -> {
                     if (!it.result("continue", String.class).equalsIgnoreCase("yes")) {
+                        log.info(this.i18nProvider().get("global.setup.cancel"));
                         return;
                     }
 
@@ -78,11 +79,13 @@ public final class GroupCommand extends Command {
                         log.error(this.i18nProvider().get("command.group.setup.memory.invalid"));
                         return;
                     }
+
                     var maxPlayers = it.result("maxPlayers", Integer.class);
                     if (maxPlayers < 1) {
                         log.error(this.i18nProvider().get("command.group.setup.maxPlayers.invalid"));
                         return;
                     }
+
                     var always = it.result("always", Integer.class);
                     if (always < 0) {
                         log.error(this.i18nProvider().get("command.group.setup.always.invalid"));
@@ -95,6 +98,7 @@ public final class GroupCommand extends Command {
                         return;
                     }
 
+
                     var platform = EasyCloudCluster.instance().platformProvider().platforms().stream()
                             .filter(it2 -> (it2.initializerId() + "-" + it2.version()).equals(it.result("platform", String.class)))
                             .findFirst()
@@ -104,12 +108,7 @@ public final class GroupCommand extends Command {
                         return;
                     }
 
-                    var group = new Group(
-                            false,
-                            it.result("name", String.class),
-                            platform
-                    );
-
+                    var group = new Group(false, it.result("name", String.class), platform);
                     group.addProperty(GroupProperties.MEMORY(), memory);
                     group.addProperty(GroupProperties.MAX_PLAYERS(), maxPlayers);
                     group.addProperty(GroupProperties.ALWAYS_RUNNING(), always);

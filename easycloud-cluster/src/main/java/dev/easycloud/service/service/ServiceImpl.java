@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.jline.jansi.Ansi.ansi;
 
@@ -96,10 +97,6 @@ public final class ServiceImpl implements Service {
         EasyCloudCluster.instance().terminal().exit(this);
 
         new Thread(() -> {
-            if (!this.group.property(GroupProperties.SAVE_FILES())) {
-                this.process.destroyForcibly();
-            }
-
             try {
                 this.process.waitFor();
                 if (!this.group.property(GroupProperties.SAVE_FILES())) {
@@ -108,6 +105,17 @@ public final class ServiceImpl implements Service {
                 EasyCloudCluster.instance().serviceProvider().services().remove(this);
             } catch (InterruptedException exception) {
                 throw new RuntimeException(exception);
+            }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+                if(this.process.isAlive()) {
+                    this.process.destroyForcibly();
+                }
+            } catch (InterruptedException e) {
+                log.error("Failed to clear log cache after service shutdown", e);
             }
         }).start();
     }
@@ -134,7 +142,10 @@ public final class ServiceImpl implements Service {
                     this.logCache.add(line);
                 }
             } catch (IOException exception) {
-                this.print(exception.getMessage());
+                if(exception.getMessage().contains("Stream closed")) {
+                    return; // Stream was closed, no need to log this
+                }
+                throw new RuntimeException();
             }
         }).start();
     }
