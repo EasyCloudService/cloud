@@ -1,6 +1,6 @@
 package dev.easycloud.service.module;
 
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -44,7 +44,7 @@ public final class ModuleService {
             try (var classLoader = URLClassLoader.newInstance(new URL[]{new URL("jar:file:" + file.getAbsolutePath() + "!/")})) {
                 var configurationPath = this.modulePath.resolve(file.getName() + ".json");
                 Files.copy(Objects.requireNonNull(classLoader.getResourceAsStream("module.json")), configurationPath, StandardCopyOption.REPLACE_EXISTING);
-                var configuration = FileFactory.readRaw(configurationPath, ModuleConfiguration.class);
+                var configuration = Configurations.Companion.readRaw(configurationPath, ModuleConfiguration.class);
                 Files.deleteIfExists(configurationPath);
                 this.modules.put(configuration, file.toPath());
             }

@@ -1,8 +1,9 @@
 package dev.easycloud.service.group;
 
 import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.resources.Group;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
@@ -43,7 +44,7 @@ public final class GroupProviderImpl implements GroupProvider {
 
         for (File file : Objects.requireNonNull(pathFile.listFiles())) {
             if(file.isDirectory()) continue;
-            this.groups.add(FileFactory.readRaw(file.toPath(), Group.class));
+            this.groups.add(Configurations.Companion.readRaw(file.toPath(), Group.class));
         }
     }
 
@@ -80,7 +81,11 @@ public final class GroupProviderImpl implements GroupProvider {
                     log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.download.failed", serviceId));
                 }
 
-                FileFactory.download(downloadUrl, jarPath);
+                if(downloadUrl == null) {
+                    throw new IllegalStateException("Download URL for platform " + serviceId + " is null.");
+                }
+
+                EasyFiles.Companion.download(downloadUrl, jarPath);
 
                 log.info(EasyCloudCluster.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(serviceId).reset()));
             }
@@ -116,11 +121,11 @@ public final class GroupProviderImpl implements GroupProvider {
                 }
 
                 group.enabled(true);
-                FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+                Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
             }).start();
         } else {
             group.enabled(true);
-            FileFactory.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+            Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
         }
     }
 

@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 
-@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity")
+@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity", authors = "EasyCloud Team")
 public class BridgeModuleVelocity {
     private final ProxyServer server;
     private final Logger logger;

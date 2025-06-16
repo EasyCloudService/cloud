@@ -1,7 +1,7 @@
 plugins {
     id("dev.vankka.dependencydownload.plugin") version ("1.3.1")
     id("application")
-    kotlin("jvm")
+    kotlin("jvm") version "2.2.0-RC2"
 }
 
 repositories {
@@ -25,6 +25,8 @@ dependencies {
 
     runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")
     runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
+
+    runtimeDownload("org.jetbrains.kotlin:kotlin-stdlib:2.2.0-RC2")
 
     runtimeDownload("org.jetbrains:annotations:15.0")
     implementation(kotlin("stdlib-jdk8"))

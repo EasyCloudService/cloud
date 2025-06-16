@@ -1,7 +1,8 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
+import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
@@ -228,11 +229,11 @@ public final class ServiceProviderImpl implements ServiceProvider {
         //noinspection ResultOfMethodCallIgnored
         service.directory().resolve("plugins").toFile().mkdirs();
 
-        FileFactory.copy(templatePath.resolve("global").resolve("all"), service.directory());
+        EasyFiles.Companion.copy(templatePath.resolve("global").resolve("all"), service.directory());
 
         if (group.platform().type().equals(PlatformType.PROXY)) {
-            FileFactory.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
-            FileFactory.copy(templatePath.resolve("proxy").resolve(service.group().name()), service.directory());
+            EasyFiles.Companion.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
+            EasyFiles.Companion.copy(templatePath.resolve("proxy").resolve(service.group().name()), service.directory());
 
             var secretPath = service.directory().resolve("forwarding.secret");
             if (Files.exists(secretPath)) {
@@ -240,12 +241,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
             }
             Files.write(secretPath, EasyCloudCluster.instance().configuration().security().value().getBytes());
         } else {
-            FileFactory.copy(templatePath.resolve("global").resolve("server"), service.directory());
-            FileFactory.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
+            EasyFiles.Companion.copy(templatePath.resolve("global").resolve("server"), service.directory());
+            EasyFiles.Companion.copy(templatePath.resolve("server").resolve(service.group().name()), service.directory());
         }
 
         EasyCloudCluster.instance().platformProvider().initializer(group.platform().initializerId()).initialize(service.directory());
-        FileFactory.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
+        Configurations.Companion.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
 
         try {
             Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);

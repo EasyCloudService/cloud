@@ -1,7 +1,8 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
+import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
@@ -100,7 +101,7 @@ public final class ServiceImpl implements Service {
             try {
                 this.process.waitFor();
                 if (!this.group.property(GroupProperties.SAVE_FILES())) {
-                    FileFactory.remove(this.directory());
+                    EasyFiles.Companion.remove(this.directory());
                 }
                 EasyCloudCluster.instance().serviceProvider().services().remove(this);
             } catch (InterruptedException exception) {

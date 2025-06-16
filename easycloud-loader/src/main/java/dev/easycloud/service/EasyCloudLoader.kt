@@ -8,6 +8,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
 import kotlin.io.path.createDirectory
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.system.exitProcess
 
@@ -15,14 +16,14 @@ class EasyCloudLoader {
 
     fun load() {
         val localPath = Paths.get("local")
-        val librariesPath = localPath.resolve("libraries")
         val resourcesPath = Paths.get("resources")
-        val modulesPath = localPath.resolve("modules")
+        val librariesPath = resourcesPath.resolve("libs")
+        val modulesPath = Paths.get("modules")
 
         // Create directories if they do not exist
         localPath.takeIf { !it.exists() }?.createDirectory()
-        librariesPath.takeIf { !it.exists() }?.createDirectory()
         resourcesPath.takeIf { !it.exists() }?.createDirectory()
+        librariesPath.takeIf { !it.exists() }?.createDirectory()
         modulesPath.takeIf { !it.exists() }?.createDirectory()
 
         // Check if the loader-patcher.jar file exists
@@ -46,7 +47,7 @@ class EasyCloudLoader {
 
         val thread = Thread {
             try {
-                var fileArg = "easycloud-cluster.jar;resources/libraries/*;"
+                var fileArg = "easycloud-cluster.jar;resources/libs/*;"
                 if (!System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win")) {
                     fileArg = fileArg.replace(";", ":")
                 }

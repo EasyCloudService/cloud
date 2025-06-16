@@ -1,7 +1,8 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.configuration.ClusterConfiguration;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
+import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.GroupProviderImpl;
 import dev.easycloud.service.command.CommandProvider;
@@ -61,7 +62,7 @@ public final class EasyCloudCluster {
 
         var localPath = Path.of("local");
         var resourcesPath = Path.of("resources");
-        FileFactory.remove(localPath.resolve("dynamic"));
+        EasyFiles.Companion.remove(localPath.resolve("dynamic"));
 
         var firstLaunch = !Files.exists(resourcesPath.resolve("config")) || !Files.exists(resourcesPath.resolve("groups"));
         this.configuration = new ClusterConfiguration();
@@ -140,7 +141,7 @@ public final class EasyCloudCluster {
         this.terminal.terminal().close();
 
         if(Files.exists(Path.of("loader-patcher.jar"))) {
-            new ProcessBuilder("java", "-jar", "dev.easycloud.patcher.jar").directory(Path.of("resources").resolve("libraries").toFile()).start();
+            new ProcessBuilder("java", "-jar", "dev.easycloud.patcher.jar").directory(Path.of("resources").resolve("libs").toFile()).start();
         }
         System.exit(0);
     }

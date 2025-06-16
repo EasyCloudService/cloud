@@ -39,7 +39,7 @@ public final class ServiceLaunchFactory {
 
         List<String> dependencies = new ArrayList<>();
         var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api", "org.slf4j", "org.apache.logging");
-        for (File file : Objects.requireNonNull(Path.of("resources").resolve("libraries").toFile().listFiles())) {
+        for (File file : Objects.requireNonNull(Path.of("resources").resolve("libs").toFile().listFiles())) {
             if(allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
                 dependencies.add(file.getAbsolutePath());
             }

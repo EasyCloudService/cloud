@@ -1,7 +1,7 @@
 package dev.easycloud.service.platform;
 
 import dev.easycloud.service.EasyCloudService;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.FileFactory;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import lombok.extern.slf4j.Slf4j;
