@@ -44,7 +44,7 @@ class EasyCloudLoader {
 
         DependencyLoader().load(librariesPath)
 
-        val thread = Thread(Runnable {
+        val thread = Thread {
             try {
                 var fileArg = "easycloud-cluster.jar;resources/libraries/*;"
                 if (!System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win")) {
@@ -70,7 +70,7 @@ class EasyCloudLoader {
                 Thread.currentThread().interrupt()
                 exitProcess(1)
             }
-        })
+        }
         thread.setDaemon(false)
         thread.start()
 
