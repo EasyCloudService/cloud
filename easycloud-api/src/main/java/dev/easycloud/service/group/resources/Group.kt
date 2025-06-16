@@ -20,7 +20,6 @@ class Group(var enabled: Boolean, val name: String, val platform: Platform) {
         }
     }
 
-
     fun <T> read(property: Property<T>): T {
         val value = this.properties[property.key.lowercase()]
         var result: Any? = null
