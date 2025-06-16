@@ -1,79 +1,63 @@
-package dev.easycloud.service.group.resources;
+package dev.easycloud.service.group.resources
 
-import dev.easycloud.service.platform.Platform;
-import dev.easycloud.service.property.Property;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import dev.easycloud.service.platform.Platform
+import dev.easycloud.service.property.Property
+import java.nio.file.Path
+import java.util.*
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+class Group(var enabled: Boolean, val name: String, val platform: Platform) {
+    val properties = HashMap<String, Any>()
 
-@SuppressWarnings({"unchecked", "rawtypes", "DuplicatedCode"})
-@Slf4j
-@Getter
-@Setter
-@AllArgsConstructor
-public final class Group {
-    private boolean enabled;
-
-    private final String name;
-    private final Platform platform;
-
-    private final Map<String, Object> properties = new HashMap<>();
-
-    public void addProperty(Property<?> property, Object value) {
-        if(value instanceof String || value instanceof Integer || value instanceof Boolean ||
-                value instanceof Double || value instanceof Float || value instanceof Long ||
-                value instanceof Short || value instanceof Byte || value instanceof Character ||
-                value instanceof Class || value instanceof Enum || value instanceof Path || value instanceof UUID
+    fun insert(property: Property<*>, value: Any) {
+        if (value is String || value is Int || value is Boolean ||
+            value is Double || value is Float || value is Long ||
+            value is Short || value is Byte || value is Char ||
+            value is Class<*> || value is Enum<*> || value is Path || value is UUID
         ) {
-            properties().put(property.key(), value);
+            properties[property.key.lowercase()] = value
         } else {
-            throw new IllegalArgumentException("Invalid property type: " + value.getClass().getSimpleName());
+            throw java.lang.IllegalArgumentException("Invalid property type: " + value.javaClass.getSimpleName())
         }
     }
 
-    public <T> T property(Property<T> property) {
-        var value = String.valueOf(this.properties().get(property.key()));
-        Object result = value;
-        if(property.className().equalsIgnoreCase("integer")) {
-            result = (int) Double.parseDouble(value);
+
+    fun <T> read(property: Property<T>): T {
+        val value = this.properties[property.key.lowercase()]
+        var result: Any? = null
+
+        property.className.equals("integer", ignoreCase = true).takeIf { it }?.let {
+            result = (value as Double).toInt()
         }
-        if(property.className().equalsIgnoreCase("boolean")) {
-            result = Boolean.parseBoolean(value);
+        property.className.equals("string", ignoreCase = true).takeIf { it }?.let {
+            result = value ?: ""
         }
-        if(property.className().equalsIgnoreCase("double")) {
-            result = Double.parseDouble(String.valueOf(value));
+        property.className.equals("boolean", ignoreCase = true).takeIf { it }?.let {
+            result = value as? Boolean ?: value?.toString()?.toBoolean()
         }
-        if(property.className().equalsIgnoreCase("float")) {
-            result = Float.parseFloat(String.valueOf(value));
+        property.className.equals("double", ignoreCase = true).takeIf { it }?.let {
+            result = value as? Double ?: value?.toString()?.toDoubleOrNull()
         }
-        if(property.className().equalsIgnoreCase("long")) {
-            result = Long.parseLong(String.valueOf(value));
+        property.className.equals("float", ignoreCase = true).takeIf { it }?.let {
+            result = value as? Float ?: value?.toString()?.toFloatOrNull()
         }
-        if(property.className().equalsIgnoreCase("short")) {
-            result = Short.parseShort(String.valueOf(value));
+        property.className.equals("long", ignoreCase = true).takeIf { it }?.let {
+            result = value as? Long ?: value?.toString()?.toLongOrNull()
         }
-        if(property.className().equalsIgnoreCase("byte")) {
-            result = Byte.parseByte(String.valueOf(value));
+        property.className.equals("uuid", ignoreCase = true).takeIf { it }?.let {
+            result = value?.let { uuid ->
+                try {
+                    UUID.fromString(uuid.toString())
+                } catch (_: Exception) { null }
+            }
         }
-        if(property.className().equalsIgnoreCase("char")) {
-            result = String.valueOf(value).charAt(0);
+        property.className.equals("path", ignoreCase = true).takeIf { it }?.let {
+            result = value?.let { path ->
+                try {
+                    Path.of(path.toString())
+                } catch (_: Exception) { null }
+            }
         }
-        if(property.className().equalsIgnoreCase("class")) {
-            result = Enum.valueOf((Class<Enum>) property.type(), String.valueOf(value));
-        }
-        if(property.className().equalsIgnoreCase("path")) {
-            result = Path.of(String.valueOf(value));
-        }
-        if(property.className().equalsIgnoreCase("uuid")) {
-            result = UUID.fromString(String.valueOf(value));
-        }
-        return (T) result;
+        return result as T? ?: throw IllegalArgumentException("Property ${property.key} not found or invalid type")
     }
-    
+
 }

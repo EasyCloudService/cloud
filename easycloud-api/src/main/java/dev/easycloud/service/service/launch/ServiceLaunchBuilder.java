@@ -27,11 +27,11 @@ public final class ServiceLaunchBuilder {
     }
 
     public <T> ServiceLaunchBuilder override(Property<T> property, T value) {
-        this.properties.put(property.key(), value);
+        this.properties.put(property.getKey(), value);
         return this;
     }
 
     public <T> T property(Property<T> property, T defaultValue) {
-        return (T) this.properties.getOrDefault(property.key(), defaultValue);
+        return (T) this.properties.getOrDefault(property.getKey(), defaultValue);
     }
 }

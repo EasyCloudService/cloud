@@ -1,7 +1,6 @@
 package dev.easycloud.service.service;
 
 import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
@@ -100,7 +99,7 @@ public final class ServiceImpl implements Service {
         new Thread(() -> {
             try {
                 this.process.waitFor();
-                if (!this.group.property(GroupProperties.SAVE_FILES())) {
+                if (!this.group.read(GroupProperties.SAVE_FILES())) {
                     EasyFiles.Companion.remove(this.directory());
                 }
                 EasyCloudCluster.instance().serviceProvider().services().remove(this);

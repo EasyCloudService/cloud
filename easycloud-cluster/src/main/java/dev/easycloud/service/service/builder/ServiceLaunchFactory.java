@@ -48,8 +48,8 @@ public final class ServiceLaunchFactory {
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
         arguments.add("--enable-native-access=ALL-UNNAMED");
-        arguments.add("-Xms" + service.group().property(GroupProperties.MEMORY()) + "M");
-        arguments.add("-Xmx" + service.group().property(GroupProperties.MEMORY()) + "M");
+        arguments.add("-Xms" + service.group().read(GroupProperties.MEMORY()) + "M");
+        arguments.add("-Xmx" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);
 
         arguments.add("-Dfile.encoding=UTF-8");
@@ -63,8 +63,8 @@ public final class ServiceLaunchFactory {
         arguments.add(serviceFile + (isWindows() ? ";" : ":") + libraries);
         arguments.add("-javaagent:" + serviceFile);
         arguments.add(mainClass);
-        if (service.group().platform().type().equals(PlatformType.SERVER)) {
-            arguments.add("--max-players=" + service.group().property(GroupProperties.MAX_PLAYERS()));
+        if (service.group().getPlatform().type().equals(PlatformType.SERVER)) {
+            arguments.add("--max-players=" + service.group().read(GroupProperties.MAX_PLAYERS()));
             arguments.add("--online-mode=false");
             arguments.add("nogui");
         }

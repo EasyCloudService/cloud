@@ -52,7 +52,7 @@ class Configurations {
         }
 
         // reading methods
-        fun <T> readRaw(path: Path, clazz: Class<T?>?): T? {
+        fun <T> readRaw(path: Path, clazz: Class<T>): T {
             try {
                 FileReader(path.toFile().path).use { reader -> return this.gson.fromJson(reader, clazz) }
             } catch (exception: IOException) {
@@ -60,8 +60,8 @@ class Configurations {
             }
         }
 
-        fun <T> read(path: Path, clazz: Class<T?>?): T? {
-            return this.readRaw(path.resolve(name(clazz!!)), clazz)
+        fun <T> read(path: Path, clazz: Class<T>): T {
+            return this.readRaw(path.resolve(name(clazz)), clazz)
         }
     }
 }

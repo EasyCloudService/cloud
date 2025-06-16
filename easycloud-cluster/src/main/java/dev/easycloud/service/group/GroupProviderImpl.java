@@ -2,8 +2,8 @@ package dev.easycloud.service.group;
 
 import dev.easycloud.service.EasyCloudCluster;
 import dev.easycloud.service.files.EasyFiles;
-import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.configuration.Configurations;
+import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
@@ -53,10 +53,10 @@ public final class GroupProviderImpl implements GroupProvider {
     public void refresh() {
         List<Platform> platforms = new ArrayList<>();
         for (Group group : this.groups) {
-            if (platforms.contains(group.platform())) {
+            if (platforms.contains(group.getPlatform())) {
                 continue;
             }
-            platforms.add(group.platform());
+            platforms.add(group.getPlatform());
         }
 
         var platformPath = Path.of("resources").resolve("groups").resolve("platforms");
@@ -101,14 +101,14 @@ public final class GroupProviderImpl implements GroupProvider {
         this.refresh();
         var resourcesPath = Path.of("resources");
         var localPath = Path.of("local");
-        var templatePath = localPath.resolve("templates").resolve(group.platform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.name());
+        var templatePath = localPath.resolve("templates").resolve(group.getPlatform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.getName());
         templatePath.toFile().mkdirs();
 
-        if (!group.property(GroupProperties.SAVE_FILES())) {
+        if (!group.read(GroupProperties.SAVE_FILES())) {
             new Thread(() -> {
-                if (group.platform().initializerId().equals("paper")) {
+                if (group.getPlatform().initializerId().equals("paper")) {
                     try {
-                        Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.platform().initializerId() + "-" + group.platform().version() + ".jar"), templatePath.resolve("tmp.jar"));
+                        Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.getPlatform().initializerId() + "-" + group.getPlatform().version() + ".jar"), templatePath.resolve("tmp.jar"));
                         var service = new ProcessBuilder("java", "-Dpaperclip.patchonly=true", "-jar", "tmp.jar")
                                 .directory(templatePath.toFile())
                                 .start();
@@ -120,12 +120,12 @@ public final class GroupProviderImpl implements GroupProvider {
                     }
                 }
 
-                group.enabled(true);
-                Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+                group.setEnabled(true);
+                Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.getName() + ".json"), group);
             }).start();
         } else {
-            group.enabled(true);
-            Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.name() + ".json"), group);
+            group.setEnabled(true);
+            Configurations.Companion.writeRaw(this.GROUPS_PATH.resolve(group.getName() + ".json"), group);
         }
     }
 
@@ -134,16 +134,16 @@ public final class GroupProviderImpl implements GroupProvider {
         this.groups.remove(group);
 
         try {
-            Files.deleteIfExists(this.GROUPS_PATH.resolve(group.name() + ".json"));
+            Files.deleteIfExists(this.GROUPS_PATH.resolve(group.getName() + ".json"));
         } catch (IOException e) {
-            log.error("Failed to delete group file: {}", group.name(), e);
+            log.error("Failed to delete group file: {}", group.getName(), e);
         }
     }
 
     @Override
     public Group get(String name) {
         return this.groups.stream()
-                .filter(it -> it.name().equals(name))
+                .filter(it -> it.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }

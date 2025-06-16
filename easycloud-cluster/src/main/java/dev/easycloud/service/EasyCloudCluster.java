@@ -113,7 +113,7 @@ public final class EasyCloudCluster {
         var groups = new StringBuilder();
         this.groupProvider.groups().forEach(group -> {
             if (!groups.isEmpty()) groups.append(", ");
-            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.name().toLowerCase()).reset());
+            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.getName().toLowerCase()).reset());
         });
         log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
 

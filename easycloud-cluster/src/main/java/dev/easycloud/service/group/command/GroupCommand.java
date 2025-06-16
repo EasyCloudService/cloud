@@ -25,10 +25,10 @@ public final class GroupCommand extends Command {
         addSubCommand(new CommandNode("list", "command.group.list.info", this::list));
         addSubCommand(new CommandNode("setup", "command.group.setup.info", this::setup));
         addSubCommand(new CommandNode("delete", "command.group.delete.info", unused -> {
-            return EasyCloudCluster.instance().groupProvider().groups().stream().map(Group::name).toList();
+            return EasyCloudCluster.instance().groupProvider().groups().stream().map(Group::getName).toList();
         }, this::delete));
         addSubCommand(new CommandNode("launch", "command.group.launch.info", unused -> {
-            return EasyCloudCluster.instance().groupProvider().groups().stream().map(Group::name).toList();
+            return EasyCloudCluster.instance().groupProvider().groups().stream().map(Group::getName).toList();
         }, this::launch));
     }
 
@@ -50,9 +50,9 @@ public final class GroupCommand extends Command {
 
         groups.forEach(it -> {
             log.info("");
-            log.info(ansi().fgRgb(LogType.PRIMARY.rgb()).a(it.name()).reset());
-            log.info("* Memory: {}", it.property(GroupProperties.MEMORY()) + "mb");
-            log.info("* Platform: {}", it.platform().initializerId() + "_" + it.platform().version());
+            log.info(ansi().fgRgb(LogType.PRIMARY.rgb()).a(it.getName()).reset());
+            log.info("* Memory: {}", it.read(GroupProperties.MEMORY()) + "mb");
+            log.info("* Platform: {}", it.getPlatform().initializerId() + "_" + it.getPlatform().version());
         });
         log.info("");
     }
@@ -109,13 +109,13 @@ public final class GroupCommand extends Command {
                     }
 
                     var group = new Group(false, it.result("name", String.class), platform);
-                    group.addProperty(GroupProperties.MEMORY(), memory);
-                    group.addProperty(GroupProperties.MAX_PLAYERS(), maxPlayers);
-                    group.addProperty(GroupProperties.ALWAYS_RUNNING(), always);
-                    group.addProperty(GroupProperties.MAXIMUM_RUNNING(), maximum);
-                    group.addProperty(GroupProperties.SAVE_FILES(), it.result("static", String.class).equalsIgnoreCase("yes"));
-                    group.addProperty(GroupProperties.PRIORITY(), platform.type().equals(PlatformType.PROXY) ? 1 : 0);
-                    group.addProperty(GroupProperties.DYNAMIC_SIZE(), true);
+                    group.insert(GroupProperties.MEMORY(), memory);
+                    group.insert(GroupProperties.MAX_PLAYERS(), maxPlayers);
+                    group.insert(GroupProperties.ALWAYS_RUNNING(), always);
+                    group.insert(GroupProperties.MAXIMUM_RUNNING(), maximum);
+                    group.insert(GroupProperties.SAVE_FILES(), it.result("static", String.class).equalsIgnoreCase("yes"));
+                    group.insert(GroupProperties.PRIORITY(), platform.type().equals(PlatformType.PROXY) ? 1 : 0);
+                    group.insert(GroupProperties.DYNAMIC_SIZE(), true);
 
                     EasyCloudCluster.instance().groupProvider().create(group);
                 });
@@ -136,14 +136,14 @@ public final class GroupCommand extends Command {
 
         var services = EasyCloudCluster.instance().serviceProvider().services()
                 .stream()
-                .filter(it -> it.group().name().equals(groupName))
+                .filter(it -> it.group().getName().equals(groupName))
                 .toList();
         for (Service service : services) {
             EasyCloudCluster.instance().serviceProvider().shutdown(service);
         }
 
         EasyCloudCluster.instance().groupProvider().delete(group);
-        log.info(this.i18nProvider().get("command.group.delete.success", ansi().fgRgb(LogType.WHITE.rgb()).a(group.name()).reset()));
+        log.info(this.i18nProvider().get("command.group.delete.success", ansi().fgRgb(LogType.WHITE.rgb()).a(group.getName()).reset()));
     }
 
 

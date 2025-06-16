@@ -27,7 +27,7 @@ public interface Service {
     }
 
     default void addProperty(Property<?> property, Object value) {
-        this.addProperty(property.key(), value);
+        this.addProperty(property.getKey(), value);
     }
 
 
@@ -76,7 +76,7 @@ public interface Service {
 
 
     default <T> T property(Property<T> property) {
-        return this.property(property.key(), property.type());
+        return this.property(property.getKey(), property.getType());
     }
 
     ServiceState state();
