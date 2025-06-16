@@ -1,10 +1,12 @@
 plugins {
     id("dev.vankka.dependencydownload.plugin") version ("1.3.1")
     id("application")
+    kotlin("jvm")
 }
 
 repositories {
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    mavenCentral()
 }
 
 dependencies {
@@ -25,6 +27,7 @@ dependencies {
     runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 
     runtimeDownload("org.jetbrains:annotations:15.0")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Jar> {
@@ -41,7 +44,7 @@ tasks.withType<Jar> {
     from(project(":easycloud-modules:bridge-module").tasks.jar)
 
     manifest {
-        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudBoot"
+        attributes["Main-Class"] = "dev.easycloud.service.EasyCloudBootKt"
     }
 
     archiveFileName.set("easycloud-loader.jar")
@@ -49,4 +52,7 @@ tasks.withType<Jar> {
         tasks.named("generateRuntimeDownloadResourceForRuntimeDownloadOnly"),
         tasks.named("generateRuntimeDownloadResourceForRuntimeDownload")
     )
+}
+kotlin {
+    jvmToolchain(21)
 }
