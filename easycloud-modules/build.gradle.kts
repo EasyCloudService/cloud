@@ -6,6 +6,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven(url = "https://repo.papermc.io/repository/maven-public/")
     }
 
     dependencies {

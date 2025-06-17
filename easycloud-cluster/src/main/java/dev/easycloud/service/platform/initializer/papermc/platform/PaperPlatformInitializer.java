@@ -1,7 +1,7 @@
 package dev.easycloud.service.platform.initializer.papermc.platform;
 
 import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.platform.initializer.papermc.AbstractPaperMCInitializer;
@@ -29,7 +29,7 @@ public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void initialize(Path path) {
-        var yaml = FileFactory.YAML;
+        var yaml = Configurations.Companion.getYaml();
         var configPath = path.resolve("config");
         configPath.toFile().mkdirs();
 

@@ -1,7 +1,7 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.classloader.PlatformClassLoader;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.service.resources.ServiceDataConfiguration;
 import lombok.Getter;
 
@@ -22,7 +22,7 @@ public final class EasyCloudServiceBoot {
         classLoaderThread = PlatformClassLoader.inject(instrumentation, args);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> classLoaderThread.interrupt()));
 
-        var configuration = FileFactory.read(Path.of(""), ServiceDataConfiguration.class);
+        var configuration = Configurations.Companion.read(Path.of(""), ServiceDataConfiguration.class);
         new EasyCloudService(configuration.key(), configuration.clusterPort(), configuration.id());
     }
 }

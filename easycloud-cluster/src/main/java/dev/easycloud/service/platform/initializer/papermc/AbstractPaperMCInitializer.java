@@ -3,7 +3,7 @@ package dev.easycloud.service.platform.initializer.papermc;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import dev.easycloud.service.file.FileFactory;
+import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.platform.PlatformInitializer;
 import dev.easycloud.service.request.RequestFactory;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public abstract class AbstractPaperMCInitializer implements PlatformInitializer 
             return null;
         }
 
-        var json = FileFactory.GSON.fromJson(response, JsonObject.class);
+        var json = Configurations.Companion.getGson().fromJson(response, JsonObject.class);
         var versions = json.getAsJsonArray("versions");
 
         List<String> versionList = new ArrayList<>();
@@ -41,7 +41,7 @@ public abstract class AbstractPaperMCInitializer implements PlatformInitializer 
     public String buildDownload(String version) {
         var apiUrl = this.url + "/versions/" + version + "/builds";
         var response = RequestFactory.getRequest(apiUrl);
-        var json = FileFactory.GSON.fromJson(response, JsonObject.class);
+        var json = Configurations.Companion.getGson().fromJson(response, JsonObject.class);
         if(json == null) {
             return null;
         }

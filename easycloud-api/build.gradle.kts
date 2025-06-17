@@ -1,10 +1,12 @@
 repositories {
     mavenLocal()
+    mavenCentral()
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 plugins {
     id("maven-publish")
+    kotlin("jvm") version "2.2.0-RC2"
 }
 
 dependencies {
@@ -14,6 +16,7 @@ dependencies {
 
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("io.activej:activej:6.0-rc2")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.jar {
@@ -30,4 +33,7 @@ publishing {
             from(components["java"])
         }
     }
+}
+kotlin {
+    jvmToolchain(21)
 }

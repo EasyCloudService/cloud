@@ -2,6 +2,10 @@ repositories {
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
+plugins {
+    kotlin("jvm") version "2.2.0-RC2"
+}
+
 dependencies {
     compileOnly(project(":easycloud-api"))
 

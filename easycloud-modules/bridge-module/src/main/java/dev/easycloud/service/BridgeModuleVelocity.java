@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 
-@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity")
+@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity", authors = "EasyCloud Team")
 public class BridgeModuleVelocity {
     private final ProxyServer server;
     private final Logger logger;
@@ -26,8 +26,6 @@ public class BridgeModuleVelocity {
     public BridgeModuleVelocity(ProxyServer server, Logger logger) {
         this.server = server;
         this.logger = logger;
-
-        this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
 
         EasyCloudService.instance()
                 .serviceProvider()
@@ -49,6 +47,7 @@ public class BridgeModuleVelocity {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
+        this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
         EasyCloudService.instance().eventProvider().publish(new ServiceReadyEvent(EasyCloudService.instance().serviceProvider().thisService()));
         this.logger.info("Service is now ready!");
     }

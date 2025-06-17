@@ -39,7 +39,7 @@ public final class ServiceLaunchFactory {
 
         List<String> dependencies = new ArrayList<>();
         var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api", "org.slf4j", "org.apache.logging");
-        for (File file : Objects.requireNonNull(Path.of("resources").resolve("libraries").toFile().listFiles())) {
+        for (File file : Objects.requireNonNull(Path.of("resources").resolve("libs").toFile().listFiles())) {
             if(allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
                 dependencies.add(file.getAbsolutePath());
             }
@@ -48,8 +48,9 @@ public final class ServiceLaunchFactory {
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
         arguments.add("--enable-native-access=ALL-UNNAMED");
-        arguments.add("-Xms" + service.group().property(GroupProperties.MEMORY()) + "M");
-        arguments.add("-Xmx" + service.group().property(GroupProperties.MEMORY()) + "M");
+        arguments.add("--sun-misc-unsafe-memory-access=allow");
+        arguments.add("-Xms" + service.group().read(GroupProperties.MEMORY()) + "M");
+        arguments.add("-Xmx" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);
 
         arguments.add("-Dfile.encoding=UTF-8");
@@ -63,8 +64,8 @@ public final class ServiceLaunchFactory {
         arguments.add(serviceFile + (isWindows() ? ";" : ":") + libraries);
         arguments.add("-javaagent:" + serviceFile);
         arguments.add(mainClass);
-        if (service.group().platform().type().equals(PlatformType.SERVER)) {
-            arguments.add("--max-players=" + service.group().property(GroupProperties.MAX_PLAYERS()));
+        if (service.group().getPlatform().type().equals(PlatformType.SERVER)) {
+            arguments.add("--max-players=" + service.group().read(GroupProperties.MAX_PLAYERS()));
             arguments.add("--online-mode=false");
             arguments.add("nogui");
         }

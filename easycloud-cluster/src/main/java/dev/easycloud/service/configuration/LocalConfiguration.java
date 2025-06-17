@@ -1,6 +1,6 @@
 package dev.easycloud.service.configuration;
 
-import dev.easycloud.service.file.resources.FileEntity;
+import dev.easycloud.service.configuration.resources.ConfigurationEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +8,7 @@ import java.util.Locale;
 
 @Getter
 @Setter
-@FileEntity(name = "local")
+@ConfigurationEntity(name = "local")
 public final class LocalConfiguration {
     private Locale language = Locale.ENGLISH;
     private boolean announceUpdates = true;
