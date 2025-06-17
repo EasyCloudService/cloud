@@ -25,7 +25,11 @@ class Group(var enabled: Boolean, val name: String, val platform: Platform) {
         var result: Any? = null
 
         property.className.equals("integer", ignoreCase = true).takeIf { it }?.let {
-            result = (value as Double).toInt()
+            result = if(value.toString().contains(".")) {
+                (value as Double).toInt()
+            } else {
+                value as? Int ?: value?.toString()?.toIntOrNull()
+            }
         }
         property.className.equals("string", ignoreCase = true).takeIf { it }?.let {
             result = value ?: ""

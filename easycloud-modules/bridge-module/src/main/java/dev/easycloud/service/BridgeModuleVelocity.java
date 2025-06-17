@@ -27,8 +27,6 @@ public class BridgeModuleVelocity {
         this.server = server;
         this.logger = logger;
 
-        this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
-
         EasyCloudService.instance()
                 .serviceProvider()
                 .services()
@@ -49,6 +47,7 @@ public class BridgeModuleVelocity {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
+        this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
         EasyCloudService.instance().eventProvider().publish(new ServiceReadyEvent(EasyCloudService.instance().serviceProvider().thisService()));
         this.logger.info("Service is now ready!");
     }

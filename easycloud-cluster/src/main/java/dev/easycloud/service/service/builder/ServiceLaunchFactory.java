@@ -48,6 +48,7 @@ public final class ServiceLaunchFactory {
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
         arguments.add("--enable-native-access=ALL-UNNAMED");
+        arguments.add("--sun-misc-unsafe-memory-access=allow");
         arguments.add("-Xms" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.add("-Xmx" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);

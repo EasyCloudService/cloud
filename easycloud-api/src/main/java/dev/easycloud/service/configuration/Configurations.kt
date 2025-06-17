@@ -14,12 +14,11 @@ class Configurations {
     companion object {
         val yaml = Yaml()
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val gsonWithoutPrettyPrinting: Gson = GsonBuilder().create()
 
         private fun name(clazz: Class<*>): String {
-            return clazz.getAnnotation(ConfigurationEntity::class.java)
-                .takeIf { it != null }?.name
+            val name = clazz.getAnnotation(ConfigurationEntity::class.java).takeIf { it != null }?.name
                 ?: throw IllegalArgumentException("The class ${clazz.name} is not annotated with @FileEntity")
+            return name + if (name.endsWith(".json")) "" else ".json"
         }
 
 
