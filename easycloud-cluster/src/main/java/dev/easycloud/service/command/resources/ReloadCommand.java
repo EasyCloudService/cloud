@@ -34,5 +34,7 @@ public final class ReloadCommand extends Command {
         });
 
         log.info(this.i18nProvider().get("command.reload.done"));
+
+        EasyCloudCluster.instance().releasesService().check();
     }
 }

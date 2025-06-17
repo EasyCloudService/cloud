@@ -18,10 +18,14 @@ public final class ReleasesService {
     private final String CURRENT = "1.0.0-preview4";
 
     public ReleasesService() {
+        this.check();
+    }
+
+    public void check() {
         new Thread(() -> {
             if(!this.CURRENT.equals(this.name()) && EasyCloudCluster.instance().configuration().local().announceUpdates()) {
-               log.info("A new release available: {} | Current: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(LogType.ERROR.rgb()).a(this.CURRENT).reset());
-               log.info("Use '{}' to update the cloud.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("local update").reset());
+                log.info("A new release available: {} | Current: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(LogType.ERROR.rgb()).a(this.CURRENT).reset());
+                log.info("Use '{}' to update the cloud.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("local update").reset());
             }
         }).start();
     }
