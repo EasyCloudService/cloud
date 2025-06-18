@@ -28,6 +28,8 @@ dependencies {
 
     runtimeDownload("org.jetbrains.kotlin:kotlin-stdlib:2.2.0-RC2")
 
+    runtimeDownload("commons-io:commons-io:2.19.0")
+
     runtimeDownload("org.jetbrains:annotations:15.0")
     implementation(kotlin("stdlib-jdk8"))
 }

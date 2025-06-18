@@ -8,8 +8,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 
 
-@Plugin(id = "hub-module", name = "EasyCloud HubModule", version = "1.0.0", description = "A hub module for EasyCloud on Velocity", authors = "EasyCloud Team")
-public class HubModuleVelocity {
+@Plugin(id = "hub-module", name = "EasyCloud HubModule", version = "1.0.0", description = "A hub module for EasyCloud on Velocity.", authors = "FlxwDNS")
+public final class HubModuleVelocity {
     @Getter
     private static HubModuleVelocity instance;
     @Getter

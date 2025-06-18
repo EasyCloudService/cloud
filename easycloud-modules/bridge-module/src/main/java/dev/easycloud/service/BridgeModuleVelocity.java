@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 
-@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity", authors = "EasyCloud Team")
-public class BridgeModuleVelocity {
+@Plugin(id = "bridge-module", name = "EasyCloud BridgeModule", version = "1.0.0", description = "A bridge module for EasyCloud on Velocity.", authors = {"FlxwDNS"})
+public final class BridgeModuleVelocity {
     private final ProxyServer server;
     private final Logger logger;
 
@@ -49,11 +49,15 @@ public class BridgeModuleVelocity {
     public void onProxyInitialize(ProxyInitializeEvent event) {
         this.server.getAllServers().forEach(it -> server.unregisterServer(it.getServerInfo()));
         EasyCloudService.instance().eventProvider().publish(new ServiceReadyEvent(EasyCloudService.instance().serviceProvider().thisService()));
+        this.server.getAllServers().forEach(serverInfo -> logger.info(serverInfo.getServerInfo().getName()));
+
         this.logger.info("Service is now ready!");
     }
 
-    @Subscribe
+    @Subscribe(priority = 1000)
     public void onPlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
+        this.logger.info("Player {} is choosing an initial server.", event.getPlayer().getUsername());
+
         this.server.getAllServers().stream()
                 .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
                 .findFirst()
@@ -62,6 +66,10 @@ public class BridgeModuleVelocity {
 
     @Subscribe
     public void onKickedFromServer(KickedFromServerEvent event) {
+        if(event.getServer().getServerInfo().getName().toLowerCase().startsWith("lobby")) {
+            return;
+        }
+
         server.getAllServers().stream()
                 .filter(it -> it.getServerInfo().getName().toLowerCase().startsWith("lobby"))
                 .findFirst()

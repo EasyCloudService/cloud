@@ -1,11 +1,11 @@
-# Do not modify this file unless you know what you're doing. This file is used to configure
+# Do not modify this file unless you know what you're doing. This file is used to configure.
 config-version = "2.7"
 bind = "0.0.0.0:25565"
 
 online-mode = true
 player-info-forwarding-mode = "modern"
 forwarding-secret-file = "forwarding.secret"
-# End of the section that you should not modify.y
+# End of the section that you should not modify.
 
 show-max-players = 500
 motd = "<color:#7CBDFFFF>EasyCloud</color> <color:#333333>»</color> <gray>simplicity meets</gray> <color:#7CBDFFFF><b>performance</b></color>.\n         <color:#3094FF>github.com/easycloudservice</color>"
@@ -47,17 +47,20 @@ ping-passthrough = "DISABLED"
 # If not enabled (default is true) player IP addresses will be replaced by <ip address withheld> in logs
 enable-player-address-logging = true
 
+
+# DO NOT MODIFY THIS SECTION UNLESS YOU KNOW WHAT YOU ARE DOING!
 [servers]
-lobby = "127.0.0.1:30066"
+fallback = "127.0.0.1:0"
 
 try = [
-    "lobby"
+    "fallback"
 ]
 
 [forced-hosts]
-"lobby.example.com" = [
-    "lobby"
+"fallback" = [
+    "fallback"
 ]
+# End of the section that you should not modify.
 
 [advanced]
 # How large a Minecraft packet has to be before we compress it. Setting this to zero will

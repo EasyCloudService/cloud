@@ -48,7 +48,6 @@ public final class ServiceLaunchFactory {
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
         arguments.add("--enable-native-access=ALL-UNNAMED");
-        arguments.add("--sun-misc-unsafe-memory-access=allow");
         arguments.add("-Xms" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.add("-Xmx" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);
@@ -67,6 +66,7 @@ public final class ServiceLaunchFactory {
         if (service.group().getPlatform().type().equals(PlatformType.SERVER)) {
             arguments.add("--max-players=" + service.group().read(GroupProperties.MAX_PLAYERS()));
             arguments.add("--online-mode=false");
+            arguments.add("--server-ip=0.0.0.0");
             arguments.add("nogui");
         }
         arguments.add("--port=" + service.property(ServiceProperties.PORT()));

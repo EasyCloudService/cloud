@@ -7,13 +7,15 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectory
-import kotlin.io.path.deleteIfExists
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.system.exitProcess
 
 class EasyCloudLoader {
 
+    @OptIn(ExperimentalPathApi::class)
     fun load() {
         val localPath = Paths.get("local")
         val resourcesPath = Paths.get("resources")
@@ -25,6 +27,9 @@ class EasyCloudLoader {
         resourcesPath.takeIf { !it.exists() }?.createDirectory()
         librariesPath.takeIf { !it.exists() }?.createDirectory()
         modulesPath.takeIf { !it.exists() }?.createDirectory()
+
+        // Remove old dynamic directory if it exists
+        localPath.resolve("dynamic").deleteRecursively()
 
         // Check if the loader-patcher.jar file exists
         if (Files.exists(Paths.get("loader-patcher.jar"))) {
@@ -54,7 +59,6 @@ class EasyCloudLoader {
                 val process = ProcessBuilder(
                     "java",
                     "--enable-native-access=ALL-UNNAMED",
-                    "--sun-misc-unsafe-memory-access=allow",
                     "-cp",
                     fileArg,
                     "dev.easycloud.service.EasyCloudBoot"

@@ -23,6 +23,8 @@ dependencies {
     compileOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
 
     compileOnly("org.jetbrains:annotations:15.0")
+
+    compileOnly("commons-io:commons-io:2.19.0")
 }
 
 
