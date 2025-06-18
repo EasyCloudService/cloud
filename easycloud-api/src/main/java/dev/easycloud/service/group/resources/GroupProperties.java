@@ -7,17 +7,17 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class GroupProperties {
     @Getter
-    private final Property<Integer> MEMORY = new Property<>("MEMORY", Integer.class);
+    private final Property<Integer> MEMORY = new Property<>("memory", Integer.class);
     @Getter
-    private final Property<Integer> MAX_PLAYERS = new Property<>("MAX_PLAYERS", Integer.class);
+    private final Property<Integer> MAX_PLAYERS = new Property<>("max_players", Integer.class);
     @Getter
-    private final Property<Integer> ALWAYS_RUNNING = new Property<>("ALWAYS_RUNNING", Integer.class);
+    private final Property<Integer> ALWAYS_RUNNING = new Property<>("always_running", Integer.class);
     @Getter
-    private final Property<Integer> MAXIMUM_RUNNING = new Property<>("MAXIMUM_RUNNING", Integer.class);
+    private final Property<Integer> MAXIMUM_RUNNING = new Property<>("maximum_running", Integer.class);
     @Getter
-    private final Property<Boolean> SAVE_FILES = new Property<>("SAVE_FILES", Boolean.class);
+    private final Property<Boolean> SAVE_FILES = new Property<>("save_files", Boolean.class);
     @Getter
-    private final Property<Integer> PRIORITY = new Property<>("PRIORITY", Integer.class);
+    private final Property<Integer> PRIORITY = new Property<>("priority", Integer.class);
     @Getter
-    private final Property<Boolean> DYNAMIC_SIZE = new Property<>("DYNAMIC_SIZE", Boolean.class);
+    private final Property<Boolean> DYNAMIC_SIZE = new Property<>("dynamic_size", Boolean.class);
 }

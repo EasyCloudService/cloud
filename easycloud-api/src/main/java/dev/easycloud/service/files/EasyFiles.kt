@@ -46,29 +46,5 @@ class EasyFiles {
                 }
             }
         }
-
-        fun copy(source: Path, destination: Path) {
-            try {
-                Files.walkFileTree(source, object : SimpleFileVisitor<Path>() {
-                    override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                        val targetDir = destination.resolve(source.relativize(dir))
-                        Files.createDirectories(targetDir)
-                        return FileVisitResult.CONTINUE
-                    }
-
-                    override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                        Files.copy(file, destination.resolve(source.relativize(file)), StandardCopyOption.REPLACE_EXISTING)
-                        return FileVisitResult.CONTINUE
-                    }
-
-                    override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
-                        System.err.println(exc)
-                        return FileVisitResult.CONTINUE
-                    }
-                })
-            } catch (exception: IOException) {
-                throw RuntimeException(exception)
-            }
-        }
     }
 }

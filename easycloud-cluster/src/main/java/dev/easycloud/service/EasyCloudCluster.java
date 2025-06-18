@@ -1,7 +1,6 @@
 package dev.easycloud.service;
 
 import dev.easycloud.service.configuration.ClusterConfiguration;
-import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.GroupProviderImpl;

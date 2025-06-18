@@ -16,6 +16,7 @@ import dev.easycloud.service.terminal.logger.LogType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,11 +69,11 @@ public final class ServiceProviderImpl implements ServiceProvider {
         for (Group group : EasyCloudCluster.instance().groupProvider().groups()
                 .stream()
                 .sorted((o1, o2) -> {
-                    if(o1.read(GroupProperties.PRIORITY()) == null) {
+                    if (o1.read(GroupProperties.PRIORITY()) == null) {
                         log.error("Group {} has no priority set, defaulting to 0.", o1.getName());
                         return 0;
                     }
-                    if(o2.read(GroupProperties.PRIORITY()) == null) {
+                    if (o2.read(GroupProperties.PRIORITY()) == null) {
                         log.error("Group {} has no priority set, defaulting to 0.", o2.getName());
                         return 0;
                     }
@@ -82,13 +83,13 @@ public final class ServiceProviderImpl implements ServiceProvider {
                 .toList()) {
             var always = group.read(GroupProperties.ALWAYS_RUNNING());
             var max = group.read(GroupProperties.MAXIMUM_RUNNING());
-            if(max == -1) {
+            if (max == -1) {
                 max = Integer.MAX_VALUE;
             }
             var online = this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count();
             if (always > online && online < max) {
                 for (int i = 0; i < always - online; i++) {
-                    if(this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count() >= max) {
+                    if (this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count() >= max) {
                         break;
                     }
                     if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
@@ -102,21 +103,22 @@ public final class ServiceProviderImpl implements ServiceProvider {
             online = this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count();
             var percentage = EasyCloudCluster.instance().configuration().local().dynamicPercentage() / 100.0;
 
-            if(online < max) {
+            if (online < max) {
                 for (Service service : this.services().stream().filter(it -> it.group().getName().equals(group.getName())).toList()) {
-                    if(service.property("ALREADY_LAUNCHED", Boolean.class) != null && service.property("ALREADY_LAUNCHED", Boolean.class)) {
+                    if (service.property("ALREADY_LAUNCHED", Boolean.class) != null && service.property("ALREADY_LAUNCHED", Boolean.class)) {
                         continue;
                     }
 
                     if (service.state().equals(ServiceState.ONLINE)) {
-                        if(((double) service.property(ServiceProperties.ONLINE_PLAYERS()) / group.read(GroupProperties.MAX_PLAYERS())) >= percentage) {
+                        if (((double) service.property(ServiceProperties.ONLINE_PLAYERS()) / group.read(GroupProperties.MAX_PLAYERS())) >= percentage) {
                             service.addProperty("ALREADY_LAUNCHED", true);
                             service.publish();
 
                             this.launch(new ServiceLaunchBuilder(group.getName()));
                         }
                     }
-                };
+                }
+                ;
             }
 
             if (max < online) {
@@ -229,11 +231,11 @@ public final class ServiceProviderImpl implements ServiceProvider {
         //noinspection ResultOfMethodCallIgnored
         service.directory().resolve("plugins").toFile().mkdirs();
 
-        EasyFiles.Companion.copy(templatePath.resolve("global").resolve("all"), service.directory());
+        FileUtils.copyDirectory(templatePath.resolve("global").resolve("all").toFile(), service.directory().toFile());
 
         if (group.getPlatform().type().equals(PlatformType.PROXY)) {
-            EasyFiles.Companion.copy(templatePath.resolve("global").resolve("proxy"), service.directory());
-            EasyFiles.Companion.copy(templatePath.resolve("proxy").resolve(service.group().getName()), service.directory());
+            FileUtils.copyDirectory(templatePath.resolve("global").resolve("proxy").toFile(), service.directory().toFile());
+            FileUtils.copyDirectory(templatePath.resolve("proxy").resolve(service.group().getName()).toFile(), service.directory().toFile());
 
             var secretPath = service.directory().resolve("forwarding.secret");
             if (Files.exists(secretPath)) {
@@ -241,8 +243,8 @@ public final class ServiceProviderImpl implements ServiceProvider {
             }
             Files.write(secretPath, EasyCloudCluster.instance().configuration().security().value().getBytes());
         } else {
-            EasyFiles.Companion.copy(templatePath.resolve("global").resolve("server"), service.directory());
-            EasyFiles.Companion.copy(templatePath.resolve("server").resolve(service.group().getName()), service.directory());
+            FileUtils.copyDirectory(templatePath.resolve("global").resolve("server").toFile(), service.directory().toFile());
+            FileUtils.copyDirectory(templatePath.resolve("server").resolve(service.group().getName()).toFile(), service.directory().toFile());
         }
 
         EasyCloudCluster.instance().platformProvider().initializer(group.getPlatform().initializerId()).initialize(service.directory());
@@ -268,13 +270,11 @@ public final class ServiceProviderImpl implements ServiceProvider {
                     }
                 });
 
-        if (!service.directory().resolve("platform.jar").toFile().exists()) {
-            try {
-                Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.getPlatform().initializerId() + "-" + group.getPlatform().version() + ".jar"), service.directory().resolve("platform.jar"));
-            } catch (Exception exception) {
-                log.error("Failed to copy platform jar.", exception);
-                return false;
-            }
+        try {
+            Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.getPlatform().initializerId() + "-" + group.getPlatform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception exception) {
+            log.error("Failed to copy platform jar.", exception);
+            return false;
         }
         return true;
     }

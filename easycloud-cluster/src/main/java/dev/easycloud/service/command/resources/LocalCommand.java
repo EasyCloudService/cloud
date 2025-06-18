@@ -69,6 +69,9 @@ public final class LocalCommand extends Command {
             log.info("Download completed. Please restart the @{} to apply the changes.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud").reset());
             log.info("After restarting wait {} for the {} to be applied.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("4-5 seconds").reset(), ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud Updater").reset());
             log.info("");
+            log.info("Always make sure you use {} command to stop the @{}", ansi().fgRgb(LogType.ERROR.rgb()).a("shutdown").reset(), ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud").reset());
+            log.info("And always make sure you read this: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a("https://github.com/EasyCloudService/cloud/releases/latest"));
+            log.info("");
             log.info("―".repeat(80));
         }).start();
     }

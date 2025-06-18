@@ -118,6 +118,7 @@ public final class GroupCommand extends Command {
                     group.insert(GroupProperties.DYNAMIC_SIZE(), true);
 
                     EasyCloudCluster.instance().groupProvider().create(group);
+                    log.info(this.i18nProvider().get("command.group.setup.success"));
                 });
     }
 

@@ -5,7 +5,9 @@ import dev.easycloud.service.network.socket.Socket;
 public record EventProvider(Socket socket) {
     public EventProvider(Socket socket) {
         this.socket = socket;
-        new Thread(this.socket::run).start();
+        var thread = new Thread(this.socket::run);
+        thread.setName("EventProvider" + socket.getClass().getSimpleName());
+        thread.start();
     }
 
     public void close() {
