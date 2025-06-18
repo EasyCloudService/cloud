@@ -80,7 +80,7 @@ public final class ServiceImpl implements Service {
                 return;
             }
         } catch (Exception exception) {
-            if(!this.process.isAlive()) {
+            if (!this.process.isAlive()) {
                 return;
             }
             log.error(EasyCloudCluster.instance().i18nProvider().get("service.stream.failed", exception));
@@ -96,7 +96,7 @@ public final class ServiceImpl implements Service {
         log.info(EasyCloudCluster.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
         EasyCloudCluster.instance().terminal().exit(this);
 
-        new Thread(() -> {
+        var thread = new Thread(() -> {
             try {
                 this.process.waitFor();
                 if (!this.group.read(GroupProperties.SAVE_FILES())) {
@@ -106,18 +106,22 @@ public final class ServiceImpl implements Service {
             } catch (InterruptedException exception) {
                 throw new RuntimeException(exception);
             }
-        }).start();
+        });
+        thread.setName("Shutdown1-" + this.id);
+        thread.start();
 
-        new Thread(() -> {
+        var thread2 = new Thread(() -> {
             try {
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-                if(this.process.isAlive()) {
+                if (this.process.isAlive()) {
                     this.process.destroyForcibly();
                 }
             } catch (InterruptedException e) {
                 log.error("Failed to clear log cache after service shutdown", e);
             }
-        }).start();
+        });
+        thread2.setName("Shutdown2-" + this.id);
+        thread2.start();
     }
 
     @SuppressWarnings("all")
@@ -126,13 +130,13 @@ public final class ServiceImpl implements Service {
             log.info("SERVICE_LOG: " + line.substring(17));
         } else if (line.startsWith("[") && line.contains(":") && line.split("] ")[0].length() == 14) {
             log.info("SERVICE_LOG: " + line.substring(16));
-        }  else {
+        } else {
             log.info("SERVICE_LOG: " + line);
         }
     }
 
     private void printStream(InputStream inputStream) {
-        new Thread(() -> {
+        var thread = new Thread(() -> {
             try (var reader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -142,11 +146,13 @@ public final class ServiceImpl implements Service {
                     this.logCache.add(line);
                 }
             } catch (IOException exception) {
-                if(exception.getMessage().contains("Stream closed")) {
+                if (exception.getMessage().contains("Stream closed")) {
                     return; // Stream was closed, no need to log this
                 }
                 throw new RuntimeException();
             }
-        }).start();
+        });
+        thread.setName("PrintStream-" + this.id);
+        thread.start();
     }
 }

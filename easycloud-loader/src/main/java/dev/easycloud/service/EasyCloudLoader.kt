@@ -53,9 +53,8 @@ class EasyCloudLoader {
                 }
                 val process = ProcessBuilder(
                     "java",
-                    "-Xms512M",
-                    "-Xmx512M",
                     "--enable-native-access=ALL-UNNAMED",
+                    "--sun-misc-unsafe-memory-access=allow",
                     "-cp",
                     fileArg,
                     "dev.easycloud.service.EasyCloudBoot"

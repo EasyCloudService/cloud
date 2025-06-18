@@ -43,6 +43,7 @@ public final class PlatformClassLoader {
                 throw new RuntimeException(exception);
             }
         });
+        thread.setName("EasyCloudCluster");
         thread.setContextClassLoader(classLoader);
         thread.start();
         return thread;
