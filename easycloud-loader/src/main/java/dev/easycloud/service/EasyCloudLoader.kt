@@ -39,14 +39,13 @@ class EasyCloudLoader {
 
         // Load the EasyCloudCluster
         mapOf(
-            Pair("easycloud-patcher", librariesPath.resolve("dev.easycloud.patcher")),
-            Pair("easycloud-service", resourcesPath.resolve("easycloud-service")),
-            Pair("easycloud-api", librariesPath.resolve("dev.easycloud.api")),
-            Pair("easycloud-cluster", Paths.get("easycloud-cluster")),
-            Pair("bridge-module", modulesPath.resolve("bridge-module")),
-        ).forEach {
-            this.copyFile("${it.key}.jar", Paths.get("${it.value}.jar"))
-        }
+                        Pair("easycloud-patcher", librariesPath.resolve("dev.easycloud.patcher")),
+                        Pair("easycloud-service", resourcesPath.resolve("easycloud-service")),
+                        Pair("easycloud-api", librariesPath.resolve("dev.easycloud.api")),
+                        Pair("easycloud-cluster", Paths.get("easycloud-cluster")),
+                        Pair("bridge-module", modulesPath.resolve("bridge-module")),
+                )
+                .forEach { this.copyFile("${it.key}.jar", Paths.get("${it.value}.jar")) }
 
         DependencyLoader().load(librariesPath)
 
@@ -56,16 +55,18 @@ class EasyCloudLoader {
                 if (!System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win")) {
                     fileArg = fileArg.replace(";", ":")
                 }
-                val process = ProcessBuilder(
-                    "java",
-                    "--enable-native-access=ALL-UNNAMED",
-                    "-cp",
-                    fileArg,
-                    "dev.easycloud.service.EasyCloudBoot"
-                ).redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
-                    .start()
+                val process =
+                        ProcessBuilder(
+                                        "java",
+                                        "--enable-native-access=ALL-UNNAMED",
+                                        "-cp",
+                                        fileArg,
+                                        "dev.easycloud.service.EasyCloudBoot"
+                                )
+                                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                                .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                                .start()
 
                 process.waitFor()
             } catch (exception: IOException) {
@@ -78,9 +79,7 @@ class EasyCloudLoader {
         thread.setDaemon(false)
         thread.start()
 
-        Runtime.getRuntime().addShutdownHook(Thread {
-            if (thread.isAlive) thread.interrupt()
-        })
+        Runtime.getRuntime().addShutdownHook(Thread { if (thread.isAlive) thread.interrupt() })
 
         while (true) {
             if (!thread.isAlive) exitProcess(0)
@@ -88,8 +87,9 @@ class EasyCloudLoader {
     }
 
     private fun copyFile(name: String, destination: Path) {
-        val file = ClassLoader.getSystemClassLoader().getResourceAsStream(name)
-            ?: throw IllegalArgumentException("Resource $name not found")
+        val file =
+                ClassLoader.getSystemClassLoader().getResourceAsStream(name)
+                        ?: throw IllegalArgumentException("Resource $name not found")
         Files.copy(file, destination, StandardCopyOption.REPLACE_EXISTING)
     }
 }
