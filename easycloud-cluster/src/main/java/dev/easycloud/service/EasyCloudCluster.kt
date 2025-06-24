@@ -1,147 +1,123 @@
-package dev.easycloud.service;
+package dev.easycloud.service
 
-import dev.easycloud.service.configuration.ClusterConfiguration;
-import dev.easycloud.service.files.EasyFiles;
-import dev.easycloud.service.group.GroupProvider;
-import dev.easycloud.service.group.GroupProviderImpl;
-import dev.easycloud.service.command.CommandProvider;
-import dev.easycloud.service.i18n.I18nProvider;
-import dev.easycloud.service.module.ModuleService;
-import dev.easycloud.service.network.event.Event;
-import dev.easycloud.service.network.event.EventProvider;
-import dev.easycloud.service.network.socket.ServerSocket;
-import dev.easycloud.service.onboarding.OnboardingProvider;
-import dev.easycloud.service.platform.PlatformProvider;
-import dev.easycloud.service.release.ReleasesService;
-import dev.easycloud.service.service.ServiceProvider;
-import dev.easycloud.service.service.ServiceImpl;
-import dev.easycloud.service.service.ServiceProviderImpl;
-import dev.easycloud.service.service.Service;
-import dev.easycloud.service.terminal.TerminalImpl;
-import dev.easycloud.service.terminal.logger.LogType;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
+import com.google.inject.AbstractModule
+import com.google.inject.Guice
+import com.google.inject.Injector
+import dev.easycloud.service.command.CommandProvider
+import dev.easycloud.service.configuration.ClusterConfiguration
+import dev.easycloud.service.files.EasyFiles
+import dev.easycloud.service.group.GroupProvider
+import dev.easycloud.service.i18n.I18nProvider
+import dev.easycloud.service.module.ModuleService
+import dev.easycloud.service.network.event.Event
+import dev.easycloud.service.network.event.EventProvider
+import dev.easycloud.service.network.socket.ServerSocket
+import dev.easycloud.service.onboarding.OnboardingProvider
+import dev.easycloud.service.platform.PlatformProvider
+import dev.easycloud.service.release.ReleasesService
+import dev.easycloud.service.service.Service
+import dev.easycloud.service.service.ServiceImpl
+import dev.easycloud.service.service.ServiceProviderImpl
+import dev.easycloud.service.terminal.TerminalImpl
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+class EasyCloudCluster {
+    val logger: Logger = LoggerFactory.getLogger(EasyCloudCluster::class.java)
+    lateinit var injector: Injector
 
-import static org.fusesource.jansi.Ansi.ansi;
+    fun load() {
+        var timeSinceStart = System.currentTimeMillis()
+        injector = Guice.createInjector(object : AbstractModule() {
+            override fun configure() {
+                bind(ClusterConfiguration::class.java).asEagerSingleton()
+                bind(I18nProvider::class.java).asEagerSingleton()
+                bind(TerminalImpl::class.java).asEagerSingleton()
+                bind(ServiceProviderImpl::class.java).asEagerSingleton()
+                bind(CommandProvider::class.java).asEagerSingleton()
 
-@Getter
-@Accessors(fluent = true)
-@Slf4j
-public final class EasyCloudCluster {
-    @Getter
-    private static EasyCloudCluster instance;
-
-    private final TerminalImpl terminal;
-    private final I18nProvider i18nProvider;
-    private final CommandProvider commandProvider;
-
-    private final ServiceProvider serviceProvider;
-    private final GroupProvider groupProvider;
-    private final PlatformProvider platformProvider;
-    private final ClusterConfiguration configuration;
-    private final EventProvider eventProvider;
-    private final ReleasesService releasesService;
-    private final ModuleService moduleService;
-
-    @SneakyThrows
-    public EasyCloudCluster() {
-        instance = this;
-
-        long timeSinceStart = System.currentTimeMillis();
-
-        var localPath = Path.of("local");
-        var resourcesPath = Path.of("resources");
-        EasyFiles.Companion.remove(localPath.resolve("dynamic"));
-
-        var firstLaunch = !Files.exists(resourcesPath.resolve("config")) || !Files.exists(resourcesPath.resolve("groups"));
-        this.configuration = new ClusterConfiguration();
-        List.of("de", "en").forEach(s -> {
-            try {
-                var fileName = "i18n_" + s + ".properties";
-                Files.copy(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("i18n/" + fileName)), resourcesPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException exception) {
-                throw new RuntimeException(exception);
+                bind(GroupProvider::class.java).asEagerSingleton()
+                bind(PlatformProvider::class.java).asEagerSingleton()
+                bind(ModuleService::class.java).asEagerSingleton()
+                bind(ReleasesService::class.java).asEagerSingleton()
             }
-        });
+        })
 
-        this.i18nProvider = new I18nProvider();
+        // Set paths
+        val localPath = Paths.get("local")
+        val resourcePath = Paths.get("resources")
+        EasyFiles.remove(localPath.resolve("dynamic"))
 
-        this.terminal = new TerminalImpl();
-        this.terminal.start();
-
-        this.eventProvider = new EventProvider(new ServerSocket(this.configuration().security().value(), this.configuration.local().clusterPort()));
-        this.eventProvider.socket().waitForConnection().get();
-
-        log.info(this.i18nProvider.get("net.listening", ansi().fgRgb(LogType.WHITE.rgb()).a("0.0.0.0").reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(this.configuration.local().clusterPort()).reset()));
-
-        Event.registerTypeAdapter(Service.class, ServiceImpl.class);
-
-        this.serviceProvider = new ServiceProviderImpl();
-        this.commandProvider = new CommandProvider();
-
-        // onboarding if its the first start
-        if(firstLaunch) {
-            var onboarding = new OnboardingProvider();
-            onboarding.run();
-            timeSinceStart = System.currentTimeMillis();
+        // Save languages
+        listOf("de", "en").forEach { lang ->
+            Files.copy(
+                this.javaClass.getResourceAsStream("i18n_$lang.properties")!!,
+                resourcePath.resolve("i18n/$lang.properties"),
+                StandardCopyOption.REPLACE_EXISTING
+            )
         }
 
-        this.groupProvider = new GroupProviderImpl();
-        this.platformProvider = new PlatformProvider();
-        this.moduleService = new ModuleService();
+        // Run terminal
+        injector.getInstance(TerminalImpl::class.java).run()
 
-        this.platformProvider.refresh();
-        var platformTypes = new StringBuilder();
-        this.platformProvider.initializers().forEach(platform -> {
-            if (!platformTypes.isEmpty()) platformTypes.append(", ");
-            platformTypes.append(ansi().fgRgb(LogType.WHITE.rgb()).a(platform.id()).reset());
-        });
-        log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("platforms").reset(), platformTypes));
+        // Check if property is set for first start
+        if (System.getProperty("easycloud.first-start") == "true") {
+            OnboardingProvider().run()
+            timeSinceStart = System.currentTimeMillis() - timeSinceStart
+        }
 
-        this.groupProvider.refresh();
-        var groups = new StringBuilder();
-        this.groupProvider.groups().forEach(group -> {
-            if (!groups.isEmpty()) groups.append(", ");
-            groups.append(ansi().fgRgb(LogType.WHITE.rgb()).a(group.getName().toLowerCase()).reset());
-        });
-        log.info(this.i18nProvider.get("cluster.found", ansi().fgRgb(LogType.WHITE.rgb()).a("groups").reset(), groups));
+        // Configuration
+        val configuration = injector.getInstance(ClusterConfiguration::class.java)
+        configuration.load()
+        configuration.reload()
 
-        this.moduleService.refresh();
+        // Run eventProvider
+        val socket = ServerSocket(configuration.security.value, configuration.local.clusterPort)
+        val eventProvider = EventProvider(socket)
+        eventProvider.socket.waitForConnection()
 
-        this.releasesService = new ReleasesService();
-        log.info(this.i18nProvider.get("cluster.ready", ansi().fgRgb(LogType.WHITE.rgb()).a((System.currentTimeMillis() - timeSinceStart)).a("ms").reset()));
+        injector.injectMembers(eventProvider)
+
+        val i18nProvider = injector.getInstance(I18nProvider::class.java)
+        logger.info(i18nProvider.get("net.listening", "<white>0.0.0.0<reset>", "<white>${configuration.local.clusterPort}<reset>"));
+
+        // Register event types
+        Event.registerTypeAdapter(Service::class.java, ServiceImpl::class.java)
+
+        // Search platforms
+        val platformProvider = injector.getInstance(PlatformProvider::class.java)
+        platformProvider.search()
+
+        val platformTypes = StringBuilder()
+        platformProvider.initializers().forEach { platform ->
+            platformTypes.append("<white>${platform.id()}<reset>, ")
+        }
+        logger.info(i18nProvider.get("cluster.found", "<white>platforms<reset>", platformTypes))
+
+        // Search groups
+        val groupProvider = injector.getInstance(GroupProvider::class.java)
+        groupProvider.search()
+
+        val groups = StringBuilder()
+        groupProvider.groups().forEach { group ->
+            groups.append("<white>${group.name.lowercase()}<reset>, ")
+        }
+        logger.info(i18nProvider.get("cluster.found", "<white>groups<reset>", groups))
+
+        // Search modules
+        injector.getInstance(ModuleService::class.java).search()
+
+        // TODO: temporary fix for old cluster
+        EasyCloudClusterOld(injector)
+
+        // Cluster ready
+        logger.info(i18nProvider.get("cluster.ready", "<white>${System.currentTimeMillis() - timeSinceStart}ms<reset>"))
     }
 
-    @SneakyThrows
-    public void shutdown() {
-        log.info(this.i18nProvider.get("services.shutdown.all"));
+    fun run() {
 
-        for (Service service : new ArrayList<>(this.serviceProvider.services())) {
-            ((ServiceImpl) service).shutdown();
-        }
-
-        log.info(this.i18nProvider.get("cluster.shutdown"));
-
-        if(Files.exists(Path.of("loader-patcher.jar"))) {
-            log.info("Applying updates from loader-patcher.jar...");
-        }
-
-        this.terminal.readingThread().interrupt();
-        this.terminal.terminal().close();
-
-        if(Files.exists(Path.of("loader-patcher.jar"))) {
-            new ProcessBuilder("java", "-jar", "dev.easycloud.patcher.jar").directory(Path.of("resources").resolve("libs").toFile()).start();
-        }
-        System.exit(0);
     }
 }

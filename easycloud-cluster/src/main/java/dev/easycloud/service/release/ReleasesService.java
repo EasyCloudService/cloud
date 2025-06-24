@@ -2,8 +2,8 @@ package dev.easycloud.service.release;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.EasyCloudClusterOld;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +15,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 public final class ReleasesService {
     @Getter
-    private final String CURRENT = "1.0.0-preview5";
+    private final String CURRENT = "1.0.0-preview6";
 
     public ReleasesService() {
         this.check();
@@ -23,9 +23,9 @@ public final class ReleasesService {
 
     public void check() {
         new Thread(() -> {
-            if(!this.CURRENT.equals(this.name()) && EasyCloudCluster.instance().configuration().local().announceUpdates()) {
-                log.info("A new release available: {} | Current: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(LogType.ERROR.rgb()).a(this.CURRENT).reset());
-                log.info("Use '{}' to update the cloud.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("local update").reset());
+            if(!this.CURRENT.equals(this.name()) && EasyCloudClusterOld.instance().configuration().local.getAnnounceUpdates()) {
+                log.info("A new release available: {} | Current: {}", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(this.name()).reset(), ansi().fgRgb(Log4jColor.ERROR.rgb()).a(this.CURRENT).reset());
+                log.info("Use '{}' to update the cloud.", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("local update").reset());
             }
         }).start();
     }

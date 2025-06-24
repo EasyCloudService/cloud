@@ -1,12 +1,7 @@
-package dev.easycloud.service.configuration;
+package dev.easycloud.service.configuration
 
-import dev.easycloud.service.configuration.resources.ConfigurationEntity;
-import lombok.Getter;
+import dev.easycloud.service.configuration.resources.ConfigurationEntity
+import java.util.concurrent.ThreadLocalRandom
 
-import java.util.concurrent.ThreadLocalRandom;
-
-@Getter
 @ConfigurationEntity(name = "security")
-public final class SecurityConfiguration {
-    private final String value = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999);
-}
+class SecurityConfiguration(val value: String = "easyCloud" + System.currentTimeMillis() + ThreadLocalRandom.current().nextInt(10000000, 99999999))

@@ -1,6 +1,6 @@
 package dev.easycloud.service.command;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.resources.*;
 import dev.easycloud.service.group.command.GroupCommand;
 import dev.easycloud.service.service.ServiceImpl;
@@ -25,19 +25,19 @@ public final class CommandProvider {
     }
 
     public void execute(String command, String[] args) {
-        if (EasyCloudCluster.instance().terminal().logging()) {
-            var service = EasyCloudCluster.instance().serviceProvider().services().stream().filter(it -> it instanceof ServiceImpl)
+        if (EasyCloudClusterOld.instance().terminal().logging()) {
+            var service = EasyCloudClusterOld.instance().serviceProvider().services().stream().filter(it -> it instanceof ServiceImpl)
                     .map(it -> (ServiceImpl) it)
                     .filter(ServiceImpl::logStream)
                     .findFirst()
                     .orElse(null);
 
             if (service == null) {
-                log.error(EasyCloudCluster.instance().i18nProvider().get("command.service.notRunning"));
+                log.error(EasyCloudClusterOld.instance().i18nProvider().get("command.service.notRunning"));
             }
 
             if (command.equalsIgnoreCase("exit") || service == null) {
-                EasyCloudCluster.instance().terminal().exit(service);
+                EasyCloudClusterOld.instance().terminal().exit(service);
                 return;
             }
 
@@ -58,6 +58,6 @@ public final class CommandProvider {
                                 .onExecute()
                                 .accept(Arrays.copyOfRange(args, 1, args.length));
                     }
-                }, () -> log.error(EasyCloudCluster.instance().i18nProvider().get("command.unknown", command)));
+                }, () -> log.error(EasyCloudClusterOld.instance().i18nProvider().get("command.unknown", command)));
     }
 }

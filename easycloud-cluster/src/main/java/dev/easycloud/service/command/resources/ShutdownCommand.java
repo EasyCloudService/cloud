@@ -1,6 +1,6 @@
 package dev.easycloud.service.command.resources;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.Command;
 
 public final class ShutdownCommand extends Command {
@@ -10,6 +10,6 @@ public final class ShutdownCommand extends Command {
 
     @Override
     public void executeBase() {
-        EasyCloudCluster.instance().shutdown();
+        EasyCloudClusterOld.instance().shutdown();
     }
 }

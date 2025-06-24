@@ -1,13 +1,13 @@
 package dev.easycloud.service.group;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +50,7 @@ public final class GroupProviderImpl implements GroupProvider {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void refresh() {
+    public void search() {
         List<Platform> platforms = new ArrayList<>();
         for (Group group : this.groups) {
             if (platforms.contains(group.getPlatform())) {
@@ -65,7 +65,7 @@ public final class GroupProviderImpl implements GroupProvider {
         }
 
         platforms.forEach(platform -> {
-            var initializer = EasyCloudCluster.instance().platformProvider().initializers()
+            var initializer = EasyCloudClusterOld.instance().platformProvider().initializers()
                     .stream()
                     .filter(it -> it.id().equals(platform.initializerId()))
                     .findFirst()
@@ -74,11 +74,11 @@ public final class GroupProviderImpl implements GroupProvider {
 
             if (!jarPath.toFile().exists()) {
                 var serviceId = platform.initializerId() + "-" + platform.version();
-                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(LogType.PRIMARY.rgb()).a(serviceId).reset()));
+                log.info(EasyCloudClusterOld.instance().i18nProvider().get("platform.downloading", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(serviceId).reset()));
 
                 var downloadUrl = initializer.buildDownload(platform.version());
                 if (downloadUrl == null) {
-                    log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.download.failed", serviceId));
+                    log.error(EasyCloudClusterOld.instance().i18nProvider().get("group.platform.download.failed", serviceId));
                 }
 
                 if(downloadUrl == null) {
@@ -87,7 +87,7 @@ public final class GroupProviderImpl implements GroupProvider {
 
                 EasyFiles.Companion.download(downloadUrl, jarPath);
 
-                log.info(EasyCloudCluster.instance().i18nProvider().get("platform.ready", ansi().fgRgb(LogType.PRIMARY.rgb()).a(serviceId).reset()));
+                log.info(EasyCloudClusterOld.instance().i18nProvider().get("platform.ready", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(serviceId).reset()));
             }
         });
     }
@@ -98,7 +98,7 @@ public final class GroupProviderImpl implements GroupProvider {
     public void create(Group group) {
         this.groups.add(group);
 
-        this.refresh();
+        this.search();
         var resourcesPath = Path.of("resources");
         var localPath = Path.of("local");
         var templatePath = localPath.resolve("templates").resolve(group.getPlatform().type().equals(PlatformType.PROXY) ? "proxy" : "server").resolve(group.getName());

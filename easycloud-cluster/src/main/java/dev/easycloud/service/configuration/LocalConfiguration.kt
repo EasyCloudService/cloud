@@ -1,19 +1,14 @@
-package dev.easycloud.service.configuration;
+package dev.easycloud.service.configuration
 
-import dev.easycloud.service.configuration.resources.ConfigurationEntity;
-import lombok.Getter;
-import lombok.Setter;
+import dev.easycloud.service.configuration.resources.ConfigurationEntity
+import java.util.Locale
 
-import java.util.Locale;
-
-@Getter
-@Setter
 @ConfigurationEntity(name = "local")
-public final class LocalConfiguration {
-    private Locale language = Locale.ENGLISH;
-    private boolean announceUpdates = true;
-    private int clusterPort = 5200;
-    private int proxyPort = 25565;
-    private int startingSameTime = 3;
-    private int dynamicPercentage = 80;
-}
+class LocalConfiguration(
+    var language: Locale = Locale.ENGLISH,
+    var announceUpdates: Boolean = true,
+    var clusterPort: Int = 8080,
+    var proxyPort: Int = 25565,
+    var startingSameTime: Int = 3,
+    var dynamicPercentage: Int = 80
+)

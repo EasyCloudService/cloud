@@ -1,41 +1,37 @@
-package dev.easycloud.service.configuration;
+package dev.easycloud.service.configuration
 
-import lombok.Getter;
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.createDirectory
+import kotlin.io.path.exists
 
-import java.nio.file.Path;
+class ClusterConfiguration {
+    val path: Path = Paths.get("resources").resolve("config")
 
-@Getter
-public final class ClusterConfiguration {
-    private final Path path = Path.of("resources").resolve("config");
+    lateinit var local: LocalConfiguration
+    lateinit var security: SecurityConfiguration
 
-    private LocalConfiguration local;
-    private SecurityConfiguration security;
+    fun load() {
+        path.takeIf { !it.exists() }?.createDirectory()
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public ClusterConfiguration() {
-        var path = Path.of("resources").resolve("config");
-        path.toFile().mkdirs();
-
-        Configurations.Companion.writeIfNotExists(path, new LocalConfiguration());
-        Configurations.Companion.writeIfNotExists(path, new SecurityConfiguration());
-
-        this.reload();
+        Configurations.writeIfNotExists(path, LocalConfiguration())
+        Configurations.writeIfNotExists(path, SecurityConfiguration())
     }
 
-    public void publish(Object object) {
-        if (object instanceof LocalConfiguration localConfig) {
-            this.local = localConfig;
-            Configurations.Companion.write(path, localConfig);
-        } else if (object instanceof SecurityConfiguration securityConfig) {
-            this.security = securityConfig;
-            Configurations.Companion.write(path, securityConfig);
+    fun reload() {
+        local = Configurations.read(path, LocalConfiguration::class.java)
+        security = Configurations.read(path, SecurityConfiguration::class.java)
+    }
+
+    fun publish(config: Any) {
+        if(config is LocalConfiguration) {
+            local = config
+            Configurations.write(path, local)
+        } else if (config is SecurityConfiguration) {
+            security = config
+            Configurations.write(path, security)
         } else {
-            throw new IllegalArgumentException("Unsupported configuration type: " + object.getClass().getName());
+            throw IllegalArgumentException("Unsupported configuration type: ${config::class.java.name}")
         }
-    }
-
-    public void reload() {
-        this.local = Configurations.Companion.read(path, LocalConfiguration.class);
-        this.security = Configurations.Companion.read(path, SecurityConfiguration.class);
     }
 }

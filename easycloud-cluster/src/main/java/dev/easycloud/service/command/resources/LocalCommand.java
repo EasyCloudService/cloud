@@ -1,10 +1,10 @@
 package dev.easycloud.service.command.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;
@@ -46,7 +46,7 @@ public final class LocalCommand extends Command {
                         return;
                     }
 
-                    log.info(" - {} ({})", ansi().fgRgb(LogType.PRIMARY.rgb()).a(node.get("login").asText()).reset(), node.get("contributions").asInt());
+                    log.info(" - {} ({})", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(node.get("login").asText()).reset(), node.get("contributions").asInt());
                 });
             } catch (Exception ignored) {
             }
@@ -55,22 +55,22 @@ public final class LocalCommand extends Command {
     }
 
     private void update(String[] args) {
-        if (EasyCloudCluster.instance().releasesService().CURRENT().equals(EasyCloudCluster.instance().releasesService().name())) {
+        if (EasyCloudClusterOld.instance().releasesService().CURRENT().equals(EasyCloudClusterOld.instance().releasesService().name())) {
             log.info("You are using the latest version of EasyCloud. Good job :>");
             return;
         }
 
-        log.info("Downloading version {} from Github...", ansi().fgRgb(LogType.PRIMARY.rgb()).a(EasyCloudCluster.instance().releasesService().name()).reset());
+        log.info("Downloading version {} from Github...", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(EasyCloudClusterOld.instance().releasesService().name()).reset());
         new Thread(() -> {
-            EasyCloudCluster.instance().releasesService().download();
+            EasyCloudClusterOld.instance().releasesService().download();
 
             log.info("―".repeat(80));
             log.info("");
-            log.info("Download completed. Please restart the @{} to apply the changes.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud").reset());
-            log.info("After restarting wait {} for the {} to be applied.", ansi().fgRgb(LogType.PRIMARY.rgb()).a("4-5 seconds").reset(), ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud Updater").reset());
+            log.info("Download completed. Please restart the @{} to apply the changes.", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("EasyCloud").reset());
+            log.info("After restarting wait {} for the {} to be applied.", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("4-5 seconds").reset(), ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("EasyCloud Updater").reset());
             log.info("");
-            log.info("Always make sure you use {} command to stop the @{}", ansi().fgRgb(LogType.ERROR.rgb()).a("shutdown").reset(), ansi().fgRgb(LogType.PRIMARY.rgb()).a("EasyCloud").reset());
-            log.info("And always make sure you read this: {}", ansi().fgRgb(LogType.PRIMARY.rgb()).a("https://github.com/EasyCloudService/cloud/releases/latest"));
+            log.info("Always make sure you use {} command to stop the @{}", ansi().fgRgb(Log4jColor.ERROR.rgb()).a("shutdown").reset(), ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("EasyCloud").reset());
+            log.info("And always make sure you read this: {}", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("https://github.com/EasyCloudService/cloud/releases/latest"));
             log.info("");
             log.info("―".repeat(80));
         }).start();

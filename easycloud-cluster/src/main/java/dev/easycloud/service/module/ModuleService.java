@@ -1,7 +1,7 @@
 package dev.easycloud.service.module;
 
 import dev.easycloud.service.configuration.Configurations;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public final class ModuleService {
     }
 
     @SneakyThrows
-    public void refresh() {
+    public void search() {
         this.modules.clear();
         for (File file : Objects.requireNonNull(this.modulePath.toFile().listFiles())) {
             if (!file.getName().endsWith(".jar")) continue;
@@ -59,10 +59,10 @@ public final class ModuleService {
             var platforms = new StringBuilder();
             Arrays.stream(module.platforms()).toList().forEach(platform -> {
                 if (!platforms.isEmpty()) platforms.append(";");
-                platforms.append(ansi().fgRgb(LogType.PRIMARY.rgb()).a(platform).reset());
+                platforms.append(ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(platform).reset());
             });
 
-            log.info("* {} ({})", ansi().fgRgb(LogType.PRIMARY.rgb()).a(module.name()).reset(), platforms);
+            log.info("* {} ({})", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(module.name()).reset(), platforms);
         });
     }
 }

@@ -1,8 +1,8 @@
 package dev.easycloud.service.terminal;
 
 
-import dev.easycloud.service.EasyCloudCluster;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.EasyCloudClusterOld;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
 import org.jline.reader.impl.LineReaderImpl;
 
@@ -33,10 +33,10 @@ public final class TerminalReadingThread extends Thread {
             var prompt = this.terminal.prompt();
             if(this.terminal.logging()) {
                 prompt = ansi()
-                        .fgRgb(LogType.WHITE.rgb()).a("service")
-                        .fgRgb(LogType.GRAY.rgb()).a("@")
-                        .fgRgb(LogType.ERROR.rgb()).a("exit")
-                        .fgRgb(LogType.GRAY.rgb()).a(": ").toString();
+                        .fgRgb(Log4jColor.WHITE.rgb()).a("dev/easycloud/service")
+                        .fgRgb(Log4jColor.GRAY.rgb()).a("@")
+                        .fgRgb(Log4jColor.ERROR.rgb()).a("exit")
+                        .fgRgb(Log4jColor.GRAY.rgb()).a(": ").toString();
             }
             var line = this.lineReader.readLine(prompt);
             if (line != null && !line.isEmpty()) {
@@ -51,10 +51,10 @@ public final class TerminalReadingThread extends Thread {
                 }
 
                 if(!line.contains(" ")) {
-                    EasyCloudCluster.instance().commandProvider().execute(line, new String[0]);
+                    EasyCloudClusterOld.instance().commandProvider().execute(line, new String[0]);
                 } else {
                     var args = line.split(" ");
-                    EasyCloudCluster.instance().commandProvider().execute(args[0], line.replaceFirst(args[0], "").split(" "));
+                    EasyCloudClusterOld.instance().commandProvider().execute(args[0], line.replaceFirst(args[0], "").split(" "));
                 }
             }
         }

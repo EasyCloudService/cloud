@@ -23,6 +23,8 @@ class EasyCloudLoader {
         val modulesPath = Paths.get("modules")
 
         // Create directories if they do not exist
+        System.setProperty("easycloud.first-start", (!localPath.exists()).toString())
+
         localPath.takeIf { !it.exists() }?.createDirectory()
         resourcesPath.takeIf { !it.exists() }?.createDirectory()
         librariesPath.takeIf { !it.exists() }?.createDirectory()

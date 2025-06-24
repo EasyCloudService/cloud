@@ -1,10 +1,9 @@
 package dev.easycloud.service.terminal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import dev.easycloud.service.terminal.stream.SimpleLoggingStream;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +20,6 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.InfoCmp;
 import org.jline.widget.AutosuggestionWidgets;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -40,6 +37,8 @@ public final class TerminalImpl {
     private final List<String> history = new ArrayList<>();
 
     private TerminalReadingThread readingThread;
+    @Setter
+    private TerminalState state = TerminalState.RUNNING;
 
     @Setter
     private boolean logging = false;
@@ -47,10 +46,10 @@ public final class TerminalImpl {
     @SneakyThrows
     public TerminalImpl() {
         this.prompt = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("cluster")
-                .fgRgb(LogType.GRAY.rgb()).a("@")
-                .fgRgb(LogType.WHITE.rgb()).a("cloud")
-                .fgRgb(LogType.GRAY.rgb()).a(": ").toString();
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a("cluster")
+                .fgRgb(Log4jColor.GRAY.rgb()).a("@")
+                .fgRgb(Log4jColor.WHITE.rgb()).a("cloud")
+                .fgRgb(Log4jColor.GRAY.rgb()).a(": ").toString();
 
         AnsiConsole.systemInstall();
         this.terminal = TerminalBuilder.builder()
@@ -88,7 +87,7 @@ public final class TerminalImpl {
         autoSuggestion.enable();
 
         System.setOut(new SimpleLoggingStream(this::print).printStream());
-        System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(result).reset().toString())).printStream());
+        System.setErr(new SimpleLoggingStream(result -> this.print(ansi().fgRgb(Log4jColor.ERROR.rgb()).a(result).reset().toString())).printStream());
     }
 
     public void revert() {
@@ -103,15 +102,15 @@ public final class TerminalImpl {
         this.update();
     }
 
-    public void start() {
+    public void run() {
         this.readingThread = new TerminalReadingThread(this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
             if (exception instanceof UserInterruptException) {
-                EasyCloudCluster.instance().shutdown();
+                EasyCloudClusterOld.instance().shutdown();
                 return;
             }
             exception.printStackTrace();
-            EasyCloudCluster.instance().shutdown();
+            EasyCloudClusterOld.instance().shutdown();
         });
         this.readingThread.start();
         this.clear();
@@ -137,22 +136,22 @@ public final class TerminalImpl {
     }
 
     public void exit(ServiceImpl service) {
-        EasyCloudCluster.instance().terminal().logging(false);
+        EasyCloudClusterOld.instance().terminal().logging(false);
 
         if (service != null) {
             service.logStream(false);
         }
 
         ((TerminalCompleter) this.lineReader.getCompleter()).enabled(true);
-        EasyCloudCluster.instance().terminal().revert();
+        EasyCloudClusterOld.instance().terminal().revert();
     }
 
     public void redraw() {
         var layout = ansi()
-                .fgRgb(LogType.PRIMARY.rgb()).a("           _           ").reset().a(" _              \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("          |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("          |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
-                .fgRgb(LogType.PRIMARY.rgb()).a("                    /  ").reset().a("\n").reset()
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a("           _           ").reset().a(" _              \n").reset()
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a("          |_  _.  _    ").reset().a("/  |  _       _| \n").reset()
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a("          |_ (_| _> \\/ ").reset().a("\\_ | (_) |_| (_|\n").reset()
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a("                    /  ").reset().a("\n").reset()
                 .reset().a("\n").toString();
 
         for (String s : layout.split("\n")) {

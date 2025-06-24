@@ -7,7 +7,6 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
 public final class PlatformProvider {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<PlatformInitializer> initializers = new ArrayList<>();
@@ -21,10 +20,19 @@ public final class PlatformProvider {
         return this.initializers.stream().filter(it -> it.id().equals(id)).findFirst().orElse(null);
     }
 
-    public void refresh() {
+    public void search() {
         this.platforms.clear();
         for (PlatformInitializer initializer : this.initializers) {
             this.platforms.addAll(initializer.platforms());
         }
     }
+
+    public List<Platform> platforms() {
+        return this.platforms;
+    }
+
+    public List<PlatformInitializer> initializers() {
+        return this.initializers;
+    }
+
 }
