@@ -21,7 +21,7 @@ public final class ServiceCommand extends Command {
 
     @Inject
     public ServiceCommand(I18nProvider i18nProvider, ServiceProvider serviceProvider, Terminal terminal) {
-        super("dev/easycloud/service", i18nProvider.get("command.service.info"));
+        super("service", i18nProvider.get("command.service.info"));
         this.i18nProvider = i18nProvider;
         this.serviceProvider = serviceProvider;
         this.terminal = terminal;

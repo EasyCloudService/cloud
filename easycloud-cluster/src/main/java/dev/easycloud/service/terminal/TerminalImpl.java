@@ -103,8 +103,11 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
         this.update();
     }
 
+    @Override
     public void run() {
+        System.out.println("a");
         this.readingThread = new TerminalReadingThread(this);
+        System.out.println("b");
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
             if (exception instanceof UserInterruptException) {
                 EasyCloudClusterOld.instance().shutdown();
@@ -113,8 +116,11 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
             exception.printStackTrace();
             EasyCloudClusterOld.instance().shutdown();
         });
+        System.out.println("c");
         this.readingThread.start();
+        System.out.println("d");
         this.clear();
+        System.out.println("e");
     }
 
     @Override

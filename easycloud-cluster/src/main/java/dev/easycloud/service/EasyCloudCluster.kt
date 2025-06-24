@@ -35,7 +35,6 @@ class EasyCloudCluster {
     fun load() {
         // Set paths
         val localPath = Paths.get("local")
-        val resourcePath = Paths.get("resources")
         EasyFiles.remove(localPath.resolve("dynamic"))
 
         // Initialize google guice injector
@@ -73,22 +72,19 @@ class EasyCloudCluster {
     }
 
     fun run() {
+        // TODO: temporary fix for old cluster
+        EasyCloudClusterOld(injector)
+        // TODO: temporary fix for old cluster
+
         // Run terminal
-        injector.getInstance(TerminalImpl::class.java).run()
+        injector.getInstance(Terminal::class.java).run()
 
         // Check if property is set for first start
         if (System.getProperty("easycloud.first-start") == "true") {
             OnboardingProvider().run()
         }
-
         // Configuration
         val configuration = injector.getInstance(ClusterConfiguration::class.java)
-
-        // TODO: temporary fix for old cluster
-        EasyCloudClusterOld(injector)
-        // TODO: temporary fix for old cluster
-
-
         val i18nProvider = injector.getInstance(I18nProvider::class.java)
         logger.info(
             i18nProvider.get(
@@ -128,6 +124,9 @@ class EasyCloudCluster {
 
         // Search modules
         injector.getInstance(ModuleService::class.java).search()
+
+        // Initialize commands
+        injector.getInstance(CommandProvider::class.java).init(this.injector)
 
         // Cluster ready
         logger.info(i18nProvider.get("cluster.ready", "<white>${System.currentTimeMillis() - startedAt}ms<reset>"))

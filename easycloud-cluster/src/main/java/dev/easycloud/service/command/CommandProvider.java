@@ -24,16 +24,19 @@ public final class CommandProvider {
     private final List<Command> commands;
 
     private final Terminal terminal;
-    private final ServiceProvider serviceProvider;
     private final I18nProvider i18nProvider;
+    private final ServiceProvider serviceProvider;
 
     @Inject
-    public CommandProvider(Injector injector, Terminal terminal, ServiceProvider serviceProvider, I18nProvider i18nProvider) {
+    public CommandProvider(Terminal terminal, I18nProvider i18nProvider, ServiceProvider serviceProvider) {
         this.terminal = terminal;
-        this.serviceProvider = serviceProvider;
         this.i18nProvider = i18nProvider;
+        this.serviceProvider = serviceProvider;
 
         this.commands = new ArrayList<>();
+    }
+
+    public void init(Injector injector) {
         this.commands.add(injector.getInstance(HelpCommand.class));
         this.commands.add(injector.getInstance(ClearCommand.class));
         this.commands.add(injector.getInstance(ShutdownCommand.class));

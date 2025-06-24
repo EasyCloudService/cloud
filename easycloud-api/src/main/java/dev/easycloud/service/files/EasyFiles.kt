@@ -7,7 +7,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.*
 import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.exists
 
 class EasyFiles {

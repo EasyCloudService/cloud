@@ -6,7 +6,7 @@ repositories {
 
 plugins {
     id("maven-publish")
-    kotlin("jvm") version "2.2.0-RC2"
+    kotlin("jvm")
 }
 
 dependencies {
@@ -16,7 +16,8 @@ dependencies {
 
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("io.activej:activej:6.0-rc2")
-    implementation(kotlin("stdlib-jdk8"))
+
+    compileOnly(kotlin("stdlib"))
 }
 
 tasks.jar {
@@ -33,7 +34,4 @@ publishing {
             from(components["java"])
         }
     }
-}
-kotlin {
-    jvmToolchain(21)
 }

@@ -1,7 +1,7 @@
 plugins {
     id("dev.vankka.dependencydownload.plugin") version ("1.3.1")
     id("application")
-    kotlin("jvm") version "2.2.0-RC2"
+    kotlin("jvm") 
 }
 
 repositories {
@@ -34,7 +34,8 @@ dependencies {
     runtimeDownload("commons-io:commons-io:2.19.0")
 
     runtimeDownload("org.jetbrains:annotations:15.0")
-    implementation(kotlin("stdlib-jdk8"))
+
+    runtimeDownload(kotlin("stdlib"))
 }
 
 tasks.withType<Jar> {
@@ -60,6 +61,6 @@ tasks.withType<Jar> {
         tasks.named("generateRuntimeDownloadResourceForRuntimeDownload")
     )
 }
-kotlin {
+/*kotlin {
     jvmToolchain(21)
-}
+}*/

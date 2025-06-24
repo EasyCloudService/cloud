@@ -9,6 +9,7 @@ public interface Terminal {
     TerminalState state();
     boolean logging();
 
+    void run();
     void clear();
     void clear(boolean redraw);
     void exit(Service service);

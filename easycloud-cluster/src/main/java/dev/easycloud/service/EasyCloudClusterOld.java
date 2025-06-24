@@ -11,6 +11,7 @@ import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.release.ReleasesService;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.ServiceImpl;
+import dev.easycloud.service.terminal.Terminal;
 import dev.easycloud.service.terminal.TerminalImpl;
 import dev.easycloud.service.terminal.TerminalState;
 import lombok.Getter;
@@ -48,7 +49,7 @@ public final class EasyCloudClusterOld {
     public EasyCloudClusterOld(Injector injector) {
         instance = this;
 
-        this.terminal = injector.getInstance(TerminalImpl.class);
+        this.terminal = (TerminalImpl) injector.getInstance(Terminal.class);
         this.i18nProvider = injector.getInstance(I18nProvider.class);
         this.commandProvider = injector.getInstance(CommandProvider.class);
         this.serviceProvider = injector.getInstance(ServiceProvider.class);
