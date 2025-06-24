@@ -1,16 +1,24 @@
 package dev.easycloud.service.service;
 
+import com.google.inject.Inject;
 import dev.easycloud.service.EasyCloudClusterOld;
+import dev.easycloud.service.configuration.ClusterConfiguration;
 import dev.easycloud.service.configuration.Configurations;
+import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.module.ModuleService;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
+import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchFactory;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
+import dev.easycloud.service.terminal.Terminal;
 import dev.easycloud.service.terminal.TerminalState;
 import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
@@ -33,7 +41,28 @@ public final class ServiceProviderImpl implements ServiceProvider {
     @Getter
     private final List<Service> services = new ArrayList<>();
 
-    public ServiceProviderImpl() {
+    private final Terminal terminal;
+    private final ClusterConfiguration configuration;
+    private final I18nProvider i18nProvider;
+    private final ModuleService moduleService;
+    private final PlatformProvider platformProvider;
+    private final EventProvider eventProvider;
+    private final GroupProvider groupProvider;
+
+    @Inject
+    public ServiceProviderImpl(
+            Terminal terminal, ClusterConfiguration configuration, I18nProvider I18nProvider,
+            PlatformProvider platformProvider, ModuleService moduleService,
+            EventProvider eventProvider, GroupProvider groupProvider
+    ) {
+        this.terminal = terminal;
+        this.configuration = configuration;
+        this.i18nProvider = I18nProvider;
+        this.moduleService = moduleService;
+        this.platformProvider = platformProvider;
+        this.eventProvider = eventProvider;
+        this.groupProvider = groupProvider;
+
         new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(5));
 
         var templatePath = Path.of("local").resolve("templates");
@@ -53,7 +82,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
     }
 
     public void refresh() {
-        if(EasyCloudClusterOld.instance().terminal().state().equals(TerminalState.STOPPING)) {
+        if(this.terminal.state().equals(TerminalState.STOPPING)) {
             return;
         }
 
@@ -61,16 +90,16 @@ public final class ServiceProviderImpl implements ServiceProvider {
             this.shutdown(service);
         }
 
-        if (EasyCloudClusterOld.instance().groupProvider() == null) {
+        if (this.groupProvider == null) {
             return;
         }
 
         var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
-        if (currentStarting >= EasyCloudClusterOld.instance().configuration().local.getStartingSameTime()) {
+        if (currentStarting >= this.configuration.local.getStartingSameTime()) {
             return;
         }
 
-        for (Group group : EasyCloudClusterOld.instance().groupProvider().groups()
+        for (Group group : this.groupProvider.groups()
                 .stream()
                 .sorted((o1, o2) -> {
                     if (o1.read(GroupProperties.PRIORITY()) == null) {
@@ -96,7 +125,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
                     if (this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count() >= max) {
                         break;
                     }
-                    if (currentStarting >= EasyCloudClusterOld.instance().configuration().local.getStartingSameTime()) {
+                    if (currentStarting >= this.configuration.local.getStartingSameTime()) {
                         return;
                     }
                     this.launch(new ServiceLaunchBuilder(group.getName()));
@@ -105,7 +134,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             }
 
             online = this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count();
-            var percentage = EasyCloudClusterOld.instance().configuration().local.getDynamicPercentage() / 100.0;
+            var percentage = this.configuration.local.getDynamicPercentage() / 100.0;
 
             if (online < max) {
                 for (Service service : this.services().stream().filter(it -> it.group().getName().equals(group.getName())).toList()) {
@@ -160,7 +189,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
     @Override
     public CompletableFuture<Service> launch(ServiceLaunchBuilder builder) {
-        var defaultGroup = EasyCloudClusterOld.instance().groupProvider().get(builder.group());
+        var defaultGroup = this.groupProvider.get(builder.group());
         var group = new Group(defaultGroup.getEnabled(), defaultGroup.getName(), defaultGroup.getPlatform());
         builder.properties().forEach((key, value) -> group.getProperties().put(key, value));
         defaultGroup.getProperties().forEach((key, value) -> {
@@ -176,7 +205,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         var port = this.freePort();
         if (group.getPlatform().type().equals(PlatformType.PROXY)) {
-            port = EasyCloudClusterOld.instance().configuration().local.getProxyPort() + (int) this.services.stream().filter(it -> it.group().getPlatform().type().equals(PlatformType.PROXY)).count();
+            port = this.configuration.local.getProxyPort() + (int) this.services.stream().filter(it -> it.group().getPlatform().type().equals(PlatformType.PROXY)).count();
         }
         if (port == -1) {
             log.error("No free port available.");
@@ -217,10 +246,10 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var process = ServiceLaunchFactory.create(service);
         service.process(process);
 
-        log.info(EasyCloudClusterOld.instance().i18nProvider().get("service.launched", ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
+        log.info(this.i18nProvider.get("service.launched", ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
 
         this.services.add(service);
-        EasyCloudClusterOld.instance().eventProvider().publish(new ServiceStartingEvent(builder.builderId(), service));
+        this.eventProvider.publish(new ServiceStartingEvent(builder.builderId(), service));
         return CompletableFuture.completedFuture(service);
     }
 
@@ -245,14 +274,14 @@ public final class ServiceProviderImpl implements ServiceProvider {
             if (Files.exists(secretPath)) {
                 Files.delete(secretPath);
             }
-            Files.write(secretPath, EasyCloudClusterOld.instance().configuration().security.getValue().getBytes());
+            Files.write(secretPath, this.configuration.security.getValue().getBytes());
         } else {
             FileUtils.copyDirectory(templatePath.resolve("global").resolve("server").toFile(), service.directory().toFile());
             FileUtils.copyDirectory(templatePath.resolve("server").resolve(service.group().getName()).toFile(), service.directory().toFile());
         }
 
-        EasyCloudClusterOld.instance().platformProvider().initializer(group.getPlatform().initializerId()).initialize(service.directory());
-        Configurations.Companion.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudClusterOld.instance().configuration().security.getValue(), EasyCloudClusterOld.instance().configuration().local.getClusterPort()));
+        this.platformProvider.initializer(group.getPlatform().initializerId()).initialize(service.directory());
+        Configurations.Companion.write(service.directory(), new ServiceDataConfiguration(service.id(), this.configuration.security.getValue(), this.configuration.local.getClusterPort()));
 
         try {
             Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
@@ -261,7 +290,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return false;
         }
 
-        EasyCloudClusterOld.instance().moduleService().modules()
+        this.moduleService.modules()
                 .entrySet()
                 .stream()
                 .filter(it -> Arrays.stream(it.getKey().platforms()).toList().stream().anyMatch(it2 -> it2.equals(service.group().getPlatform().initializerId())))

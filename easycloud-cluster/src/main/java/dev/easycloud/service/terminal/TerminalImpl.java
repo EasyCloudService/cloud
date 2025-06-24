@@ -1,6 +1,7 @@
 package dev.easycloud.service.terminal;
 
 import dev.easycloud.service.EasyCloudClusterOld;
+import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
 import dev.easycloud.service.terminal.logger.Log4jColor;
@@ -29,7 +30,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Getter
 @Accessors(fluent = true)
 @SuppressWarnings("CallToPrintStackTrace")
-public final class TerminalImpl {
+public final class TerminalImpl implements dev.easycloud.service.terminal.Terminal {
     private final String prompt;
 
     private final Terminal terminal;
@@ -135,11 +136,12 @@ public final class TerminalImpl {
         }
     }
 
-    public void exit(ServiceImpl service) {
+    @Override
+    public void exit(Service service) {
         EasyCloudClusterOld.instance().terminal().logging(false);
 
         if (service != null) {
-            service.logStream(false);
+            ((ServiceImpl) service).logStream(false);
         }
 
         ((TerminalCompleter) this.lineReader.getCompleter()).enabled(true);
