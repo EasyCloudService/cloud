@@ -1,6 +1,5 @@
 package dev.easycloud.service.command;
 
-import dev.easycloud.service.EasyCloudClusterOld;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -22,14 +21,14 @@ public final class CommandNode {
 
     public CommandNode(String name, String description, Consumer<String[]> onExecute) {
         this.name = name;
-        this.description = EasyCloudClusterOld.instance().i18nProvider().get(description);
+        this.description = description;
         this.completer = null;
         this.onExecute = onExecute;
     }
 
     public CommandNode(String name, String description, Function<Void, List<String>> completer, Consumer<String[]> onExecute) {
         this.name = name;
-        this.description = EasyCloudClusterOld.instance().i18nProvider().get(description);
+        this.description = description;
         this.completer = completer;
         this.onExecute = onExecute;
     }

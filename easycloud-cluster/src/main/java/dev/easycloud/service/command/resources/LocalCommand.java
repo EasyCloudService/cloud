@@ -1,9 +1,12 @@
 package dev.easycloud.service.command.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.release.ReleasesService;
 import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,24 +17,29 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 @Slf4j
 public final class LocalCommand extends Command {
+    private final I18nProvider i18nProvider;
+    private final ReleasesService releasesService;
 
-    public LocalCommand() {
-        super("local", "command.local.info");
+    @Inject
+    public LocalCommand(I18nProvider i18nProvider, ReleasesService releasesService) {
+        super("local", i18nProvider.get("command.local.info"));
+        this.i18nProvider = i18nProvider;
+        this.releasesService = releasesService;
 
-        addSubCommand(new CommandNode("contributors", "command.local.contributors.info", this::contributors));
-        addSubCommand(new CommandNode("update", "command.local.update.info", this::update));
+        addSubCommand(new CommandNode("contributors", this.i18nProvider.get("command.local.contributors.info"), this::contributors));
+        addSubCommand(new CommandNode("update", this.i18nProvider.get("command.local.update.info"), this::update));
     }
 
     @Override
     public void executeBase() {
-        log.error(this.i18nProvider().get("global.wrongUsage"));
+        log.error(this.i18nProvider.get("global.wrongUsage"));
         log.info("local [contributors]");
         log.info("local [update]");
     }
 
     @SuppressWarnings("deprecation")
     private void contributors(String[] args) {
-        log.info(this.i18nProvider().get("global.contributors"));
+        log.info(this.i18nProvider.get("global.contributors"));
         new Thread(() -> {
             URL url;
             try {
@@ -42,7 +50,7 @@ public final class LocalCommand extends Command {
             try {
                 var mapper = new ObjectMapper().readTree(url);
                 mapper.forEach(node -> {
-                    if(node.get("login") == null || node.get("type").asText().equalsIgnoreCase("bot")) {
+                    if (node.get("login") == null || node.get("type").asText().equalsIgnoreCase("bot")) {
                         return;
                     }
 
@@ -55,14 +63,14 @@ public final class LocalCommand extends Command {
     }
 
     private void update(String[] args) {
-        if (EasyCloudClusterOld.instance().releasesService().CURRENT().equals(EasyCloudClusterOld.instance().releasesService().name())) {
+        if (this.releasesService.CURRENT().equals(this.releasesService.name())) {
             log.info("You are using the latest version of EasyCloud. Good job :>");
             return;
         }
 
-        log.info("Downloading version {} from Github...", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(EasyCloudClusterOld.instance().releasesService().name()).reset());
+        log.info("Downloading version {} from Github...", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a(this.releasesService.name()).reset());
         new Thread(() -> {
-            EasyCloudClusterOld.instance().releasesService().download();
+            this.releasesService.download();
 
             log.info("―".repeat(80));
             log.info("");

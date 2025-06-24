@@ -1,7 +1,7 @@
 package dev.easycloud.service.command;
 
 import com.google.inject.Inject;
-import dev.easycloud.service.EasyCloudClusterOld;
+import com.google.inject.Injector;
 import dev.easycloud.service.command.resources.*;
 import dev.easycloud.service.group.command.GroupCommand;
 import dev.easycloud.service.i18n.I18nProvider;
@@ -28,13 +28,19 @@ public final class CommandProvider {
     private final I18nProvider i18nProvider;
 
     @Inject
-    public CommandProvider(Terminal terminal, ServiceProvider serviceProvider, I18nProvider i18nProvider) {
+    public CommandProvider(Injector injector, Terminal terminal, ServiceProvider serviceProvider, I18nProvider i18nProvider) {
         this.terminal = terminal;
         this.serviceProvider = serviceProvider;
         this.i18nProvider = i18nProvider;
 
         this.commands = new ArrayList<>();
-        this.commands.addAll(List.of(new HelpCommand(), new ClearCommand(), new ShutdownCommand(), new GroupCommand(), new ServiceCommand(), new ReloadCommand(), new LocalCommand()));
+        this.commands.add(injector.getInstance(HelpCommand.class));
+        this.commands.add(injector.getInstance(ClearCommand.class));
+        this.commands.add(injector.getInstance(ShutdownCommand.class));
+        this.commands.add(injector.getInstance(GroupCommand.class));
+        this.commands.add(injector.getInstance(ServiceCommand.class));
+        this.commands.add(injector.getInstance(ReloadCommand.class));
+        this.commands.add(injector.getInstance(LocalCommand.class));
     }
 
     public void execute(String command, String[] args) {

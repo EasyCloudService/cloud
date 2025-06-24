@@ -117,10 +117,12 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
         this.clear();
     }
 
+    @Override
     public void clear() {
         this.clear(true);
     }
 
+    @Override
     public void clear(boolean redraw) {
         this.terminal.puts(InfoCmp.Capability.clear_screen);
         this.terminal.flush();
@@ -138,14 +140,14 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
 
     @Override
     public void exit(Service service) {
-        EasyCloudClusterOld.instance().terminal().logging(false);
+        this.logging(false);
 
         if (service != null) {
             ((ServiceImpl) service).logStream(false);
         }
 
         ((TerminalCompleter) this.lineReader.getCompleter()).enabled(true);
-        EasyCloudClusterOld.instance().terminal().revert();
+        this.revert();
     }
 
     public void redraw() {

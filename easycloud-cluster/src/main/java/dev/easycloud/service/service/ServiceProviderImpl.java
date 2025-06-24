@@ -73,12 +73,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
         //noinspection ResultOfMethodCallIgnored
         templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
-        new ServiceReadyListener();
-        new ServiceShutdownListener();
-        new ServiceRequestInformationListener();
-        new ServiceRequestLaunchListener();
-        new ServiceUpdateListener();
-        new ServiceRequestShutdownListener();
+        new ServiceReadyListener(this, this.eventProvider, this.i18nProvider);
+        new ServiceShutdownListener(this, this.eventProvider);
+        new ServiceRequestInformationListener(this, this.eventProvider);
+        new ServiceRequestLaunchListener(this, this.eventProvider);
+        new ServiceUpdateListener(this, this.eventProvider);
+        new ServiceRequestShutdownListener(this, this.eventProvider);
     }
 
     public void refresh() {

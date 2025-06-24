@@ -1,17 +1,22 @@
 package dev.easycloud.service.command.resources;
 
-import dev.easycloud.service.EasyCloudClusterOld;
+import com.google.inject.Inject;
 import dev.easycloud.service.command.Command;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.terminal.Terminal;
 
 public final class ClearCommand extends Command {
+    private final Terminal terminal;
 
-    public ClearCommand() {
-        super("clear", "command.clear.info");
+    @Inject
+    public ClearCommand(I18nProvider i18nProvider, Terminal terminal) {
+        super("clear", i18nProvider.get("command.clear.info"));
+        this.terminal = terminal;
     }
 
     @Override
     public void executeBase() {
-        EasyCloudClusterOld.instance().terminal().clear();
-        EasyCloudClusterOld.instance().terminal().history().clear();
+        this.terminal.clear();
+        this.terminal.history().clear();
     }
 }
