@@ -41,6 +41,9 @@ dependencies {
 tasks.withType<Jar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations["compileClasspath"].forEach { file: File ->
+        if(!file.name.startsWith("dependencydownload") && !file.name.startsWith("kotlin")) {
+            return@forEach
+        }
         from(zipTree(file.absoluteFile))
     }
 
