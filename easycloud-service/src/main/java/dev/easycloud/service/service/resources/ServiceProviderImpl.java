@@ -1,7 +1,5 @@
 package dev.easycloud.service.service.resources;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestLaunch;
@@ -10,6 +8,7 @@ import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.ServiceUpdateListener;
+import io.activej.inject.Injector;
 import lombok.Getter;
 
 import java.util.*;
@@ -24,8 +23,8 @@ public final class ServiceProviderImpl implements ServiceProvider {
         this.eventProvider = eventProvider;
     }
 
-    public void init(Injector injector) {
-        injector.getInstance(ServiceUpdateListener.class);
+    public void init(Injector inject) {
+        inject.getInstance(ServiceUpdateListener.class);
 
         this.eventProvider.socket().read(ServiceStartingEvent.class, (socket, event) -> {
             if(this.serviceLaunchFutures.containsKey(event.builderId())) {

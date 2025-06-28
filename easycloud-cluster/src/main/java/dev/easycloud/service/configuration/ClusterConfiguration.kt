@@ -24,14 +24,20 @@ class ClusterConfiguration {
     }
 
     fun publish(config: Any) {
-        if(config is LocalConfiguration) {
-            local = config
-            Configurations.write(path, local)
-        } else if (config is SecurityConfiguration) {
-            security = config
-            Configurations.write(path, security)
-        } else {
-            throw IllegalArgumentException("Unsupported configuration type: ${config::class.java.name}")
+        when (config) {
+            is LocalConfiguration -> {
+                local = config
+                Configurations.write(path, local)
+            }
+
+            is SecurityConfiguration -> {
+                security = config
+                Configurations.write(path, security)
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unsupported configuration type: ${config::class.java.name}")
+            }
         }
     }
 }

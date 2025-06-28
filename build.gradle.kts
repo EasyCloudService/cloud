@@ -16,7 +16,7 @@ allprojects {
         "compileOnly"("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
 
         "compileOnly"("com.google.code.gson:gson:2.12.1")
-        "compileOnly"("com.google.inject:guice:7.0.0")
+        "compileOnly"("io.activej:activej-inject:6.0-rc2")
 
         "compileOnly"("org.projectlombok:lombok:1.18.36")
         "annotationProcessor"("org.projectlombok:lombok:1.18.36")

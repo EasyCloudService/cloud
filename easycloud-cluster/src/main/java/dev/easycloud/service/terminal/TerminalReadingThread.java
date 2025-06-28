@@ -11,10 +11,10 @@ import java.util.function.Consumer;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public final class TerminalReadingThread extends Thread {
-    private final TerminalImpl terminal;
+    private final ClusterTerminal terminal;
     private final LineReaderImpl lineReader;
 
-    public TerminalReadingThread(TerminalImpl terminal) {
+    public TerminalReadingThread(ClusterTerminal terminal) {
         super("Console-Thread");
 
         this.terminal = terminal;

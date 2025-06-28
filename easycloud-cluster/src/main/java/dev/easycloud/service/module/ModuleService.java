@@ -2,6 +2,7 @@ package dev.easycloud.service.module;
 
 import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.jar.JarFile;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -26,6 +26,7 @@ public final class ModuleService {
     @Getter
     private final Map<ModuleConfiguration, Path> modules;
 
+    @Inject
     public ModuleService() {
         this.modulePath = Path.of("modules");
         this.modules = new HashMap<>();
@@ -39,8 +40,6 @@ public final class ModuleService {
         this.modules.clear();
         for (File file : Objects.requireNonNull(this.modulePath.toFile().listFiles())) {
             if (!file.getName().endsWith(".jar")) continue;
-
-            var jarFile = new JarFile(file);
             try (var classLoader = URLClassLoader.newInstance(new URL[]{new URL("jar:file:" + file.getAbsolutePath() + "!/")})) {
                 var configurationPath = this.modulePath.resolve(file.getName() + ".json");
                 Files.copy(Objects.requireNonNull(classLoader.getResourceAsStream("module.json")), configurationPath, StandardCopyOption.REPLACE_EXISTING);

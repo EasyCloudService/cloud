@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,7 @@ public final class ReleasesService {
     @Getter
     private final String CURRENT = "1.0.0-preview6";
 
+    @Inject
     public ReleasesService() {
         this.check();
     }

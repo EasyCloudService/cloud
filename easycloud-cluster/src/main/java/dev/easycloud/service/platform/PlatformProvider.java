@@ -2,7 +2,7 @@ package dev.easycloud.service.platform;
 
 import dev.easycloud.service.platform.initializer.papermc.platform.PaperPlatformInitializer;
 import dev.easycloud.service.platform.initializer.papermc.platform.VelocityPlatformInitializer;
-import lombok.Getter;
+import io.activej.inject.annotation.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ public final class PlatformProvider {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<PlatformInitializer> initializers = new ArrayList<>();
 
+    @Inject
     public PlatformProvider() {
         this.initializers.add(new PaperPlatformInitializer());
         this.initializers.add(new VelocityPlatformInitializer());

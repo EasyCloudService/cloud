@@ -1,9 +1,9 @@
 package dev.easycloud.service.service.listener;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
 import dev.easycloud.service.service.ServiceProvider;
+import io.activej.inject.annotation.Inject;
 
 public final class ServiceUpdateListener {
     @Inject

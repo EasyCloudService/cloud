@@ -1,9 +1,6 @@
 package dev.easycloud.service;
 
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
+import jakarta.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
@@ -38,7 +35,7 @@ public final class BridgeModuleVelocity {
 
         var injector = EasyCloudService.injector;
         this.eventProvider = injector.getInstance(EventProvider.class);
-        this.service = injector.getInstance(Key.get(Service.class, Names.named("thisService")));
+        this.service = injector.getInstance(Service.class);
 
         injector.getInstance(ServiceProvider.class).services()
                 .stream()

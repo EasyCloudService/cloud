@@ -1,6 +1,5 @@
 package dev.easycloud.service;
 
-import com.google.inject.Injector;
 import dev.easycloud.service.configuration.ClusterConfiguration;
 import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.command.CommandProvider;
@@ -11,9 +10,9 @@ import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.release.ReleasesService;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.ServiceImpl;
-import dev.easycloud.service.terminal.Terminal;
-import dev.easycloud.service.terminal.TerminalImpl;
+import dev.easycloud.service.terminal.ClusterTerminal;
 import dev.easycloud.service.terminal.TerminalState;
+import io.activej.inject.Injector;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -23,8 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 @Getter
 @Accessors(fluent = true)
 @Slf4j
@@ -33,7 +30,7 @@ public final class EasyCloudClusterOld {
     @Getter
     private static EasyCloudClusterOld instance;
 
-    private final TerminalImpl terminal;
+    private final ClusterTerminal terminal;
     private final I18nProvider i18nProvider;
     private final CommandProvider commandProvider;
 
@@ -49,7 +46,7 @@ public final class EasyCloudClusterOld {
     public EasyCloudClusterOld(Injector injector) {
         instance = this;
 
-        this.terminal = (TerminalImpl) injector.getInstance(Terminal.class);
+        this.terminal = injector.getInstance(ClusterTerminal.class);
         this.i18nProvider = injector.getInstance(I18nProvider.class);
         this.commandProvider = injector.getInstance(CommandProvider.class);
         this.serviceProvider = injector.getInstance(ServiceProvider.class);

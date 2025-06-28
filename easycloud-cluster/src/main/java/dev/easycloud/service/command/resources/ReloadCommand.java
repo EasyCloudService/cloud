@@ -1,6 +1,5 @@
 package dev.easycloud.service.command.resources;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.configuration.ClusterConfiguration;
 import dev.easycloud.service.group.GroupProvider;
@@ -10,6 +9,7 @@ import dev.easycloud.service.module.ModuleService;
 import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.release.ReleasesService;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.jline.jansi.Ansi.ansi;
@@ -24,8 +24,10 @@ public final class ReloadCommand extends Command {
     private final ReleasesService releasesService;
 
     @Inject
-    public ReloadCommand(I18nProvider i18nProvider, ClusterConfiguration configuration, ModuleService moduleService,
-                         PlatformProvider platformProvider, GroupProvider groupProvider, ReleasesService releasesService) {
+    public ReloadCommand(
+            I18nProvider i18nProvider, ClusterConfiguration configuration, ModuleService moduleService,
+            PlatformProvider platformProvider, GroupProvider groupProvider, ReleasesService releasesService
+    ) {
         super("reload", i18nProvider.get("command.reload.info"));
         this.i18nProvider = i18nProvider;
         this.configuration = configuration;

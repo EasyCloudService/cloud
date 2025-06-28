@@ -1,6 +1,5 @@
 package dev.easycloud.service.service.command;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.command.CommandNode;
@@ -8,19 +7,19 @@ import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.service.ServiceProvider;
-import dev.easycloud.service.terminal.Terminal;
-import dev.easycloud.service.terminal.TerminalImpl;
+import dev.easycloud.service.terminal.ClusterTerminal;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
+import io.activej.inject.annotation.Inject;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public final class ServiceCommand extends Command {
     private final I18nProvider i18nProvider;
     private final ServiceProvider serviceProvider;
-    private final Terminal terminal;
+    private final ClusterTerminal terminal;
 
     @Inject
-    public ServiceCommand(I18nProvider i18nProvider, ServiceProvider serviceProvider, Terminal terminal) {
+    public ServiceCommand(I18nProvider i18nProvider, ServiceProvider serviceProvider, ClusterTerminal terminal) {
         super("service", i18nProvider.get("command.service.info"));
         this.i18nProvider = i18nProvider;
         this.serviceProvider = serviceProvider;
@@ -71,7 +70,6 @@ public final class ServiceCommand extends Command {
             return;
         }
 
-        var terminal = (TerminalImpl) this.terminal;
         ((TerminalCompleter) terminal.lineReader().getCompleter()).enabled(false);
 
         terminal.logging(true);

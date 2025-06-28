@@ -1,7 +1,7 @@
 package dev.easycloud.service.i18n;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.configuration.ClusterConfiguration;
+import io.activej.inject.annotation.Inject;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

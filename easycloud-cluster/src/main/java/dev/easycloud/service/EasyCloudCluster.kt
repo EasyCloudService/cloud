@@ -1,8 +1,5 @@
 package dev.easycloud.service
 
-import com.google.inject.AbstractModule
-import com.google.inject.Guice
-import com.google.inject.Injector
 import dev.easycloud.service.command.CommandProvider
 import dev.easycloud.service.configuration.ClusterConfiguration
 import dev.easycloud.service.files.EasyFiles
@@ -20,8 +17,9 @@ import dev.easycloud.service.service.Service
 import dev.easycloud.service.service.ServiceImpl
 import dev.easycloud.service.service.ServiceProvider
 import dev.easycloud.service.service.ServiceProviderImpl
-import dev.easycloud.service.terminal.Terminal
-import dev.easycloud.service.terminal.TerminalImpl
+import dev.easycloud.service.terminal.ClusterTerminal
+import io.activej.inject.Injector
+import io.activej.inject.module.ModuleBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -38,37 +36,24 @@ class EasyCloudCluster {
         EasyFiles.remove(localPath.resolve("dynamic"))
 
         // Initialize google guice injector
-        injector = Guice.createInjector(object : AbstractModule() {
-            override fun configure() {
-                // Save cluster configuration
-                val clusterConfiguration = ClusterConfiguration()
-                clusterConfiguration.load()
-                clusterConfiguration.reload()
-                bind(ClusterConfiguration::class.java)
-                    .toInstance(clusterConfiguration)
+        val clusterConfiguration = ClusterConfiguration()
+        clusterConfiguration.load()
+        clusterConfiguration.reload()
+        val socket = ServerSocket(clusterConfiguration.security.value, clusterConfiguration.local.clusterPort)
 
-                // Bind services and providers
-                bind(I18nProvider::class.java).asEagerSingleton()
-                bind(Terminal::class.java)
-                    .to(TerminalImpl::class.java)
-                    .asEagerSingleton()
+        val moduleBuilder = ModuleBuilder.create()
+        moduleBuilder.bind(ClusterConfiguration::class.java).toInstance(clusterConfiguration)
+        moduleBuilder.bind(I18nProvider::class.java)
+        moduleBuilder.bind(ClusterTerminal::class.java).toInstance(ClusterTerminal())
+        moduleBuilder.bind(EventProvider::class.java).toInstance(EventProvider(socket))
+        moduleBuilder.bind(GroupProvider::class.java).to(GroupProviderImpl::class.java)
+        moduleBuilder.bind(ModuleService::class.java)
+        moduleBuilder.bind(PlatformProvider::class.java)
+        moduleBuilder.bind(ServiceProvider::class.java).to(ServiceProviderImpl::class.java)
+        moduleBuilder.bind(CommandProvider::class.java)
+        moduleBuilder.bind(ReleasesService::class.java)
 
-                val socket = ServerSocket(clusterConfiguration.security.value, clusterConfiguration.local.clusterPort)
-                bind(EventProvider::class.java).toInstance(EventProvider(socket))
-
-                bind(ServiceProvider::class.java)
-                    .to(ServiceProviderImpl::class.java)
-                    .asEagerSingleton()
-                bind(CommandProvider::class.java).asEagerSingleton()
-
-                bind(GroupProvider::class.java)
-                    .to(GroupProviderImpl::class.java)
-                    .asEagerSingleton()
-                bind(PlatformProvider::class.java).asEagerSingleton()
-                bind(ModuleService::class.java).asEagerSingleton()
-                bind(ReleasesService::class.java).asEagerSingleton()
-            }
-        })
+        injector = Injector.of(moduleBuilder.build())
     }
 
     fun run() {
@@ -77,7 +62,7 @@ class EasyCloudCluster {
         // TODO: temporary fix for old cluster
 
         // Run terminal
-        injector.getInstance(Terminal::class.java).run()
+        injector.getInstance(ClusterTerminal::class.java).run()
 
         // Check if property is set for first start
         if (System.getProperty("easycloud.first-start") == "true") {
@@ -126,7 +111,7 @@ class EasyCloudCluster {
         injector.getInstance(ModuleService::class.java).search()
 
         // Initialize commands
-        injector.getInstance(CommandProvider::class.java).init(this.injector)
+        injector.getInstance(CommandProvider::class.java).init(injector)
 
         // Cluster ready
         logger.info(i18nProvider.get("cluster.ready", "<white>${System.currentTimeMillis() - startedAt}ms<reset>"))

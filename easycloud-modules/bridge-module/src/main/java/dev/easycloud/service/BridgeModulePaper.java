@@ -1,13 +1,11 @@
 package dev.easycloud.service;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.Service;
 import dev.easycloud.service.service.resources.ServiceProperties;
+import io.activej.inject.Injector;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -24,7 +22,7 @@ public final class BridgeModulePaper extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        var service = this.injector.getInstance(Key.get(Service.class, Names.named("thisService")));
+        var service = this.injector.getInstance(Service.class);
         var eventProvider = this.injector.getInstance(EventProvider.class);
         eventProvider.publish(new ServiceReadyEvent(service));
         log.info("Service is now ready!");
@@ -34,7 +32,7 @@ public final class BridgeModulePaper extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        var service = this.injector.getInstance(Key.get(Service.class, Names.named("thisService")));
+        var service = this.injector.getInstance(Service.class);
         var eventProvider = this.injector.getInstance(EventProvider.class);
         eventProvider.publish(new ServiceShutdownEvent(service));
         eventProvider.close();
@@ -42,14 +40,14 @@ public final class BridgeModulePaper extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        var service = this.injector.getInstance(Key.get(Service.class, Names.named("thisService")));
+        var service = this.injector.getInstance(Service.class);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), Bukkit.getOnlinePlayers().size());
         service.publish();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        var service = this.injector.getInstance(Key.get(Service.class, Names.named("thisService")));
+        var service = this.injector.getInstance(Service.class);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), Bukkit.getOnlinePlayers().size() - 1);
         service.publish();
     }

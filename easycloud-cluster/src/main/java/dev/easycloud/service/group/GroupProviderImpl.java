@@ -8,6 +8,7 @@ import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +28,7 @@ public final class GroupProviderImpl implements GroupProvider {
 
     private final Path GROUPS_PATH = Path.of("resources").resolve("groups");
 
+    @Inject
     public GroupProviderImpl() {
         this.groups = new ArrayList<>();
 

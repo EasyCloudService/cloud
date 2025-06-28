@@ -30,7 +30,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Getter
 @Accessors(fluent = true)
 @SuppressWarnings("CallToPrintStackTrace")
-public final class TerminalImpl implements dev.easycloud.service.terminal.Terminal {
+public final class ClusterTerminal {
     private final String prompt;
 
     private final Terminal terminal;
@@ -45,7 +45,7 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
     private boolean logging = false;
 
     @SneakyThrows
-    public TerminalImpl() {
+    public ClusterTerminal() {
         this.prompt = ansi()
                 .fgRgb(Log4jColor.PRIMARY.rgb()).a("cluster")
                 .fgRgb(Log4jColor.GRAY.rgb()).a("@")
@@ -103,7 +103,6 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
         this.update();
     }
 
-    @Override
     public void run() {
         this.readingThread = new TerminalReadingThread(this);
         this.readingThread.setUncaughtExceptionHandler((t, exception) -> {
@@ -118,12 +117,10 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
         this.clear();
     }
 
-    @Override
     public void clear() {
         this.clear(true);
     }
 
-    @Override
     public void clear(boolean redraw) {
         this.terminal.puts(InfoCmp.Capability.clear_screen);
         this.terminal.flush();
@@ -139,7 +136,6 @@ public final class TerminalImpl implements dev.easycloud.service.terminal.Termin
         }
     }
 
-    @Override
     public void exit(Service service) {
         this.logging(false);
 

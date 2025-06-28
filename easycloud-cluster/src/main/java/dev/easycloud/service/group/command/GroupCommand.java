@@ -1,6 +1,5 @@
 package dev.easycloud.service.group.command;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
@@ -15,6 +14,7 @@ import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.setup.SetupService;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
@@ -29,8 +29,10 @@ public final class GroupCommand extends Command {
     private final PlatformProvider platformProvider;
 
     @Inject
-    public GroupCommand(I18nProvider i18nProvider, GroupProvider groupProvider,
-                        ServiceProvider serviceProvider, PlatformProvider platformProvider) {
+    public GroupCommand(
+            I18nProvider i18nProvider, GroupProvider groupProvider,
+            ServiceProvider serviceProvider, PlatformProvider platformProvider
+    ) {
         super("group", i18nProvider.get("command.group.info"));
         this.i18nProvider = i18nProvider;
         this.groupProvider = groupProvider;

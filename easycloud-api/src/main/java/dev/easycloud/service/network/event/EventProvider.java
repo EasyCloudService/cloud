@@ -1,9 +1,7 @@
 package dev.easycloud.service.network.event;
 
-import com.google.inject.Singleton;
 import dev.easycloud.service.network.socket.Socket;
 
-@Singleton
 public record EventProvider(Socket socket) {
     public EventProvider(Socket socket) {
         this.socket = socket;

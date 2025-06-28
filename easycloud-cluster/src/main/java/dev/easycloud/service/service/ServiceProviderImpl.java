@@ -1,7 +1,5 @@
 package dev.easycloud.service.service;
 
-import com.google.inject.Inject;
-import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.configuration.ClusterConfiguration;
 import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.group.GroupProvider;
@@ -18,9 +16,10 @@ import dev.easycloud.service.service.builder.ServiceLaunchFactory;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
-import dev.easycloud.service.terminal.Terminal;
+import dev.easycloud.service.terminal.ClusterTerminal;
 import dev.easycloud.service.terminal.TerminalState;
 import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
     @Getter
     private final List<Service> services = new ArrayList<>();
 
-    private final Terminal terminal;
+    private final ClusterTerminal terminal;
     private final ClusterConfiguration configuration;
     private final I18nProvider i18nProvider;
     private final ModuleService moduleService;
@@ -51,12 +50,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
     @Inject
     public ServiceProviderImpl(
-            Terminal terminal, ClusterConfiguration configuration, I18nProvider I18nProvider,
+            ClusterTerminal terminal, I18nProvider I18nProvider,
             PlatformProvider platformProvider, ModuleService moduleService,
             EventProvider eventProvider, GroupProvider groupProvider
     ) {
         this.terminal = terminal;
-        this.configuration = configuration;
+        this.configuration = new ClusterConfiguration();
         this.i18nProvider = I18nProvider;
         this.moduleService = moduleService;
         this.platformProvider = platformProvider;

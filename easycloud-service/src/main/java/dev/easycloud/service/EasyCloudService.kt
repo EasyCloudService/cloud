@@ -1,10 +1,6 @@
 package dev.easycloud.service
 
-import com.google.inject.AbstractModule
-import com.google.inject.Guice
-import com.google.inject.Injector
-import com.google.inject.Key
-import com.google.inject.name.Names
+import dev.easycloud.service.group.GroupProvider
 import dev.easycloud.service.network.event.Event
 import dev.easycloud.service.network.event.EventProvider
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent
@@ -16,6 +12,9 @@ import dev.easycloud.service.service.Service
 import dev.easycloud.service.service.ServiceProvider
 import dev.easycloud.service.service.resources.ServiceImpl
 import dev.easycloud.service.service.resources.ServiceProviderImpl
+import io.activej.inject.Injector
+import io.activej.inject.annotation.Provides
+import io.activej.inject.module.AbstractModule
 import io.activej.net.socket.tcp.ITcpSocket
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,7 +34,51 @@ class EasyCloudService(val key: String, val serviceId: String, val port: Int) {
         eventProvider.run()
         eventProvider.socket().waitForConnection().get()
 
-        injector = Guice.createInjector(object : AbstractModule() {
+        val serviceProvider = ServiceProviderImpl(eventProvider)
+        ServiceImpl.eventProvider = eventProvider
+
+        Event.registerTypeAdapter(Service::class.java, ServiceImpl::class.java)
+        Thread {
+            eventProvider.socket.read(ServiceInformationEvent::class.java) { channel: ITcpSocket?, event: ServiceInformationEvent ->
+                event.services()
+                    .forEach(Consumer { service: Service -> serviceProvider.services().add(service) })
+                thisService = event.service()
+            }
+        }.start()
+
+        // Request service information
+        eventProvider.publish(ServiceRequestInformationEvent(serviceId))
+
+        while (thisService == null) {
+            Thread.sleep(100)
+        }
+
+        injector = Injector.of(object : AbstractModule() {
+            @Provides
+            fun eventProvider(): EventProvider {
+                return EventProvider(socket)
+            }
+            @Provides
+            fun serviceProvider(): ServiceProvider {
+                return serviceProvider
+            }
+            @Provides
+            fun service(): Service {
+                return thisService!!
+            }
+        })
+
+       /* inject = inject.injector()
+            .add(eventProvider)
+            .add(serviceProvider)
+            .add(thisService)
+            .build()*/
+
+        logger.info("Welcome back, @${thisService!!.id()}")
+        EasyCloudServiceBoot.loaded = true
+
+
+        /*injector = Guice.createInjector(object : AbstractModule() {
             override fun configure() {
                 // Bind services and providers
                 bind(EventProvider::class.java).toInstance(eventProvider)
@@ -78,24 +121,23 @@ class EasyCloudService(val key: String, val serviceId: String, val port: Int) {
                 )
                 EasyCloudServiceBoot.loaded = true
             }
-        })
+        })*/
     }
 
     fun run() {
         val eventProvider = injector.getInstance(EventProvider::class.java)
         val serviceProvider = injector.getInstance(ServiceProvider::class.java)
-        val thisService = injector.getInstance(Key.get(Service::class.java, Names.named("thisService")))
 
         (serviceProvider as ServiceProviderImpl).init(injector)
 
         eventProvider.socket.read(ServiceReadyEvent::class.java) { channel: ITcpSocket?, event: ServiceReadyEvent ->
-            if (event.service().id() == thisService.id()) return@read
+            if (event.service().id() == thisService!!.id()) return@read
             serviceProvider.services().add(event.service())
             logger.info("Service '{}' has connected.", event.service().id())
         }
 
         eventProvider.socket.read(ServiceShutdownEvent::class.java) { channel: ITcpSocket?, event: ServiceShutdownEvent ->
-            if (event.service().id() == thisService.id()) return@read
+            if (event.service().id() == thisService!!.id()) return@read
             serviceProvider.services().removeIf({ it -> it.id().equals(event.service().id()) })
             logger.info("Service '{}' has been shut down.", event.service().id())
         }

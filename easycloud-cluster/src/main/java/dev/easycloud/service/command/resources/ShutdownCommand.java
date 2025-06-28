@@ -1,9 +1,9 @@
 package dev.easycloud.service.command.resources;
 
-import com.google.inject.Inject;
 import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.command.Command;
 import dev.easycloud.service.i18n.I18nProvider;
+import io.activej.inject.annotation.Inject;
 
 public final class ShutdownCommand extends Command {
     @Inject

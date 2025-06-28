@@ -1,14 +1,14 @@
 package dev.easycloud.service.command;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import dev.easycloud.service.command.resources.*;
 import dev.easycloud.service.group.command.GroupCommand;
 import dev.easycloud.service.i18n.I18nProvider;
 import dev.easycloud.service.service.ServiceImpl;
 import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.command.ServiceCommand;
-import dev.easycloud.service.terminal.Terminal;
+import dev.easycloud.service.terminal.ClusterTerminal;
+import io.activej.inject.Injector;
+import io.activej.inject.annotation.Inject;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
@@ -23,12 +23,12 @@ import java.util.List;
 public final class CommandProvider {
     private final List<Command> commands;
 
-    private final Terminal terminal;
+    private final ClusterTerminal terminal;
     private final I18nProvider i18nProvider;
     private final ServiceProvider serviceProvider;
 
     @Inject
-    public CommandProvider(Terminal terminal, I18nProvider i18nProvider, ServiceProvider serviceProvider) {
+    public CommandProvider(ClusterTerminal terminal, I18nProvider i18nProvider, ServiceProvider serviceProvider) {
         this.terminal = terminal;
         this.i18nProvider = i18nProvider;
         this.serviceProvider = serviceProvider;
