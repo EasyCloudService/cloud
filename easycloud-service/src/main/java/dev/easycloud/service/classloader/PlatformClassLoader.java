@@ -21,7 +21,7 @@ public final class PlatformClassLoader {
         var classLoader = ClassLoader.getSystemClassLoader();
 
         // preload
-        if(jarFile.getEntry("META-INF/versions.list") != null) {
+        /*if(jarFile.getEntry("META-INF/versions.list") != null) {
             classLoader = new URLClassLoader(new URL[]{platformFile.toUri().toURL()}, classLoader);
             try (var inputStream = new JarInputStream(Files.newInputStream(platformFile))) {
                 JarEntry jarEntry;
@@ -31,7 +31,7 @@ public final class PlatformClassLoader {
                     }
                 }
             }
-        }
+        }*/
 
         instrumentation.appendToSystemClassLoaderSearch(jarFile);
         var mainClass = Class.forName(jarFile.getManifest().getMainAttributes().getValue("Main-Class"), true, classLoader);

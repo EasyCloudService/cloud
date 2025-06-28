@@ -33,7 +33,7 @@ public final class TerminalReadingThread extends Thread {
             var prompt = this.terminal.prompt();
             if(this.terminal.logging()) {
                 prompt = ansi()
-                        .fgRgb(Log4jColor.WHITE.rgb()).a("dev/easycloud/service")
+                        .fgRgb(Log4jColor.WHITE.rgb()).a("service")
                         .fgRgb(Log4jColor.GRAY.rgb()).a("@")
                         .fgRgb(Log4jColor.ERROR.rgb()).a("exit")
                         .fgRgb(Log4jColor.GRAY.rgb()).a(": ").toString();

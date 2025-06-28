@@ -56,7 +56,6 @@ public final class ClientSocket implements Socket {
                         byte[] data = new byte[byteBuf.readRemaining()];
                         byteBuf.read(data);
                         var dataString = new String(data, UTF_8);
-
                         if(dataString.equals("SECURITY:ACCEPTED")) {
                             System.out.println("Connection established successfully.");
                             waitForConnection.complete(null);

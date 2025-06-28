@@ -18,6 +18,7 @@ dependencies {
 
     runtimeDownload("com.google.code.gson:gson:2.11.0")
     runtimeDownload("com.google.inject:guice:7.0.0")
+    //runtimeDownload("com.google.common:google-collect:1.0-rc1")
 
     runtimeDownload("org.jline:jline:3.30.4")
     runtimeDownload("org.fusesource.jansi:jansi:2.4.2")

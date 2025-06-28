@@ -18,7 +18,6 @@ public final class HubModuleVelocity {
     @Inject
     public HubModuleVelocity(ProxyServer server) {
         this.server = server;
-
         instance = this;
     }
 

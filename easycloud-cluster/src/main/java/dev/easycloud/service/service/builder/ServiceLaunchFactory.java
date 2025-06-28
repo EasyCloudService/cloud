@@ -38,9 +38,12 @@ public final class ServiceLaunchFactory {
         var mainClass = new JarInputStream(Files.newInputStream(serviceFile)).getManifest().getMainAttributes().getValue("Main-Class");
 
         List<String> dependencies = new ArrayList<>();
-        var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api", "org.slf4j", "org.apache.logging");
+        var allowedDependencies = List.of(
+                "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api",
+                "org.slf4j", "org.apache.logging", "com.google", "jakarta.inject", "aopalliance"
+        );
         for (File file : Objects.requireNonNull(Path.of("resources").resolve("libs").toFile().listFiles())) {
-            if(allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
+            if (allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
                 dependencies.add(file.getAbsolutePath());
             }
         }
@@ -58,7 +61,7 @@ public final class ServiceLaunchFactory {
         arguments.add("-cp");
 
         var libraries = String.join(";", dependencies);
-        if(!isWindows()) libraries = libraries.replace(";", ":");
+        if (!isWindows()) libraries = libraries.replace(";", ":");
 
         arguments.add(serviceFile + (isWindows() ? ";" : ":") + libraries);
         arguments.add("-javaagent:" + serviceFile);
