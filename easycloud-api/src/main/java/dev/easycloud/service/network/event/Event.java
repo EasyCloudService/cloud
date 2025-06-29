@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 @ToString
 @RequiredArgsConstructor
 public abstract class Event {
-
     private static Gson tmpGson;
     private static final GsonBuilder builder = new GsonBuilder();
 

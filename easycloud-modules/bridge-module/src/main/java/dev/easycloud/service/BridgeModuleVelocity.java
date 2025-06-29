@@ -33,11 +33,10 @@ public final class BridgeModuleVelocity {
         this.server = server;
         this.logger = logger;
 
-        var injector = EasyCloudService.injector;
-        this.eventProvider = injector.getInstance(EventProvider.class);
-        this.service = injector.getInstance(Service.class);
+        this.eventProvider = CloudInjector.get().getInstance(EventProvider.class);
+        this.service = CloudInjector.get().getInstance(Service.class);
 
-        injector.getInstance(ServiceProvider.class).services()
+        CloudInjector.get().getInstance(ServiceProvider.class).services()
                 .stream()
                 .filter(it -> it.state().equals(ServiceState.ONLINE) && !it.id().equals(this.service.id()))
                 .forEach(service -> this.server.registerServer(new ServerInfo(service.id(), new InetSocketAddress(service.property(ServiceProperties.PORT())))));

@@ -14,12 +14,11 @@ allprojects {
         "compileOnly"("io.activej:activej-net:6.0-rc2")
         "compileOnly"("io.activej:activej-csp:6.0-rc2")
 
-        "compileOnly"("io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT")
+        "compileOnly"("org.github.paperspigot:paperspigot-api:1.8.8-R0.1-20160806.221350-1")
         "compileOnly"("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
         "annotationProcessor"("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
         "compileOnly"(project(":easycloud-api"))
-        "compileOnly"(project(":easycloud-service"))
     }
 
     tasks.withType<JavaCompile>().configureEach {

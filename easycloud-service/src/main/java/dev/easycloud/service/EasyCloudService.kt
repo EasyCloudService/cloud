@@ -1,8 +1,8 @@
 package dev.easycloud.service
 
-import dev.easycloud.service.group.GroupProvider
 import dev.easycloud.service.network.event.Event
 import dev.easycloud.service.network.event.EventProvider
+import dev.easycloud.service.service.listener.ServiceUpdateListener
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent
@@ -13,8 +13,7 @@ import dev.easycloud.service.service.ServiceProvider
 import dev.easycloud.service.service.resources.ServiceImpl
 import dev.easycloud.service.service.resources.ServiceProviderImpl
 import io.activej.inject.Injector
-import io.activej.inject.annotation.Provides
-import io.activej.inject.module.AbstractModule
+import io.activej.inject.module.ModuleBuilder
 import io.activej.net.socket.tcp.ITcpSocket
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -53,75 +52,21 @@ class EasyCloudService(val key: String, val serviceId: String, val port: Int) {
             Thread.sleep(100)
         }
 
-        injector = Injector.of(object : AbstractModule() {
-            @Provides
-            fun eventProvider(): EventProvider {
-                return EventProvider(socket)
-            }
-            @Provides
-            fun serviceProvider(): ServiceProvider {
-                return serviceProvider
-            }
-            @Provides
-            fun service(): Service {
-                return thisService!!
-            }
-        })
+        val moduleBuilder = ModuleBuilder.create()
+        // Bind services and providers
+        moduleBuilder.bind(EventProvider::class.java).toInstance(eventProvider)
+        moduleBuilder.bind(ServiceProvider::class.java).toInstance(serviceProvider)
+        moduleBuilder.bind(Service::class.java).toInstance(thisService!!)
+        // Bind listeners
+        moduleBuilder.bind(ServiceUpdateListener::class.java)
 
-       /* inject = inject.injector()
-            .add(eventProvider)
-            .add(serviceProvider)
-            .add(thisService)
-            .build()*/
+        // Inject
+        injector = Injector.of(moduleBuilder.build())
+        CloudInjector.initialize(injector)
 
+        // Loaded
         logger.info("Welcome back, @${thisService!!.id()}")
         EasyCloudServiceBoot.loaded = true
-
-
-        /*injector = Guice.createInjector(object : AbstractModule() {
-            override fun configure() {
-                // Bind services and providers
-                bind(EventProvider::class.java).toInstance(eventProvider)
-
-                val serviceProvider = ServiceProviderImpl(eventProvider)
-                bind(ServiceProvider::class.java).toInstance(serviceProvider)
-
-                // wait for service to be registered by cluster
-                ServiceImpl.eventProvider = eventProvider
-                Event.registerTypeAdapter(Service::class.java, ServiceImpl::class.java)
-                Thread {
-                    eventProvider.socket.read(ServiceInformationEvent::class.java) { channel: ITcpSocket?, event: ServiceInformationEvent ->
-                        event.services()
-                            .forEach(Consumer { service: Service -> serviceProvider.services().add(service) })
-                        thisService = event.service()
-                    }
-                }.start()
-
-                // Request service information
-                eventProvider.publish(ServiceRequestInformationEvent(serviceId))
-
-                while (thisService == null) {
-                    Thread.sleep(100)
-                }
-
-                // Continue with bindings
-                bind(Service::class.java)
-                    .annotatedWith(Names.named("thisService"))
-                    .toInstance(thisService)
-
-                logger.info(
-                    """
-                     
-                            _            _
-                           |_  _.  _    /  |  _       _|
-                           |_ (_| _> \/ \_ | (_) |_| (_|
-                                     /
-                           Welcome back, @SERVICE_ID
-                           """.trimIndent().replace("SERVICE_ID", thisService!!.id())
-                )
-                EasyCloudServiceBoot.loaded = true
-            }
-        })*/
     }
 
     fun run() {

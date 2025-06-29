@@ -32,7 +32,7 @@ public final class EasyCloudServiceBoot {
         }).start();
 
         while (loaded) {
-            Thread.sleep(500);
+            Thread.sleep(250);
         }
 
         classLoaderThread = PlatformClassLoader.inject(instrumentation, args);

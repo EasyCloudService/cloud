@@ -50,12 +50,12 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
     @Inject
     public ServiceProviderImpl(
-            ClusterTerminal terminal, I18nProvider I18nProvider,
+            ClusterTerminal terminal, I18nProvider I18nProvider, ClusterConfiguration configuration,
             PlatformProvider platformProvider, ModuleService moduleService,
             EventProvider eventProvider, GroupProvider groupProvider
     ) {
         this.terminal = terminal;
-        this.configuration = new ClusterConfiguration();
+        this.configuration = configuration;
         this.i18nProvider = I18nProvider;
         this.moduleService = moduleService;
         this.platformProvider = platformProvider;

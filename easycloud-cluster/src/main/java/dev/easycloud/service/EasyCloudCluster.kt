@@ -1,10 +1,12 @@
 package dev.easycloud.service
 
 import dev.easycloud.service.command.CommandProvider
+import dev.easycloud.service.command.resources.*
 import dev.easycloud.service.configuration.ClusterConfiguration
 import dev.easycloud.service.files.EasyFiles
 import dev.easycloud.service.group.GroupProvider
 import dev.easycloud.service.group.GroupProviderImpl
+import dev.easycloud.service.group.command.GroupCommand
 import dev.easycloud.service.i18n.I18nProvider
 import dev.easycloud.service.module.ModuleService
 import dev.easycloud.service.network.event.Event
@@ -17,6 +19,7 @@ import dev.easycloud.service.service.Service
 import dev.easycloud.service.service.ServiceImpl
 import dev.easycloud.service.service.ServiceProvider
 import dev.easycloud.service.service.ServiceProviderImpl
+import dev.easycloud.service.service.command.ServiceCommand
 import dev.easycloud.service.terminal.ClusterTerminal
 import io.activej.inject.Injector
 import io.activej.inject.module.ModuleBuilder
@@ -42,6 +45,7 @@ class EasyCloudCluster {
         val socket = ServerSocket(clusterConfiguration.security.value, clusterConfiguration.local.clusterPort)
 
         val moduleBuilder = ModuleBuilder.create()
+        // Bind services and providers
         moduleBuilder.bind(ClusterConfiguration::class.java).toInstance(clusterConfiguration)
         moduleBuilder.bind(I18nProvider::class.java)
         moduleBuilder.bind(ClusterTerminal::class.java).toInstance(ClusterTerminal())
@@ -53,7 +57,18 @@ class EasyCloudCluster {
         moduleBuilder.bind(CommandProvider::class.java)
         moduleBuilder.bind(ReleasesService::class.java)
 
+        // Bind commands
+        moduleBuilder.bind(HelpCommand::class.java)
+        moduleBuilder.bind(ClearCommand::class.java)
+        moduleBuilder.bind(ShutdownCommand::class.java)
+        moduleBuilder.bind(GroupCommand::class.java)
+        moduleBuilder.bind(ServiceCommand::class.java)
+        moduleBuilder.bind(ReloadCommand::class.java)
+        moduleBuilder.bind(LocalCommand::class.java)
+
+        // Inject
         injector = Injector.of(moduleBuilder.build())
+        CloudInjector.initialize(injector)
     }
 
     fun run() {
