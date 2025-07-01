@@ -27,12 +27,6 @@ public final class BridgeModulePaper extends JavaPlugin implements Listener {
         eventProvider.publish(new ServiceReadyEvent(service));
         log.info("Service is now ready!");
 
-        CloudInjector.get().getInstance(ServiceProvider.class).launch(new ServiceLaunchBuilder("Lobby")
-            .override(GroupProperties.MAX_PLAYERS(), 10)
-            .override(GroupProperties.SAVE_FILES(), true)
-            .override(GroupProperties.MEMORY(), 512)
-        );
-
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
