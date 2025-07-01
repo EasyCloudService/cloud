@@ -13,13 +13,10 @@ dependencies {
     implementation("dev.vankka:dependencydownload-runtime:1.3.1")
 
     // define all dependencies that should be downloaded at runtime
-    runtimeDownload("org.yaml:snakeyaml:2.4")
+    runtimeDownload("org.yaml:snakeyaml:1.33")
     runtimeDownload("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
 
     runtimeDownload("com.google.code.gson:gson:2.11.0")
-    //runtimeDownload("com.google.inject:guice:7.0.0")
-
-    //runtimeDownload("io.github.suppierk:inject:3.0.0")
 
 
     runtimeDownload("org.jline:jline:3.30.4")
@@ -30,8 +27,9 @@ dependencies {
     runtimeDownload("io.activej:activej-csp:6.0-rc2")
     runtimeDownload("io.activej:activej-inject:6.0-rc2")
 
-    runtimeDownload("org.apache.logging.log4j:log4j-core:2.24.1")
-    runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
+    runtimeDownload("org.apache.logging.log4j:log4j-api:2.25.0")
+    runtimeDownload("org.apache.logging.log4j:log4j-core:2.25.0")
+    runtimeDownload("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")
 
     runtimeDownload("org.jetbrains.kotlin:kotlin-stdlib:2.2.0-RC2")
 

@@ -1,7 +1,9 @@
 package dev.easycloud.service.classloader;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -12,8 +14,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
+@Slf4j
 public final class PlatformClassLoader {
-
     @SneakyThrows
     public static Thread inject(Instrumentation instrumentation, String[] args) {
         var platformFile = Path.of("platform.jar").toAbsolutePath();
@@ -21,7 +23,7 @@ public final class PlatformClassLoader {
         var classLoader = ClassLoader.getSystemClassLoader();
 
         // preload
-        if(jarFile.getEntry("META-INF/versions.list") != null) {
+        if (jarFile.getEntry("META-INF/versions.list") != null) {
             classLoader = new URLClassLoader(new URL[]{platformFile.toUri().toURL()}, classLoader);
             try (var inputStream = new JarInputStream(Files.newInputStream(platformFile))) {
                 JarEntry jarEntry;
@@ -33,13 +35,16 @@ public final class PlatformClassLoader {
             }
         }
 
-        instrumentation.appendToSystemClassLoaderSearch(jarFile);
-        var mainClass = Class.forName(jarFile.getManifest().getMainAttributes().getValue("Main-Class"), true, classLoader);
 
+        instrumentation.appendToSystemClassLoaderSearch(jarFile);
+
+        ClassLoader finalClassLoader = classLoader;
         var thread = new Thread(() -> {
             try {
+                var mainClass = Class.forName(jarFile.getManifest().getMainAttributes().getValue("Main-Class"), true, finalClassLoader);
                 mainClass.getMethod("main", String[].class).invoke(null, (Object) args);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException exception) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | IOException |
+                     ClassNotFoundException exception) {
                 throw new RuntimeException(exception);
             }
         });

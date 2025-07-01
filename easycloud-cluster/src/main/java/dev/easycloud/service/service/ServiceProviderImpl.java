@@ -212,7 +212,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
 
-        var id = 0;
+        var id = 1;
         for (int i = 0; i < 999; i++) {
             int finalId = id;
             if (this.services.stream().noneMatch(it -> it.id().equals(group.getName() + "-" + finalId))) {
@@ -303,6 +303,15 @@ public final class ServiceProviderImpl implements ServiceProvider {
                 });
 
         try {
+            var cachePath = templatePath.resolve("server").resolve(group.getName()).resolve("cache");
+            if(cachePath.toFile().listFiles() != null && Arrays.stream(cachePath.toFile().listFiles()).anyMatch(it -> it.getName().startsWith("patched"))) {
+                Files.copy(
+                        Arrays.stream(cachePath.toFile().listFiles()).filter(it -> it.getName().startsWith("patched")).findFirst().orElseThrow().toPath(),
+                        service.directory().resolve("platform.jar"),
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+                return true;
+            }
             Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.getPlatform().initializerId() + "-" + group.getPlatform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy platform jar.", exception);
