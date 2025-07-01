@@ -62,7 +62,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         this.eventProvider = eventProvider;
         this.groupProvider = groupProvider;
 
-        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(5));
+        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(2));
 
         var templatePath = Path.of("local").resolve("templates");
         //noinspection ResultOfMethodCallIgnored
