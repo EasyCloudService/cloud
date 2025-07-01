@@ -44,41 +44,11 @@ public final class OnboardingProvider {
             completer.possibleResults().clear();
             if (line.toLowerCase().startsWith("yes")) {
                 EasyCloudClusterOld.instance().terminal().clear();
-                SetupService.simple()
-                        .add(new SetupData<String>("language", i18n.get("onboarding.setup.language"), List.of("de", "en")))
-                        .add(new SetupData<String>("update", i18n.get("onboarding.setup.update"), List.of("yes", "no")))
-                        .add(new SetupData<Integer>("proxy_port", i18n.get("onboarding.setup.proxy.port"), null))
-                        .publish()
-                        .thenAccept(it -> {
-                            if(it.answers().isEmpty()) {
-                                EasyCloudClusterOld.instance().terminal().clear();
-                                finished.set(true);
-                                return;
-                            }
-
-                            var configuration = EasyCloudClusterOld.instance().configuration().local;
-                            configuration.setLanguage(it.result("language", String.class).equalsIgnoreCase("de") ? Locale.GERMAN : Locale.ENGLISH);
-                            configuration.setAnnounceUpdates(it.result("update", String.class).equalsIgnoreCase("yes"));
-                            configuration.setProxyPort(it.result("proxy_port", Integer.class));
-
-                            EasyCloudClusterOld.instance().configuration().publish(configuration);
-
-                            finished.set(true);
-
-                            new Thread(() -> {
-                                try {
-                                    Thread.sleep(500);
-                                    log.info("Onboarding completed. Welcome to @{}!", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("EasyCloud").reset());
-                                    log.info("Following command can be used to create a group: '{}'", ansi().fgRgb(Log4jColor.PRIMARY.rgb()).a("group setup").reset());
-                                } catch (InterruptedException exception) {
-                                    throw new RuntimeException(exception);
-                                }
-                            }).start();
-                        });
+                finished.set(true);
                 return;
             }
             EasyCloudClusterOld.instance().terminal().clear();
-            finished.set(true);
+            System.exit(0);
         });
 
 
