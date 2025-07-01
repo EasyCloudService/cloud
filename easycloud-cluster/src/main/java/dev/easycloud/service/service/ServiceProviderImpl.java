@@ -235,6 +235,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var service = new ServiceImpl(group.getName() + "-" + id, group, directory);
         service.addProperty(ServiceProperties.PORT(), port);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), 0);
+        service.property()
 
         var result = this.prepare(service);
         if (!result) {

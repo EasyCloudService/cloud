@@ -1,10 +1,13 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.service.Service;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.resources.ServiceProperties;
+import dev.easycloud.service.service.ServiceProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -23,6 +26,12 @@ public final class BridgeModulePaper extends JavaPlugin implements Listener {
         var eventProvider = CloudInjector.get().getInstance(EventProvider.class);
         eventProvider.publish(new ServiceReadyEvent(service));
         log.info("Service is now ready!");
+
+        CloudInjector.get().getInstance(ServiceProvider.class).launch(new ServiceLaunchBuilder("Lobby")
+            .override(GroupProperties.MAX_PLAYERS(), 10)
+            .override(GroupProperties.SAVE_FILES(), true)
+            .override(GroupProperties.MEMORY(), 512)
+        );
 
         Bukkit.getPluginManager().registerEvents(this, this);
     }
