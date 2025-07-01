@@ -1,5 +1,3 @@
-package dev.easycloud.service;
-
 import dev.easycloud.service.network.event.Event;
 import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
@@ -7,7 +5,6 @@ import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
 import dev.easycloud.service.network.socket.ClientSocket;
-import dev.easycloud.service.service.InternalServiceProvider;
 import dev.easycloud.service.service.resources.ServiceImpl;
 import dev.easycloud.service.service.resources.ServiceProviderImpl;
 import dev.easycloud.service.service.Service;

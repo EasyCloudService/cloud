@@ -1,18 +1,19 @@
 package dev.easycloud.service.service.listener;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceInformationEvent;
 import dev.easycloud.service.network.event.resources.request.ServiceRequestInformationEvent;
+import dev.easycloud.service.service.ServiceProvider;
 import io.activej.bytebuf.ByteBuf;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class ServiceRequestInformationListener {
 
-    public ServiceRequestInformationListener() {
+    public ServiceRequestInformationListener(ServiceProvider serviceProvider, EventProvider eventProvider) {
         //noinspection CodeBlock2Expr
-        EasyCloudCluster.instance().eventProvider().socket().read(ServiceRequestInformationEvent.class, (socket, event) -> {
-            socket.write(ByteBuf.wrapForReading(new ServiceInformationEvent(EasyCloudCluster.instance().serviceProvider().get(event.serviceId()), EasyCloudCluster.instance().serviceProvider().services()).asBytes()));
+        eventProvider.socket().read(ServiceRequestInformationEvent.class, (socket, event) -> {
+            socket.write(ByteBuf.wrapForReading(new ServiceInformationEvent(serviceProvider.get(event.serviceId()), serviceProvider.services()).asBytes()));
         });
     }
 }

@@ -1,9 +1,11 @@
 package dev.easycloud.service.service.listener;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
+import dev.easycloud.service.service.ServiceProvider;
 import dev.easycloud.service.service.resources.ServiceState;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -12,14 +14,14 @@ import static org.jline.jansi.Ansi.ansi;
 @Slf4j
 public final class ServiceReadyListener {
 
-    public ServiceReadyListener() {
-        EasyCloudCluster.instance().eventProvider().socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
-            var service = EasyCloudCluster.instance().serviceProvider().get(event.service().id());
+    public ServiceReadyListener(ServiceProvider serviceProvider, EventProvider eventProvider, I18nProvider i18nProvider) {
+        eventProvider.socket().read(ServiceReadyEvent.class, (netChannel, event) -> {
+            var service = serviceProvider.get(event.service().id());
             service.state(ServiceState.ONLINE);
             service.publish();
 
-            EasyCloudCluster.instance().eventProvider().publish(event);
-            log.info(EasyCloudCluster.instance().i18nProvider().get("service.ready", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset()));
+            eventProvider.publish(event);
+            log.info(i18nProvider.get("service.ready", ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.id()).reset()));
         });
     }
 }

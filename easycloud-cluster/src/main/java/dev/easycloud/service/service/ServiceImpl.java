@@ -1,13 +1,13 @@
 package dev.easycloud.service.service;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.files.EasyFiles;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
 import dev.easycloud.service.network.event.resources.ServiceUpdateEvent;
 import dev.easycloud.service.service.resources.ServiceState;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public final class ServiceImpl implements Service {
 
     @Override
     public void publish() {
-        EasyCloudCluster.instance().eventProvider().publish(new ServiceUpdateEvent(this));
+        EasyCloudClusterOld.instance().eventProvider().publish(new ServiceUpdateEvent(this));
     }
 
     public void process(Process process) {
@@ -83,18 +83,18 @@ public final class ServiceImpl implements Service {
             if (!this.process.isAlive()) {
                 return;
             }
-            log.error(EasyCloudCluster.instance().i18nProvider().get("service.stream.failed", exception));
+            log.error(EasyCloudClusterOld.instance().i18nProvider().get("service.stream.failed", exception));
             return;
         }
-        log.error(EasyCloudCluster.instance().i18nProvider().get("service.command.failed", command));
+        log.error(EasyCloudClusterOld.instance().i18nProvider().get("service.command.failed", command));
     }
 
     public void shutdown() {
-        EasyCloudCluster.instance().eventProvider().publish(new ServiceShutdownEvent(this));
+        EasyCloudClusterOld.instance().eventProvider().publish(new ServiceShutdownEvent(this));
 
         this.execute("stop");
-        log.info(EasyCloudCluster.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(LogType.WHITE.rgb()).a(this.id).reset()));
-        EasyCloudCluster.instance().terminal().exit(this);
+        log.info(EasyCloudClusterOld.instance().i18nProvider().get("service.shutdown", ansi().fgRgb(Log4jColor.WHITE.rgb()).a(this.id).reset()));
+        EasyCloudClusterOld.instance().terminal().exit(this);
 
         var thread = new Thread(() -> {
             try {
@@ -102,7 +102,7 @@ public final class ServiceImpl implements Service {
                 if (!this.group.read(GroupProperties.SAVE_FILES())) {
                     EasyFiles.Companion.remove(this.directory());
                 }
-                EasyCloudCluster.instance().serviceProvider().services().remove(this);
+                EasyCloudClusterOld.instance().serviceProvider().services().remove(this);
             } catch (InterruptedException exception) {
                 throw new RuntimeException(exception);
             }
@@ -149,7 +149,7 @@ public final class ServiceImpl implements Service {
                 if (exception.getMessage().contains("Stream closed")) {
                     return; // Stream was closed, no need to log this
                 }
-                throw new RuntimeException();
+                throw new RuntimeException(exception);
             }
         });
         thread.setName("PrintStream-" + this.id);

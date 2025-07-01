@@ -1,19 +1,19 @@
 package dev.easycloud.service.service.listener;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
-import dev.easycloud.service.platform.PlatformType;
+import dev.easycloud.service.service.ServiceProvider;
 
 public final class ServiceShutdownListener {
 
-    public ServiceShutdownListener() {
-        EasyCloudCluster.instance().eventProvider().socket().read(ServiceShutdownEvent.class, (channel, event) -> {
-            var service = EasyCloudCluster.instance().serviceProvider().get(event.service().id());
+    public ServiceShutdownListener(ServiceProvider serviceProvider, EventProvider eventProvider) {
+        eventProvider.socket().read(ServiceShutdownEvent.class, (channel, event) -> {
+            var service = serviceProvider.get(event.service().id());
             if (service == null) {
                 return;
             }
 
-            EasyCloudCluster.instance().serviceProvider().shutdown(service);
+            serviceProvider.shutdown(service);
         });
     }
 }

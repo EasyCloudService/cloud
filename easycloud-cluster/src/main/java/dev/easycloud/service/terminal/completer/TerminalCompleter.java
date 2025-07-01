@@ -1,6 +1,6 @@
 package dev.easycloud.service.terminal.completer;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public final class TerminalCompleter implements Completer {
 
         if (possibleResults.isEmpty()) {
             if (lineCount > 1) {
-                var command = EasyCloudCluster.instance().commandProvider().commands().stream().filter(it -> it.name().equalsIgnoreCase(splitLine[0])).findFirst().orElse(null);
+                var command = EasyCloudClusterOld.instance().commandProvider().commands().stream().filter(it -> it.name().equalsIgnoreCase(splitLine[0])).findFirst().orElse(null);
                 if (command == null) {
                     return;
                 }
@@ -57,7 +57,7 @@ public final class TerminalCompleter implements Completer {
                     });
                 }
             } else {
-                EasyCloudCluster.instance().commandProvider().commands().forEach(command -> {
+                EasyCloudClusterOld.instance().commandProvider().commands().forEach(command -> {
                     possibleResults.add(new Candidate(command.name(), command.name(), null, null, null, null, true));
                 });
             }

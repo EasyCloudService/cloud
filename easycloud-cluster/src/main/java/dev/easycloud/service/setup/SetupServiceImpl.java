@@ -1,10 +1,10 @@
 package dev.easycloud.service.setup;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.setup.resources.SetupData;
 import dev.easycloud.service.setup.resources.SetupServiceResult;
 import dev.easycloud.service.terminal.completer.TerminalCompleter;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.logger.Log4jColor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jline.reader.Candidate;
@@ -30,9 +30,9 @@ public final class SetupServiceImpl implements SetupService {
     public CompletableFuture<SetupServiceResult> publish() {
         SetupService.running.add(this);
 
-        EasyCloudCluster.instance().terminal().clear();
+        EasyCloudClusterOld.instance().terminal().clear();
 
-        this.print(ansi().a("Write ").fgRgb(LogType.ERROR.rgb()).a("cancel").reset().a(" to abort the setup.").toString());
+        this.print(ansi().a("Write ").fgRgb(Log4jColor.ERROR.rgb()).a("cancel").reset().a(" to abort the setup.").toString());
 
         var future = new CompletableFuture<SetupServiceResult>();
         this.trigger(future);
@@ -43,18 +43,18 @@ public final class SetupServiceImpl implements SetupService {
     private Boolean error = false;
     private void trigger(CompletableFuture<SetupServiceResult> future) {
         new Thread(() -> {
-            var completer = (TerminalCompleter) EasyCloudCluster.instance().terminal().lineReader().getCompleter();
+            var completer = (TerminalCompleter) EasyCloudClusterOld.instance().terminal().lineReader().getCompleter();
 
             if (tempSetupList.isEmpty()) {
                 SetupService.running.remove(this);
-                EasyCloudCluster.instance().terminal().revert();
+                EasyCloudClusterOld.instance().terminal().revert();
                 future.complete(new SetupServiceResult(this.answers));
                 completer.possibleResults().clear();
                 return;
             }
             var current = this.tempSetupList.getFirst();
             if (!this.error) {
-                this.print(ansi().bgRgb(LogType.PRIMARY.rgb()).fgRgb(LogType.WHITE.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
+                this.print(ansi().bgRgb(Log4jColor.PRIMARY.rgb()).fgRgb(Log4jColor.WHITE.rgb()).a((this.answers.size() + 1) + ". ").a(current.question()).reset().toString());
 
                 if (current.possible() != null) {
                     this.print(ansi().a("* For possible answers use 'tab'").toString());
@@ -66,12 +66,12 @@ public final class SetupServiceImpl implements SetupService {
                 }
             }
 
-            EasyCloudCluster.instance().terminal().readingThread().priority(line -> {
+            EasyCloudClusterOld.instance().terminal().readingThread().priority(line -> {
                 if(line.equalsIgnoreCase("cancel")) {
                     SetupService.running.remove(this);
                     completer.possibleResults().clear();
-                    EasyCloudCluster.instance().terminal().revert();
-                    this.print(ansi().fgRgb(LogType.ERROR.rgb()).a(EasyCloudCluster.instance().i18nProvider().get("global.setup.cancel")).toString());
+                    EasyCloudClusterOld.instance().terminal().revert();
+                    this.print(ansi().fgRgb(Log4jColor.ERROR.rgb()).a(EasyCloudClusterOld.instance().i18nProvider().get("global.setup.cancel")).toString());
                     future.complete(new SetupServiceResult(new HashMap<>()));
                     return;
                 }
@@ -84,7 +84,7 @@ public final class SetupServiceImpl implements SetupService {
                 this.error = false;
                 completer.possibleResults().clear();
 
-                this.print(ansi().fgRgb(LogType.GRAY.rgb()).a("> ").a(line).reset().toString());
+                this.print(ansi().fgRgb(Log4jColor.GRAY.rgb()).a("> ").a(line).reset().toString());
 
                 this.tempSetupList.remove(current);
                 this.answers.put(current, line.replace(" ", ""));

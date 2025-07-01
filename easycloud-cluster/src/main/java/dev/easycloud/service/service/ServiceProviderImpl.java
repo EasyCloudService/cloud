@@ -1,18 +1,25 @@
 package dev.easycloud.service.service;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.configuration.ClusterConfiguration;
 import dev.easycloud.service.configuration.Configurations;
-import dev.easycloud.service.files.EasyFiles;
+import dev.easycloud.service.group.GroupProvider;
 import dev.easycloud.service.group.resources.Group;
 import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.i18n.I18nProvider;
+import dev.easycloud.service.module.ModuleService;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceStartingEvent;
+import dev.easycloud.service.platform.PlatformProvider;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.scheduler.EasyScheduler;
 import dev.easycloud.service.service.builder.ServiceLaunchFactory;
 import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.listener.*;
 import dev.easycloud.service.service.resources.*;
-import dev.easycloud.service.terminal.logger.LogType;
+import dev.easycloud.service.terminal.ClusterTerminal;
+import dev.easycloud.service.terminal.TerminalState;
+import dev.easycloud.service.terminal.logger.Log4jColor;
+import io.activej.inject.annotation.Inject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +40,29 @@ public final class ServiceProviderImpl implements ServiceProvider {
     @Getter
     private final List<Service> services = new ArrayList<>();
 
-    public ServiceProviderImpl() {
-        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(5));
+    private final ClusterTerminal terminal;
+    private final ClusterConfiguration configuration;
+    private final I18nProvider i18nProvider;
+    private final ModuleService moduleService;
+    private final PlatformProvider platformProvider;
+    private final EventProvider eventProvider;
+    private final GroupProvider groupProvider;
+
+    @Inject
+    public ServiceProviderImpl(
+            ClusterTerminal terminal, I18nProvider I18nProvider, ClusterConfiguration configuration,
+            PlatformProvider platformProvider, ModuleService moduleService,
+            EventProvider eventProvider, GroupProvider groupProvider
+    ) {
+        this.terminal = terminal;
+        this.configuration = configuration;
+        this.i18nProvider = I18nProvider;
+        this.moduleService = moduleService;
+        this.platformProvider = platformProvider;
+        this.eventProvider = eventProvider;
+        this.groupProvider = groupProvider;
+
+        new EasyScheduler(this::refresh).repeat(TimeUnit.SECONDS.toMillis(2));
 
         var templatePath = Path.of("local").resolve("templates");
         //noinspection ResultOfMethodCallIgnored
@@ -44,29 +72,33 @@ public final class ServiceProviderImpl implements ServiceProvider {
         //noinspection ResultOfMethodCallIgnored
         templatePath.resolve("global").resolve("proxy").toFile().mkdirs();
 
-        new ServiceReadyListener();
-        new ServiceShutdownListener();
-        new ServiceRequestInformationListener();
-        new ServiceRequestLaunchListener();
-        new ServiceUpdateListener();
-        new ServiceRequestShutdownListener();
+        new ServiceReadyListener(this, this.eventProvider, this.i18nProvider);
+        new ServiceShutdownListener(this, this.eventProvider);
+        new ServiceRequestInformationListener(this, this.eventProvider);
+        new ServiceRequestLaunchListener(this, this.eventProvider);
+        new ServiceUpdateListener(this, this.eventProvider);
+        new ServiceRequestShutdownListener(this, this.eventProvider);
     }
 
     public void refresh() {
+        if(this.terminal.state().equals(TerminalState.STOPPING)) {
+            return;
+        }
+
         for (ServiceImpl service : this.services.stream().map(it -> (ServiceImpl) it).filter(it -> it.process() == null || !it.process().isAlive()).toList()) {
             this.shutdown(service);
         }
 
-        if (EasyCloudCluster.instance().groupProvider() == null) {
+        if (this.groupProvider == null) {
             return;
         }
 
         var currentStarting = this.services.stream().filter(it -> it.state().equals(ServiceState.STARTING)).count();
-        if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+        if (currentStarting >= this.configuration.local.getStartingSameTime()) {
             return;
         }
 
-        for (Group group : EasyCloudCluster.instance().groupProvider().groups()
+        for (Group group : this.groupProvider.groups()
                 .stream()
                 .sorted((o1, o2) -> {
                     if (o1.read(GroupProperties.PRIORITY()) == null) {
@@ -92,7 +124,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
                     if (this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count() >= max) {
                         break;
                     }
-                    if (currentStarting >= EasyCloudCluster.instance().configuration().local().startingSameTime()) {
+                    if (currentStarting >= this.configuration.local.getStartingSameTime()) {
                         return;
                     }
                     this.launch(new ServiceLaunchBuilder(group.getName()));
@@ -101,7 +133,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             }
 
             online = this.services.stream().filter(it -> it.group().getName().equals(group.getName())).count();
-            var percentage = EasyCloudCluster.instance().configuration().local().dynamicPercentage() / 100.0;
+            var percentage = this.configuration.local.getDynamicPercentage() / 100.0;
 
             if (online < max) {
                 for (Service service : this.services().stream().filter(it -> it.group().getName().equals(group.getName())).toList()) {
@@ -156,7 +188,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
     @Override
     public CompletableFuture<Service> launch(ServiceLaunchBuilder builder) {
-        var defaultGroup = EasyCloudCluster.instance().groupProvider().get(builder.group());
+        var defaultGroup = this.groupProvider.get(builder.group());
         var group = new Group(defaultGroup.getEnabled(), defaultGroup.getName(), defaultGroup.getPlatform());
         builder.properties().forEach((key, value) -> group.getProperties().put(key, value));
         defaultGroup.getProperties().forEach((key, value) -> {
@@ -172,7 +204,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
 
         var port = this.freePort();
         if (group.getPlatform().type().equals(PlatformType.PROXY)) {
-            port = EasyCloudCluster.instance().configuration().local().proxyPort() + (int) this.services.stream().filter(it -> it.group().getPlatform().type().equals(PlatformType.PROXY)).count();
+            port = this.configuration.local.getProxyPort() + (int) this.services.stream().filter(it -> it.group().getPlatform().type().equals(PlatformType.PROXY)).count();
         }
         if (port == -1) {
             log.error("No free port available.");
@@ -180,7 +212,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         }
 
 
-        var id = 0;
+        var id = 1;
         for (int i = 0; i < 999; i++) {
             int finalId = id;
             if (this.services.stream().noneMatch(it -> it.id().equals(group.getName() + "-" + finalId))) {
@@ -203,6 +235,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var service = new ServiceImpl(group.getName() + "-" + id, group, directory);
         service.addProperty(ServiceProperties.PORT(), port);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), 0);
+        service.property()
 
         var result = this.prepare(service);
         if (!result) {
@@ -213,10 +246,10 @@ public final class ServiceProviderImpl implements ServiceProvider {
         var process = ServiceLaunchFactory.create(service);
         service.process(process);
 
-        log.info(EasyCloudCluster.instance().i18nProvider().get("service.launched", ansi().fgRgb(LogType.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(LogType.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
+        log.info(this.i18nProvider.get("service.launched", ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.id()).reset(), ansi().fgRgb(Log4jColor.WHITE.rgb()).a(service.property(ServiceProperties.PORT())).reset()));
 
         this.services.add(service);
-        EasyCloudCluster.instance().eventProvider().publish(new ServiceStartingEvent(builder.builderId(), service));
+        this.eventProvider.publish(new ServiceStartingEvent(builder.builderId(), service));
         return CompletableFuture.completedFuture(service);
     }
 
@@ -241,14 +274,14 @@ public final class ServiceProviderImpl implements ServiceProvider {
             if (Files.exists(secretPath)) {
                 Files.delete(secretPath);
             }
-            Files.write(secretPath, EasyCloudCluster.instance().configuration().security().value().getBytes());
+            Files.write(secretPath, this.configuration.security.getValue().getBytes());
         } else {
             FileUtils.copyDirectory(templatePath.resolve("global").resolve("server").toFile(), service.directory().toFile());
             FileUtils.copyDirectory(templatePath.resolve("server").resolve(service.group().getName()).toFile(), service.directory().toFile());
         }
 
-        EasyCloudCluster.instance().platformProvider().initializer(group.getPlatform().initializerId()).initialize(service.directory());
-        Configurations.Companion.write(service.directory(), new ServiceDataConfiguration(service.id(), EasyCloudCluster.instance().configuration().security().value(), EasyCloudCluster.instance().configuration().local().clusterPort()));
+        this.platformProvider.initializer(group.getPlatform().initializerId()).initialize(service.directory());
+        Configurations.Companion.write(service.directory(), new ServiceDataConfiguration(service.id(), this.configuration.security.getValue(), this.configuration.local.getClusterPort()));
 
         try {
             Files.copy(resourcesPath.resolve("easycloud-service.jar"), service.directory().resolve("easycloud-service.jar"), StandardCopyOption.REPLACE_EXISTING);
@@ -257,7 +290,7 @@ public final class ServiceProviderImpl implements ServiceProvider {
             return false;
         }
 
-        EasyCloudCluster.instance().moduleService().modules()
+        this.moduleService.modules()
                 .entrySet()
                 .stream()
                 .filter(it -> Arrays.stream(it.getKey().platforms()).toList().stream().anyMatch(it2 -> it2.equals(service.group().getPlatform().initializerId())))
@@ -271,6 +304,15 @@ public final class ServiceProviderImpl implements ServiceProvider {
                 });
 
         try {
+            var cachePath = templatePath.resolve("server").resolve(group.getName()).resolve("cache");
+            if(cachePath.toFile().listFiles() != null && Arrays.stream(cachePath.toFile().listFiles()).anyMatch(it -> it.getName().startsWith("patched"))) {
+                Files.copy(
+                        Arrays.stream(cachePath.toFile().listFiles()).filter(it -> it.getName().startsWith("patched")).findFirst().orElseThrow().toPath(),
+                        service.directory().resolve("platform.jar"),
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+                return true;
+            }
             Files.copy(resourcesPath.resolve("groups").resolve("platforms").resolve(group.getPlatform().initializerId() + "-" + group.getPlatform().version() + ".jar"), service.directory().resolve("platform.jar"), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {
             log.error("Failed to copy platform jar.", exception);

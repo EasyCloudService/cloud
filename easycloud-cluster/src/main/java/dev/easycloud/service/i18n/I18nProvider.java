@@ -1,14 +1,19 @@
 package dev.easycloud.service.i18n;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.configuration.ClusterConfiguration;
+import io.activej.inject.annotation.Inject;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public final class I18nProvider {
+    private final ClusterConfiguration configurations;
     private ResourceBundle bundle;
 
-    public I18nProvider() {
+    @Inject
+    public I18nProvider(ClusterConfiguration configurations) {
+        this.configurations = configurations;
+
         this.buildBundle();
     }
 
@@ -16,7 +21,7 @@ public final class I18nProvider {
         if(!this.bundle.containsKey(key)) {
             return String.format(Locale.ENGLISH, "Missing translation for key: %s", key);
         }
-        var language = EasyCloudCluster.instance().configuration().local().language();
+        var language = this.configurations.local.getLanguage();
         if(!this.bundle.getLocale().equals(language)) {
             this.buildBundle();
         }
@@ -24,6 +29,6 @@ public final class I18nProvider {
     }
 
     private void buildBundle() {
-        this.bundle = ResourceBundle.getBundle("resources/i18n", EasyCloudCluster.instance().configuration().local().language());
+        this.bundle = ResourceBundle.getBundle("i18n", this.configurations.local.getLanguage());
     }
 }

@@ -1,6 +1,6 @@
 package dev.easycloud.service.platform;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.plugin.Plugin;

@@ -1,6 +1,6 @@
 package dev.easycloud.service.platform.initializer.papermc.platform;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.configuration.Configurations;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
@@ -44,7 +44,7 @@ public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
         Map<String, Object> velocity = new HashMap<>();
         velocity.put("enabled", true);
         velocity.put("online-mode", true);
-        velocity.put("secret", EasyCloudCluster.instance().configuration().security().value());
+        velocity.put("secret", EasyCloudClusterOld.instance().configuration().security.getValue());
         proxies.put("velocity", velocity);
 
         Map<String, Object> yamlData;
@@ -76,7 +76,7 @@ public final class PaperPlatformInitializer extends AbstractPaperMCInitializer {
         List<Platform> tmp = new ArrayList<>();
         var versions = this.versions();
         if(versions == null) {
-            log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.fetch.failed", "Paper"));
+            log.error(EasyCloudClusterOld.instance().i18nProvider().get("group.platform.fetch.failed", "Paper"));
             return new ArrayList<>();
         }
 

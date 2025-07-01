@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarInputStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @UtilityClass
@@ -28,8 +29,8 @@ public final class ServiceLaunchFactory {
             "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5",
             "-XX:G1MixedGCCountTarget=4", "-XX:InitiatingHeapOccupancyPercent=15",
             "-XX:G1MixedGCLiveThresholdPercent=90", "-XX:G1RSetUpdatingPauseTimePercent=5",
-            "-XX:SurvivorRatio=32", "-XX:+PerfDisableSharedMem",
-            "-XX:MaxTenuringThreshold=1", "-Dusing.aikars.flags=https://mcflags.emc.gs"
+            "-XX:SurvivorRatio=32", "-XX:+PerfDisableSharedMem", "-XX:MaxTenuringThreshold=1",
+            "-Dusing.aikars.flags=https://mcflags.emc.gs", "-DIReallyKnowWhatIAmDoingISwear=true"
     );
 
     @SneakyThrows
@@ -38,27 +39,32 @@ public final class ServiceLaunchFactory {
         var mainClass = new JarInputStream(Files.newInputStream(serviceFile)).getManifest().getMainAttributes().getValue("Main-Class");
 
         List<String> dependencies = new ArrayList<>();
-        var allowedDependencies = List.of("com.google", "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api", "org.slf4j", "org.apache.logging");
+        var allowedDependencies = List.of(
+                "com.fasterxml", "org.yaml", "io.activej", "org.jetbrains", "dev.easycloud.api",
+                "org.slf4j", "org.apache.logging", "com.google", "jakarta.inject", "aopalliance", "platform.jar"
+        );
         for (File file : Objects.requireNonNull(Path.of("resources").resolve("libs").toFile().listFiles())) {
-            if(allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
+            if (allowedDependencies.stream().anyMatch(it -> file.getName().startsWith(it))) {
                 dependencies.add(file.getAbsolutePath());
             }
         }
 
         List<String> arguments = new ArrayList<>();
         arguments.add("java");
-        arguments.add("--enable-native-access=ALL-UNNAMED");
         arguments.add("-Xms" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.add("-Xmx" + service.group().read(GroupProperties.MEMORY()) + "M");
         arguments.addAll(ARGUMENTS);
 
+        arguments.add("--enable-native-access=ALL-UNNAMED");
+        arguments.add("-Dlog4j.configurationFile=log4j2.xml");
+        arguments.add("-Djline.terminal=jline.UnsupportedTerminal");
         arguments.add("-Dfile.encoding=UTF-8");
         arguments.add("-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener");
         arguments.add("-Dcom.mojang.eula.agree=true");
         arguments.add("-cp");
 
         var libraries = String.join(";", dependencies);
-        if(!isWindows()) libraries = libraries.replace(";", ":");
+        if (!isWindows()) libraries = libraries.replace(";", ":");
 
         arguments.add(serviceFile + (isWindows() ? ";" : ":") + libraries);
         arguments.add("-javaagent:" + serviceFile);

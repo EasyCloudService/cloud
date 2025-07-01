@@ -1,8 +1,13 @@
 package dev.easycloud.service;
 
+import dev.easycloud.service.group.resources.GroupProperties;
+import dev.easycloud.service.network.event.EventProvider;
 import dev.easycloud.service.network.event.resources.ServiceReadyEvent;
 import dev.easycloud.service.network.event.resources.ServiceShutdownEvent;
+import dev.easycloud.service.service.Service;
+import dev.easycloud.service.service.launch.ServiceLaunchBuilder;
 import dev.easycloud.service.service.resources.ServiceProperties;
+import dev.easycloud.service.service.ServiceProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -15,31 +20,40 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Slf4j
 @AllArgsConstructor
 public final class BridgeModulePaper extends JavaPlugin implements Listener {
-
     @Override
     public void onEnable() {
-        EasyCloudService.instance().eventProvider().publish(new ServiceReadyEvent(EasyCloudService.instance().serviceProvider().thisService()));
+        var service = CloudInjector.get().getInstance(Service.class);
+        var eventProvider = CloudInjector.get().getInstance(EventProvider.class);
+        eventProvider.publish(new ServiceReadyEvent(service));
         log.info("Service is now ready!");
+
+        CloudInjector.get().getInstance(ServiceProvider.class).launch(new ServiceLaunchBuilder("Lobby")
+            .override(GroupProperties.MAX_PLAYERS(), 10)
+            .override(GroupProperties.SAVE_FILES(), true)
+            .override(GroupProperties.MEMORY(), 512)
+        );
 
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-        EasyCloudService.instance().eventProvider().publish(new ServiceShutdownEvent(EasyCloudService.instance().serviceProvider().thisService()));
-        EasyCloudService.instance().eventProvider().close();
+        var service = CloudInjector.get().getInstance(Service.class);
+        var eventProvider = CloudInjector.get().getInstance(EventProvider.class);
+        eventProvider.publish(new ServiceShutdownEvent(service));
+        eventProvider.close();
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        var service = EasyCloudService.instance().serviceProvider().thisService();
+        var service = CloudInjector.get().getInstance(Service.class);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), Bukkit.getOnlinePlayers().size());
         service.publish();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        var service = EasyCloudService.instance().serviceProvider().thisService();
+        var service = CloudInjector.get().getInstance(Service.class);
         service.addProperty(ServiceProperties.ONLINE_PLAYERS(), Bukkit.getOnlinePlayers().size() - 1);
         service.publish();
     }

@@ -3,7 +3,7 @@ repositories {
 }
 
 plugins {
-    kotlin("jvm") version "2.2.0-RC2"
+    kotlin("jvm")
 }
 
 dependencies {
@@ -14,7 +14,6 @@ dependencies {
     compileOnly("org.jline:jline:3.30.4")
     compileOnly("org.fusesource.jansi:jansi:2.4.2")
 
-    //compileOnly("io.netty:netty5-all:5.0.0.Alpha5")
     compileOnly("io.activej:activej:6.0-rc2")
     compileOnly("io.activej:activej-net:6.0-rc2")
     compileOnly("io.activej:activej-csp:6.0-rc2")

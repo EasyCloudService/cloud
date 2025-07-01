@@ -1,10 +1,8 @@
 package dev.easycloud.service.command;
 
-import dev.easycloud.service.EasyCloudCluster;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.jline.reader.Completer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +21,14 @@ public final class CommandNode {
 
     public CommandNode(String name, String description, Consumer<String[]> onExecute) {
         this.name = name;
-        this.description = EasyCloudCluster.instance().i18nProvider().get(description);
+        this.description = description;
         this.completer = null;
         this.onExecute = onExecute;
     }
 
     public CommandNode(String name, String description, Function<Void, List<String>> completer, Consumer<String[]> onExecute) {
         this.name = name;
-        this.description = EasyCloudCluster.instance().i18nProvider().get(description);
+        this.description = description;
         this.completer = completer;
         this.onExecute = onExecute;
     }

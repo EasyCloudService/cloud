@@ -5,6 +5,7 @@ repositories {
 
 plugins {
     id("maven-publish")
+    kotlin("jvm")
 }
 
 dependencies {
@@ -13,6 +14,9 @@ dependencies {
     compileOnly("io.activej:activej:6.0-rc2")
     compileOnly("io.activej:activej-net:6.0-rc2")
     compileOnly("io.activej:activej-csp:6.0-rc2")
+
+    compileOnly("org.apache.logging.log4j:log4j-api:2.25.0")
+    compileOnly("org.apache.logging.log4j:log4j-core:2.25.0")
 }
 
 tasks.withType<Jar> {

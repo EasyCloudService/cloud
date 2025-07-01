@@ -1,3 +1,7 @@
+plugins {
+    kotlin("jvm") version "2.2.0-RC2" apply false
+}
+
 allprojects {
     apply(plugin = "java-library")
 
@@ -10,7 +14,9 @@ allprojects {
 
     dependencies {
         "compileOnly"("com.fasterxml.jackson.core:jackson-databind:2.13.4.2")
+
         "compileOnly"("com.google.code.gson:gson:2.12.1")
+        "compileOnly"("io.activej:activej-inject:6.0-rc2")
 
         "compileOnly"("org.projectlombok:lombok:1.18.36")
         "annotationProcessor"("org.projectlombok:lombok:1.18.36")

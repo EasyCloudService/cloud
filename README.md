@@ -13,7 +13,7 @@
 [![Download](https://img.shields.io/github/downloads/EasyCloudService/cloud/total?style=for-the-badge&logo=github&color=2ea043)](https://github.com/EasyCloudService/cloud/releases)
 [![Version](https://img.shields.io/github/v/release/EasyCloudService/cloud?style=for-the-badge&logo=semver&color=blue)](https://github.com/EasyCloudService/cloud/releases)
 [![Discord](https://img.shields.io/discord/1235237612931776512?label=Community&style=for-the-badge&logo=discord&color=7289da)](https://discord.gg/D5EKk9Cr2P)
-[![Wiki](https://img.shields.io/badge/Docs-Wiki-4d7a97?style=for-the-badge&logo=gitbook)](https://github.com/EasyCloudService/cloud/wiki)
+[![Wiki](https://img.shields.io/badge/Docs-Wiki-4d7a97?style=for-the-badge&logo=gitbook)](https://slimwiki.com/easycloud/getting-started/welcome)
 
 **[📥 Download](https://github.com/EasyCloudService/cloud/releases)** • **[📚 Documentation](https://github.com/EasyCloudService/cloud/wiki)** • **[💬 Discord](https://discord.gg/D5EKk9Cr2P)** • **[🐛 Issues](https://github.com/EasyCloudService/cloud/issues)**
 
@@ -26,26 +26,11 @@ If you are using EasyCloudService, you must follow these guidelines.
 
 ---
 
-## 🚀 Quick Start
+## Installation and Docs
+### [slimwiki.com/easycloud/getting-started/welcome](https://slimwiki.com/easycloud/getting-started/welcome)
 
-### Prerequisites
-- ☕ Java 21 or higher
-- 💾 At least 4GB RAM
-- 🌐 Internet connection
-- 🔮 All versions from 1.17 up to 1.21 are supported
-
-### Installation
-[Github Wiki](https://github.com/EasyCloudService/cloud/wiki/Setup)
 ---
 
-## 🔌 API Integration
-
-### Usage Example
-```java
-// Get current service instance
-ServiceProvider provider = EasyCloudService.instance().serviceProvider();
-var service = provider.thisService();
-```
 
 ## 📊 System Requirements
 
@@ -53,7 +38,6 @@ var service = provider.thisService();
 |-------------|---------|-------------|
 | **Java**    | 21+     | 21+         |
 | **RAM**     | 3GB     | 16GB+       |
-| **Storage** | 2GB     | 25GB+       |
 | **CPU**     | 2 Cores | 4+ Cores    |
 
 ---
@@ -88,14 +72,6 @@ Found a bug? Have a great idea? We want to hear from you!
 - 🐛 **Bug Reports**: [Create an Issue](https://github.com/EasyCloudService/cloud/issues/new?template=bug_report.md)
 - 💡 **Feature Requests**: [Request a Feature](https://github.com/EasyCloudService/cloud/issues/new?template=feature_request.md)
 - 💬 **Questions**: Join our [Discord Community](https://discord.gg/D5EKk9Cr2P)
-
----
-
-## 📋 Roadmap
-
-- [ ] 📊 **Web Dashboard** - Beautiful management interface
-- [ ] 🔌 **Module "Marketplace"** - Community-driven modules
-- [ ] ☁️ **Multi-Cloud Support** - Clustering
 
 ---
 

@@ -1,6 +1,6 @@
 package dev.easycloud.service.platform.initializer.papermc.platform;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.platform.Platform;
 import dev.easycloud.service.platform.PlatformType;
 import dev.easycloud.service.platform.initializer.papermc.AbstractPaperMCInitializer;
@@ -27,7 +27,7 @@ public final class VelocityPlatformInitializer extends AbstractPaperMCInitialize
     @SneakyThrows
     public void initialize(Path path) {
         if(!Files.exists(path.resolve("velocity.toml"))) {
-            Files.copy(Objects.requireNonNull(EasyCloudCluster.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml")), path.resolve("velocity.toml"));
+            Files.copy(Objects.requireNonNull(EasyCloudClusterOld.class.getClassLoader().getResourceAsStream("platform/velocity/velocity.toml")), path.resolve("velocity.toml"));
         }
     }
 
@@ -36,7 +36,7 @@ public final class VelocityPlatformInitializer extends AbstractPaperMCInitialize
         List<Platform> tmp = new ArrayList<>();
         var versions = this.versions();
         if(versions == null) {
-            log.error(EasyCloudCluster.instance().i18nProvider().get("group.platform.fetch.failed", "Velocity"));
+            log.error(EasyCloudClusterOld.instance().i18nProvider().get("group.platform.fetch.failed", "Velocity"));
             return new ArrayList<>();
         }
 

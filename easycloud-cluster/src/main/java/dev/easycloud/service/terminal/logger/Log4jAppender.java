@@ -1,6 +1,6 @@
 package dev.easycloud.service.terminal.logger;
 
-import dev.easycloud.service.EasyCloudCluster;
+import dev.easycloud.service.EasyCloudClusterOld;
 import dev.easycloud.service.setup.SetupService;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
@@ -45,14 +45,20 @@ public final class Log4jAppender extends AbstractAppender {
     public void append(@NotNull LogEvent event) {
         var message = event.getMessage().getFormattedMessage();
         if(event.getLevel().name().equals("ERROR")) {
-            message = ansi().fgRgb(LogType.ERROR.rgb()).a(message).reset().toString();
+            message = ansi().fgRgb(Log4jColor.ERROR.rgb()).a(message).reset().toString();
+        }
+
+        for (Log4jColor color : Log4jColor.values()) {
+            var name = color.name().toLowerCase();
+            // replace message parts like "it was <success>successfully<reset>" with colored versions
+            message = message.replace("<" + name + ">", ansi().fgRgb(color.rgb()).toString()).replace("<reset>", ansi().reset().toString());
         }
 
         var PATTERN = ansi()
-                .fgRgb(LogType.GRAY.rgb()).a("[")
-                .fgRgb(LogType.WHITE.rgb()).a(DATE_FORMAT.format(Calendar.getInstance().getTime()))
-                .fgRgb(LogType.GRAY.rgb()).a("]")
-                .fgRgb(LogType.PRIMARY.rgb()).a(" " + event.getLevel().name() + ": ")
+                .fgRgb(Log4jColor.GRAY.rgb()).a("[")
+                .fgRgb(Log4jColor.WHITE.rgb()).a(DATE_FORMAT.format(Calendar.getInstance().getTime()))
+                .fgRgb(Log4jColor.GRAY.rgb()).a("]")
+                .fgRgb(Log4jColor.PRIMARY.rgb()).a(" " + event.getLevel().name() + ": ")
                 .reset().a(format(message) + "\r");
 
         if(message.startsWith("Listening on [/")) {
@@ -72,32 +78,32 @@ public final class Log4jAppender extends AbstractAppender {
                 if(rawMessage.contains("ERROR")) logType = "ERROR";
 
                 System.out.println(ansi()
-                        .fgRgb(LogType.GRAY.rgb()).a("[")
-                        .fgRgb(LogType.WHITE.rgb()).a(DATE_FORMAT.format(Calendar.getInstance().getTime()))
-                        .fgRgb(LogType.GRAY.rgb()).a("]")
-                        .fgRgb(LogType.PRIMARY.rgb()).a(" " + logType + ": ")
+                        .fgRgb(Log4jColor.GRAY.rgb()).a("[")
+                        .fgRgb(Log4jColor.WHITE.rgb()).a(DATE_FORMAT.format(Calendar.getInstance().getTime()))
+                        .fgRgb(Log4jColor.GRAY.rgb()).a("]")
+                        .fgRgb(Log4jColor.PRIMARY.rgb()).a(" " + logType + ": ")
                         .reset().a(format(message) + "\r").toString().replace("SERVICE_LOG: ", "").replace(":" + logType + " : ", ""));
                 return;
             }
-            if (!EasyCloudCluster.instance().terminal().logging() && SetupService.running.isEmpty()) {
+            if (!EasyCloudClusterOld.instance().terminal().logging() && SetupService.running.isEmpty()) {
                 System.out.println(PATTERN.toString());
             }
         } else {
             System.out.println(PATTERN.toString());
         }
-        EasyCloudCluster.instance().terminal().history().add(PATTERN.toString());
+        EasyCloudClusterOld.instance().terminal().history().add(PATTERN.toString());
     }
 
     private String format(String message) {
         return message
-                .replaceAll("\\bsuccessfully\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("successfully").reset().toString())
-                .replaceAll("\\bready\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("ready").reset().toString())
-                .replaceAll("\\bonline\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("online").reset().toString())
-                .replaceAll("\\bshut down\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("shut down").reset().toString())
-                .replaceAll("\\bsuccess\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("success").reset().toString())
-                .replaceAll("\\bcanceled\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("canceled").reset().toString())
-                .replaceAll("\\bcompleted\\b", ansi().fgRgb(LogType.SUCCESS.rgb()).a("completed").reset().toString())
-                .replaceAll("\\berror\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("error").reset().toString())
-                .replaceAll("\\bfailed\\b", ansi().fgRgb(LogType.ERROR.rgb()).a("failed").reset().toString());
+                .replaceAll("\\bsuccessfully\\b", ansi().fgRgb(Log4jColor.SUCCESS.rgb()).a("successfully").reset().toString())
+                .replaceAll("\\bready\\b", ansi().fgRgb(Log4jColor.SUCCESS.rgb()).a("ready").reset().toString())
+                .replaceAll("\\bonline\\b", ansi().fgRgb(Log4jColor.SUCCESS.rgb()).a("online").reset().toString())
+                .replaceAll("\\bshut down\\b", ansi().fgRgb(Log4jColor.ERROR.rgb()).a("shut down").reset().toString())
+                .replaceAll("\\bsuccess\\b", ansi().fgRgb(Log4jColor.SUCCESS.rgb()).a("success").reset().toString())
+                .replaceAll("\\bcanceled\\b", ansi().fgRgb(Log4jColor.ERROR.rgb()).a("canceled").reset().toString())
+                .replaceAll("\\bcompleted\\b", ansi().fgRgb(Log4jColor.SUCCESS.rgb()).a("completed").reset().toString())
+                .replaceAll("\\berror\\b", ansi().fgRgb(Log4jColor.ERROR.rgb()).a("error").reset().toString())
+                .replaceAll("\\bfailed\\b", ansi().fgRgb(Log4jColor.ERROR.rgb()).a("failed").reset().toString());
     }
 }
